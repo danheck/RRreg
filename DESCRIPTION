@@ -1,0 +1,32 @@
+Package: RRreg
+Type: Package
+Title: Correlation and Regression Analyses of Randomized Response Designs
+Authors@R: c(person( given="Daniel
+    W.",family="Heck",email="dheck@mail.uni-mannheim.de", role=c("aut","cre")),
+    person(given="Morten",family="Moshagen",email="moshagen@uni-mannheim.de",
+    rol=c("aut")))
+Author: Daniel W. Heck [aut, cre], Morten Moshagen [aut]
+Maintainer: Daniel W. Heck <dheck@mail.uni-mannheim.de>
+Depends:
+    R (>= 3.0.0)
+Imports:
+    parallel,
+    doParallel,
+    foreach
+Suggests:
+    knitr
+Description: RRreg provides univariate and multivariate methods to analyze
+    randomized response (RR) survey designs (e.g., Warner, S. L. (1965).
+    Randomized response: A survey technique for eliminating evasive answer
+    bias. Journal of the American Statistical Association, 60, 63–69).
+    Besides univariate estimates of true proportions, RR variables can be used
+    for correlations, as dependent variable in a logistic regression and as
+    predictors in a linear regression. For simulation and bootstrap purposes,
+    RR data can be generated according to several models.
+License: GPL-2
+Encoding: UTF-8
+LazyLoad: yes
+URL: http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg/
+VignetteBuilder: knitr
+Version: 0.2.0
+Date: 2014-11-14
