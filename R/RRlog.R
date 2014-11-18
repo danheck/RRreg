@@ -69,7 +69,8 @@ RRlog.default <-function(formula,data,model,p,group, LR.test=TRUE, fit.n=c(10,10
     cnt <- 0
   }
   
-  while (cnt <fit.n[1] | ( (est$logLik==-Inf |max(abs(est$coef))>fit.bound) & cnt <fit.n[2])){
+  while (cnt <fit.n[1] | 
+           ( (est$logLik==-Inf |max(abs(est$coef))>fit.bound) & cnt <fit.n[2])){
     cnt <- cnt +1
     if (cnt == 1){
       glmcoef <- coef(glm.fit(x,y, family=binomial(link = "logit")))
@@ -79,9 +80,9 @@ RRlog.default <-function(formula,data,model,p,group, LR.test=TRUE, fit.n=c(10,10
         start <- c(start, summary(uni)$coef[2,1])
       }
     }else{
-      start <- runif (ncol(x),-1e-4, 1e-4)*(1+25*cnt/fit.n[2])^3
+      start <- runif (ncol(x),-1e-4, 1e-4)*(3+25*cnt/fit.n[2])^3
       if(is2group(model)){
-        start <- c(start, runif(1, .4,.9))
+        start <- c(start, runif(1, .35,.95))
       }
     }
     
@@ -97,13 +98,11 @@ RRlog.default <-function(formula,data,model,p,group, LR.test=TRUE, fit.n=c(10,10
                est2$model="Crosswise"},
              "CDM" = est2 <- RRlog.CDM(x,y,p,start,group, maxit=maxit),
              "CDMsym" = est2 <- RRlog.CDMsym(x,y,p,start,group, maxit=maxit),
-             "SLD" = est2 <- RRlog.SLD(x,y,p,start,group, maxit=maxit))
-      if (!is.na(est2$logLik) && est2$logLik > est$logLik) est <- est2
-#     if(cnt==fit.n[2]){
-#       print(coef(glm.fit(x,y, family=binomial(link = "logit"))))
-#       print(est2$value)
-#       print(est2$par)
-#     }
+             "SLD" = est2 <- RRlog.SLD(x,y,p,start,group, maxit=maxit)
+             )
+      
+    if (!is.na(est2$logLik) && est2$logLik > est$logLik) 
+        est <- est2
   }
 #   if (cnt == fit.n[2]) warning(paste0("Maximum number of fitting replications reached (fit.n=",fit.n[2],"). This could indicate extreme and/or unstable parameter estimates. Consider re-fitting the model (e.g., using fit.n=c(5,1000) and/or fit.bound=25)"))
   

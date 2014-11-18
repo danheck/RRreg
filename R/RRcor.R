@@ -8,7 +8,7 @@
 #' @param group a matrix defining the group membership of each participant (values 1 and 2) for all multiple group models(\code{SLD}, \code{UQTunknown}). If only one of these models is included in \code{models}, a vector can be used. For more than one model, each column should contain one grouping variable 
 #' @param bs.n number of samples used to get bootstrapped standard errors
 #' @param bs.type to get boostrapped standard errors, use \code{"se.p"} for the parametric and/or \code{"se.n"} for the nonparametric bootstrap. Use \code{"pval"} to get p-values from the parametric bootstrap (assuming a true correlation of zero). Note that \code{bs.n} has to be larger than 0. The parametric bootstrap is based on the assumption, that the continuous variable is normally distributed within groups defined by the true state of the RR variable. For polytomous forced response (FR) designs, the RR variable is assumed to have equally spaced distances between categories (i.e., that it is interval scaled)
-#  @param pval if \code{TRUE}, p-values are obtained from a separate parametric bootstrap using the null hypothesis that the true correlation is zero (i.e., rho=0; note that \code{bs.n} must be larger than zero)
+#  @param pval if \code{TRUE}, p-values are obtained from a separate parametric bootstrap using the null hypothesis that the true correlation is zero (i.e., cor=0; note that \code{bs.n} must be larger than zero)
 #' @param nCPU number of CPUs used for the bootstrap
 #' @return \code{RRcor} returns a list with the following components:: 
 #' 
@@ -29,25 +29,23 @@
 #' @examples 
 #' # generate first RR variable
 #' n <-1000
-#' p1 <- c(.4,.6)
+#' p1 <- c(.3,.7)
 #' gData <- RRgen(n,pi=.3,model="Kuk",p1)
-#' n1 <- table(gData$true)[1]
-#' gData[gData$true==0,4] <-  rnorm(n1)
-#' gData[gData$true==1,4] <-  rnorm(n-n1,mean=0.7)
 #' 
 #' # generate second RR variable
-#' p2 <- c(.7,.4)
-#' temp <- RRgen(n1,pi=.2,model="UQTknown",p2)
-#' gData$uqtResponse[gData$true==0] <- temp$response
-#' gData$uqtTrue[gData$true==0] <- temp$true
-#' temp <- RRgen(n-n1,pi=.7,model="Kuk",p2)
-#' gData$uqtResponse[gData$true==1] <- temp$response
-#' gData$uqtTrue[gData$true==1] <- temp$true
+#' p2 <- c(.8,.5)
+#' t2 <- rbinom(n=n, size=1, prob=(gData$true+1)/2)
+#' temp <- RRgen(model="UQTknown",p=p2, trueState=t2)
+#' gData$UQTresp <- temp$response
+#' gData$UQTtrue <- temp$true
 #' 
-#' # show true correlation
-#' cor(gData[,c("true","V4","uqtTrue")])
-#' # estimated correlation
-#' RRcor(x=gData[,c("response","V4","uqtTrue")],models=c("Kuk","d","UQTknown"),p.list= list(p1,p2) )
+#' # generate continuous covariate
+#' gData$cov <- rnorm(n,0,4) + gData$UQTtrue + gData$true
+#' 
+#' # estimate correlations using directly measured / RR variables
+#' cor(gData[,c("true","cov","UQTtrue")])
+#' RRcor(x=gData[,c("response","cov","UQTresp")],
+#'       models=c("Kuk","d","UQTknown"),p.list= list(p1,p2) )
 #' @import doParallel
 #' @import parallel
 #' @import foreach
@@ -316,11 +314,11 @@ rownames(r) <- colnames(X)
 colnames(r) <- colnames(X)
 
 if (sum( r < -1, na.rm=T) >0){
-  warning("The corrected correlation was smaller than -1 and thus set to -1.")
+#   warning("The corrected correlation was smaller than -1 and thus set to -1.")
   r[-r >1] <- -1
 }
 if (sum( r > 1, na.rm=T) >0){
-  warning("The corrected correlation was larger than 1 and thus set to 1.")
+#   warning("The corrected correlation was larger than 1 and thus set to 1.")
   r[r>1] <- 1
 }
 

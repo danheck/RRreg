@@ -16,7 +16,7 @@
 #' @param alpha significance threshold for testing the logistic regression parameter \code{beta}
 #' @param groupRatio proportion of participants in group 1. Only for two-group models (e.g., \code{"SLD"}) (for 2 RR variables: \code{vector})
 #' @param MLest correct estimates of \code{RRuni} if pi is outside of [0,1]
-#' @param getPval whether to compute p-values and power for \code{method="RRcor"} (performs an additional bootstrap assuming independence)
+#' @param getPower whether to compute power for \code{method="RRcor"} (performs an additional bootstrap assuming independence)
 #' @param nCPU integer: how many processors to use? (use 'max' for automatic detection on Windows)
 #' @return a list containing:
 #' 
@@ -34,17 +34,16 @@
 #' \code{cor} has to be used. In case of two dichotomous RR variables, the true group membership of individuals is sampled from a 2x2 cross table. Within this table, probabilities are chosen in a way, to obtain the point-tetrachoric correlation defined by \code{cor}
 #' 
 #' Note, that for the FR model with multiple response categories (e.g., from 0 to 4), the specified \code{cor} is not the exact target of the sampling procedure. It assumes a normal distribution for each true state, with constant differences between the groups (i.e., it assumes an interval scaled variable).
-#' @examples # Simulate data according to the Warner model
-#' mcsim <-  RRsimu(numRep=5, n=200, pi=.3, model="Warner", p=2/12, cor=.6)
-#' mcsim
-#' plot(mcsim)
+#' @examples # Not run: Simulate data according to the Warner model
+#' # mcsim <-  RRsimu(numRep=100, n=300, pi=.4, model="Warner", p=.2, cor=.3)
+#' # print(mcsim)
 #' @import doParallel
 #' @import parallel
 #' @import foreach
 #' @export
 RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0, complyRates=c(1,1), 
                    sysBias=c(0,0), method=c("RRuni","RRcor","RRlog","RRlin"), 
-                   alpha=0.05, groupRatio=0.5, MLest=TRUE, getPval=TRUE, nCPU=1){
+                   alpha=0.05, groupRatio=0.5, MLest=TRUE, getPower=TRUE, nCPU=1){
   try(stopCluster(cl.tmp), silent = T)
   
   modelNames <- c("Warner","UQTknown","UQTunknown","Mangat","Kuk","FR","Crosswise","direct","CDM","CDMsym","SLD")
@@ -98,7 +97,7 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0, complyRates=c(1,1),
   }
   
   ### CDM and CDMsym not available in RRcor
-  if (any(model %in% c("CDM","CDMsym"))){
+  if (any(model %in% c("CDM","CDMsym")) && any( c("RRlin","RRcor") %in% method)){
     method <- method[!(method == "RRcor")]
     warning("Models 'CDM' and 'CDMsym' are not available in RRcor because both define a third group of cheaters (see vignette('RRreg') ).")
   }
@@ -309,25 +308,26 @@ results <- data.frame(Mean=colMeans(parEsts,na.rm =T),
 ####################################### COMPUTE POWER ###########################################
 power <- rep(-1,4) 
 names(power) <-  c("RRuni(z-test)", "RRcor(par_bootstrap)","RRlog(LR-test)","RRlin(Wald-test)")
-if (!twoRR){
-  if("RRuni" %in% method){
-    z_val <- parEsts[,"pi.RRuni"] / parEsts[,"piSE.RRuni"]
-    power[1] <- sum( pnorm(z_val,lower.tail=F) < alpha, na.rm =T)/ (nrow(parEsts)-NAs["pi.RRuni"])
-  }
-  if ("RRcor" %in% method && getPval){
-    simH0 <- RRsimu(numRep=numRep, n=n, pi=pi, model = model, p=p, MLest=TRUE, complyRates =complyRates,
-                    sysBias = sysBias, groupRatio=groupRatio, method="RRcor",getPval=F, nCPU=nCPU)
-    crit <- quantile(ecdf(abs(simH0$parEsts[,"cor.RRcor"])), 1-alpha)
-    power[2] <- sum(abs(parEsts[,"cor.RRcor"]) > crit, na.rm=T)/(nrow(parEsts)-NAs["cor.RRcor"])
-  }
-  if ("RRlog" %in% method){
-    prob <- pchisq(parEsts[,"beta.deltaG2.RRlog"], 1, lower.tail=F)
-    power[3] <- sum(prob < alpha, na.rm =T)/ (nrow(parEsts)-NAs["beta.deltaG2.RRlog"])
-  }
-  if ("RRlin" %in% method){
-    z_val <- parEsts[,"lincoef.RRlin"] / parEsts[,"lincoefSE.RRlin"]
-    power[4] <- sum( pnorm( abs(z_val), lower.tail=F) < alpha/2, na.rm =T) / (nrow(parEsts)-NAs["lincoef.RRlin"])
-  }
+if(!twoRR && "RRuni" %in% method){
+  z_val <- parEsts[,"pi.RRuni"] / parEsts[,"piSE.RRuni"]
+  power[1] <- sum( pnorm(z_val,lower.tail=F) < alpha, na.rm =T)/ (nrow(parEsts)-NAs["pi.RRuni"])
+}
+if ("RRcor" %in% method && getPower){
+  simH0 <- RRsimu(numRep=numRep, n=n, pi=pi, model = model, 
+                  p=p, MLest=TRUE, complyRates =complyRates,
+                  sysBias = sysBias, groupRatio=groupRatio, 
+                  method="RRcor",getPower=F, nCPU=nCPU)
+  crit <- quantile(ecdf(abs(simH0$parEsts[,"cor.RRcor"])), 1-alpha)
+  power[2] <- sum(abs(parEsts[,"cor.RRcor"]) > crit, na.rm=T)/
+    (nrow(parEsts)-NAs["cor.RRcor"])
+}
+if ("RRlog" %in% method){
+  prob <- pchisq(parEsts[,"beta.deltaG2.RRlog"], 1, lower.tail=F)
+  power[3] <- sum(prob < alpha, na.rm =T)/ (nrow(parEsts)-NAs["beta.deltaG2.RRlog"])
+}
+if (!twoRR &&"RRlin" %in% method){
+  z_val <- parEsts[,"lincoef.RRlin"] / parEsts[,"lincoefSE.RRlin"]
+  power[4] <- sum( pnorm( abs(z_val), lower.tail=F) < alpha/2, na.rm =T) / (nrow(parEsts)-NAs["lincoef.RRlin"])
 }
 power <- power[power != -1]
 

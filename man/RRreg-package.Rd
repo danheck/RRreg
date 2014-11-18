@@ -12,13 +12,12 @@ The package \code{RRreg} provides univariate and multivariate methods for random
 Package: \tab RRreg\cr
 Type: \tab Package\cr
 Version: \tab 0.2.0\cr
-Date: \tab 2014-11-14\cr
+Date: \tab 2014-11-18\cr
 Depends: \tab R (>= 3.0.0)\cr
 Imports: \tab parallel, doParallel, foreach\cr
 Suggests: \tab knitr\cr
 License: \tab GPL-2\cr
 URL: \tab \url{http://psycho3.uni-mannheim.de/Home/Research/Software/}\cr
-Vignette: \tab \url{https://dl.dropboxusercontent.com/u/21456540/RRreg/index.html}\cr
 }
 }
 \author{

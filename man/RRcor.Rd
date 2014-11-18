@@ -45,25 +45,23 @@ Note that the continuous RR model \code{mix.norm} with the randomization paramet
 \examples{
 # generate first RR variable
 n <-1000
-p1 <- c(.4,.6)
+p1 <- c(.3,.7)
 gData <- RRgen(n,pi=.3,model="Kuk",p1)
-n1 <- table(gData$true)[1]
-gData[gData$true==0,4] <-  rnorm(n1)
-gData[gData$true==1,4] <-  rnorm(n-n1,mean=0.7)
 
 # generate second RR variable
-p2 <- c(.7,.4)
-temp <- RRgen(n1,pi=.2,model="UQTknown",p2)
-gData$uqtResponse[gData$true==0] <- temp$response
-gData$uqtTrue[gData$true==0] <- temp$true
-temp <- RRgen(n-n1,pi=.7,model="Kuk",p2)
-gData$uqtResponse[gData$true==1] <- temp$response
-gData$uqtTrue[gData$true==1] <- temp$true
+p2 <- c(.8,.5)
+t2 <- rbinom(n=n, size=1, prob=(gData$true+1)/2)
+temp <- RRgen(model="UQTknown",p=p2, trueState=t2)
+gData$UQTresp <- temp$response
+gData$UQTtrue <- temp$true
 
-# show true correlation
-cor(gData[,c("true","V4","uqtTrue")])
-# estimated correlation
-RRcor(x=gData[,c("response","V4","uqtTrue")],models=c("Kuk","d","UQTknown"),p.list= list(p1,p2) )
+# generate continuous covariate
+gData$cov <- rnorm(n,0,4) + gData$UQTtrue + gData$true
+
+# estimate correlations using directly measured / RR variables
+cor(gData[,c("true","cov","UQTtrue")])
+RRcor(x=gData[,c("response","cov","UQTresp")],
+      models=c("Kuk","d","UQTknown"),p.list= list(p1,p2) )
 }
 \references{
 Fox, J. A., & Tracy, P. E. (1984). Measuring associations with randomized response. \emph{Social Science Research, 13}, 188-197.

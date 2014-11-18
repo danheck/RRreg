@@ -17,6 +17,8 @@ powerplot(numRep, n = c(100, 500, 1000), pi, cor = c(0, 0.1, 0.3),
 
 \item{cor}{vector of true correlations}
 
+\item{b.log}{vector of true logistic regression coefficients}
+
 \item{model}{randomized response model}
 
 \item{p}{randomization probability}
@@ -32,6 +34,8 @@ powerplot(numRep, n = c(100, 500, 1000), pi, cor = c(0, 0.1, 0.3),
 \item{alpha}{type-I error used to estimate power}
 
 \item{nCPU}{number of CPUs to be used}
+
+\item{show.messages}{toggle printing of progress messages}
 }
 \value{
 a list of the class \code{powerplot} containing an array \code{res} with the power estimates and details of the simulation (e.g., model, p, pi, etc.)
@@ -41,8 +45,9 @@ Uses the function \code{\link{RRsimu}} to estimate the power of the multivariate
 }
 \examples{
 # Not run
-# powerplot(100, n=c(150,250), cor=c(0,.3,.5),
-#        pi=.6, model="Warner", p=.3, nCPU=4)
+# pplot <- powerplot(100, n=c(150,250), cor=c(0,.3,.5),
+#                   method="RRlog",pi=.6, model="Warner", p=.3)
+# plot(pplot)
 }
 \seealso{
 \code{\link{RRsimu}} for Monte-Carlo simulation / parametric bootstrap

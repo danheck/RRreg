@@ -1,10 +1,12 @@
 #' Power plots for multivariate RR methods
 #' 
 #' Uses the function \code{\link{RRsimu}} to estimate the power of the multivariate RR methods (correlation \code{\link{RRcor}}, logistic regression \code{\link{RRlog}}, and/or linear regression \code{\link{RRlin}}.
+#' 
 #' @param numRep number of boostrap replications
 #' @param n vector of samples sizes
 #' @param pi true prevalence
 #' @param cor vector of true correlations
+#' @param b.log vector of true logistic regression coefficients
 #' @param model randomized response model
 #' @param p randomization probability
 #' @param method multivariate RR method
@@ -13,13 +15,15 @@
 #' @param groupRatio ratio of subgroups in two-group RR designs
 #' @param alpha type-I error used to estimate power
 #' @param nCPU number of CPUs to be used
+#' @param show.messages toggle printing of progress messages
 #' 
 #' @return
 #' a list of the class \code{powerplot} containing an array \code{res} with the power estimates and details of the simulation (e.g., model, p, pi, etc.)
 #' @examples 
 #' # Not run
-#' # powerplot(100, n=c(150,250), cor=c(0,.3,.5),
-#' #        pi=.6, model="Warner", p=.3, nCPU=4)
+#' # pplot <- powerplot(100, n=c(150,250), cor=c(0,.3,.5),
+#' #                   method="RRlog",pi=.6, model="Warner", p=.3)
+#' # plot(pplot)
 #' @seealso \code{\link{RRsimu}} for Monte-Carlo simulation / parametric bootstrap
 #' @export
 powerplot <- function(numRep, n=c(100,500,1000), pi, cor=c(0,.1,.3), b.log=NULL, 
@@ -48,8 +52,9 @@ powerplot <- function(numRep, n=c(100,500,1000), pi, cor=c(0,.1,.3), b.log=NULL,
   for (nn in 1:length(n)){
     for (c in 1:ncor){
       sim <- RRsimu(numRep=numRep, n=n[nn], pi=pi, model=model, p=p, method=method,
-                    cor=cor[c], b.log=b.log[c], complyRates = complyRates, sysBias = sysBias, 
-                    groupRatio=groupRatio, alpha=alpha, nCPU=nCPU, getPval=T)
+                    cor=cor[c], b.log=b.log[c], complyRates = complyRates, 
+                    sysBias = sysBias, groupRatio=groupRatio, alpha=alpha, 
+                    nCPU=nCPU, getPower=T)
       res[nn,c,] <- sim$power
       if(show.messages)
         print(paste("n =",nn, "of", length(n),"; C =",c, "of",length(cor)))
@@ -89,6 +94,8 @@ plot.powerplot <- function(x, y, ...){
   b.log <- x$b.log
   method <- x$method
   nmet <- length(method)
+  model <- x$model
+  p <- x$p
   if(!all(b.log==0)){
     cor <- b.log
     leg <- "b.log ="
@@ -100,11 +107,21 @@ plot.powerplot <- function(x, y, ...){
   xpd <- par("xpd")
   oma <- par("oma")
   mar <- par("mar")
+  
   par(mfrow=c(1,nmet+1), mar=c(4,4,3,1)+.1, oma=c(0,0,0,0))
   for (i in 1:nmet){
+    if (length(model) == 1){
+      main = paste0( model, "(",paste0(p,collapse=","),")", "-",method[i])
+    }else{
+      main = paste0( model[1], "(",paste0(p[[1]],collapse=","),")","-",
+                    model[2], "(",paste0(p[[2]],collapse=","),")", "-",
+                    method[i])
+    }
+    
     ll <- 1
     plot(n, res[,1,i],type="o", ylim=0:1, ylab=paste0("Power"), 
-         xlab="Sample size", bty='L', main=paste(method[i]))
+         xlab="Sample size", bty='L', 
+         main=main)
     if (length(cor)>1){
       for (c in 2:length(cor)){
         lines(n, res[,c,i],lty=rep(1:6,4)[c], col=cols[c])

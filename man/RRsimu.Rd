@@ -5,7 +5,7 @@
 \usage{
 RRsimu(numRep, n, pi, model, p, cor = 0, b.log = 0, complyRates = c(1, 1),
   sysBias = c(0, 0), method = c("RRuni", "RRcor", "RRlog", "RRlin"),
-  alpha = 0.05, groupRatio = 0.5, MLest = TRUE, getPval = TRUE,
+  alpha = 0.05, groupRatio = 0.5, MLest = TRUE, getPower = TRUE,
   nCPU = 1)
 }
 \arguments{
@@ -35,7 +35,7 @@ RRsimu(numRep, n, pi, model, p, cor = 0, b.log = 0, complyRates = c(1, 1),
 
 \item{MLest}{correct estimates of \code{RRuni} if pi is outside of [0,1]}
 
-\item{getPval}{whether to compute p-values and power for \code{method="RRcor"} (performs an additional bootstrap assuming independence)}
+\item{getPower}{whether to compute power for \code{method="RRcor"} (performs an additional bootstrap assuming independence)}
 
 \item{nCPU}{integer: how many processors to use? (use 'max' for automatic detection on Windows)}
 }
@@ -63,9 +63,8 @@ Two RR variables:
 Note, that for the FR model with multiple response categories (e.g., from 0 to 4), the specified \code{cor} is not the exact target of the sampling procedure. It assumes a normal distribution for each true state, with constant differences between the groups (i.e., it assumes an interval scaled variable).
 }
 \examples{
-# Simulate data according to the Warner model
-mcsim <-  RRsimu(numRep=5, n=200, pi=.3, model="Warner", p=2/12, cor=.6)
-mcsim
-plot(mcsim)
+# Not run: Simulate data according to the Warner model
+# mcsim <-  RRsimu(numRep=100, n=300, pi=.4, model="Warner", p=.2, cor=.3)
+# print(mcsim)
 }
 

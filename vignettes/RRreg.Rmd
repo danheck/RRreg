@@ -19,7 +19,7 @@ Correlation and regression analysis for randomized response designs
 
 Daniel W. Heck, <dheck@mail.uni-mannheim.de>
 
-Last update: November 14th, 2014
+Last update: November 18th, 2014
 
 1) Introduction
 ---------------------------------------
@@ -270,7 +270,7 @@ In the forced response (FR) model (also known as directed-answers model), a know
 
 ![title](figure/FR.jpg)
 
-The FR model can easily be extended to account for more than two response categories. For instance, responses can be given on a 5-point Likert scale from 0 to 4. For these categories, the randomization probabilities, determining the proportion of forced responses, are provided in a vector `p=c(p[1], p[2],...,p[5])`. The sum of these probabilities must be smaller than one. This polytomous RR model can be used with the functions `RRgen`, `RRuni`, `RRcor`, and `RRlin`. Only the logistic RR regression `RRlog` requires a dichotomous response format for the FR method.
+The FR model can easily be extended to account for more than two response categories. For instance, responses can be given on a 5-point Likert scale from 0 to 4. For these categories, the randomization probabilities, determining the proportion of forced responses, are provided in a vector `p=c(p[1], p[2],...,p[5])`. The sum of these probabilities must be smaller than one. This polytomous RR model can be used with the functions `RRgen`, `RRuni`, `RRcor`, and `RRlin` (the logistic RR regression `RRlog` requires a dichotomous response format).
 
 The following code snippets illustrate, how the FR method is used with multiple response categories:
 
@@ -316,7 +316,7 @@ For several reasons, RR designs were proposed that require two independent rando
 
 For these two-group models, the functions `RRuni`, `RRcor`, `RRlog`, and `RRlin` additionally require a vector `group` with values in 1 and 2, indicating the group membership of each respondent. If more than one RR variable is in the model, `group` is specified by a matrix containing the corresponding group vectors (one in each column) in the same order as the RR variables appear in the model. Moreover, the randomization probability `p` often specifies different values for the two groups. Code examples are given in [Section 5.5](#two-group-code-example).
 
-Note that in the functions `RRcor` and `RRlin`, the second parameter of these two-group models is estimated first and then treated as a fixed constant in further computations. Ideally, the second parameter should be treated as an additional, free parameter in the optimization routine (this is the case for the function `RRlog`). However, simulations show that the results are still adequate. Use `RRsimu` to run such a simulation for `RRcor` yourself. Furthermore, `RRcor` uses only the most informative subgroup of a two-group RR variable (e.g., for SLD, the group with the larger randomization probability `p`). According to simulations, this provides better results than averaging estimated correlations across subgroups.
+Note that in the functions `RRcor` and `RRlin`, the second parameter of these two-group models is estimated first and then treated as a fixed constant in further computations. For the maximum likelihood estimation in `RRlin`, the second parameter should ideally be included as an additional, free parameter to provide unbiased standard errors (this is the case for the function `RRlog`). However, simulations show that the results are still adequate. `RRsimu` can be used to run such a simulations yourself and get bootstrapped standard errors.
 
 &nbsp;
 
