@@ -6,16 +6,20 @@
 #' A dichotomous variable, measured by a randomized response method, serves as dependent variable using one or more continuous and/or categorical predictors
 #' @param formula specifying the regression model, see \code{\link{formula}}
 #' @param data \code{data.frame}, in which variables can be found (optional)
-#' @param model Available RR models: \code{"Warner","UQTknown","UQTunknown","Mangat","Kuk","FR","Crosswise","CDM","CDMsym","SLD"}. See \code{vignette("RRreg")} for details.
-#' @param p randomization probability/probabilities (depending on model)
+#' @param model Available RR models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}. See \code{vignette("RRreg")} for details.
+#\code{"custom"} (custom: the argument \code{p} defines the sensitivity and specificity of the binary RR response, i.e., the probabilities P(1 | 1) and P(0 | 0))
+#'
+#' @param p randomization probability/probabilities (depending on model, see \code{\link{RRuni}} for details)
 #' @param group vector specifying group membership. Can be omitted for single-group RR designs (e.g., Warner). For two-group RR designs (e.g., \code{CDM} or \code{SLD}), use 1 and 2 to indicate the group membership, matching the respective randomization probabilities \code{p[1], p[2]}. If an RR design and a direct question (DQ) were both used in the study, the group indices are set to 0 (DQ) and 1 (RR; 1 or 2 for two-group RR designs). This can be used to test, whether the RR design leads to a different prevalence estimate by including a dummy variable for the question format (RR vs. DQ) as predictor. If the corresponding regression coefficient is significant, the prevalence estimates differ between RR and DQ. Similarly, interaction hypotheses can be tested (e.g., the correlation between a sensitive attribute and a predictor is only found using the RR but not the DQ design). Hypotheses like this can be tested by including the interaction of the DQ-RR-dummy variable and the predictor in \code{formula} (e.g., \code{RR ~ dummy*predictor}).
 #' @param LR.test test regression coefficients by a likelihood ratio test, i.e., fitting the model repeatedly while excluding one parameter at a time
 # @param intercept should  the model contain an intercept?
-#' @param fit.n Minimum and maximum number of fitting replications using random starting values to avoid local maxima (only if \code{start=NULL})
-#' @param fit.bound The model is fitted repeatedly either until the absolute parameter estimates are below \code{fit.bound} or the maximum number of fitting replication is reached. Thereby, stability of the estimates is increased. \code{fit.bound} should be increased if extreme parameter estimates are to be expected.
-#' @param start starting values for optimization. Might be useful if model does not converge with default starting values.
-#' @param maxit Maximum number of iterations within each run of \code{optim}
+#' @param fit.n Number of fitting replications using random starting values to avoid local maxima
+#' param fit.bound The model is fitted repeatedly either until the absolute parameter estimates are below \code{fit.bound} or the maximum number of fitting replication is reached. Thereby, stability of the estimates is increased. \code{fit.bound} should be increased if extreme parameter estimates are to be expected.
+#' @param EM.max maximum number of iterations of the EM algorithm. If \code{EM.max=0}, the EM algorithm is skipped.
+#' @param optim.max Maximum number of iterations within each run of \code{optim}
+# @param start starting values for optimization. Might be useful if model does not converge with default starting values.
 #' @param ... ignored
+#' @details The logistic regression model is fitted first by an EM algorithm, in which the dependend RR variable is treated as a misclassified binary variable (Magder & Hughes, 1997). The results are used as starting values for a Newton-Raphson based optimization by \code{\link{optim}}. Note that random starting values are only used if \code{fit.n>1}; otherwise, starting valeus are computed by a standard logistic regression on the RR variable.
 #' @author Daniel W. Heck
 #' @seealso \code{vignette('RRreg')} or \url{https://dl.dropboxusercontent.com/u/21456540/RRreg/index.html} for a detailed description of the RR models and the appropriate definition of \code{p} 
 #' @return Returns an object \code{RRlog} which can be analysed by the generic method \code{\link{summary}}
@@ -26,18 +30,17 @@
 #' dat$covariate <- rnorm(1000)
 #' dat$covariate[dat$true==1] <- rnorm(sum(dat$true==1),.4,1)
 #' # analyse
-#' ana <- RRlog(response~covariate,dat,"Warner",.8, fit.n = c(1,5))
+#' ana <- RRlog(response~covariate,dat,"Warner",.8, fit.n = 1)
 #' summary(ana)
-# @rdname RRlog
 #' @export
-RRlog <- function(formula, data,model, p,group, LR.test=TRUE, 
-                  fit.n=c(10,100),fit.bound=10, maxit=1000, 
-                  start=NULL, ...) UseMethod("RRlog")
+RRlog <- function(formula, data, model, p,group, LR.test=TRUE, 
+                  fit.n=1, EM.max=1000, optim.max=500,  ...) UseMethod("RRlog")
 
 # choose model and construct S3 method 'RRlog' 
 
 #' @export
-RRlog.default <-function(formula,data,model,p,group, LR.test=TRUE, fit.n=c(10,100), fit.bound=10, maxit=1000, start=NULL, ...){
+RRlog.default <-function(formula, data, model, p, group, LR.test=TRUE, fit.n=1, 
+                         EM.max=1000, optim.max=500, ...){
   # not very nice: avoiding CMD CHECK errors by using the same parameter names as in the generic function
   x <- formula;
   y <- data;
@@ -61,50 +64,89 @@ RRlog.default <-function(formula,data,model,p,group, LR.test=TRUE, fit.n=c(10,10
   
   # get estimates repeatedly (because of local minima and starting points)
   est <- list(logLik = -Inf, coef=Inf)
-  # given starting values
-  if (! ( missing(start) || is.null(start) || is.na(start))){
-    start <- RRcheck.start(model,x,start) 
-    cnt <- fit.n[2]-1
-  }else{  
-    cnt <- 0
+  uni <- RRuni(response=y,model=model,p=p,group=group)
+  
+  ## EM: get sensitivity P(1 | 1) and specificity P(0 | 0) from missclassification matrices (separately for groups)
+  n <- length(y)
+  sens <- rep(1, n)
+  spec <- rep(1, n)
+  #   if(model == "custom"){
+  #     sens[group == 1] <- p[1]
+  #     sens[group == 1] <- p[2]
+  if (!(is2group(model))){
+    P <- getPW(model, p, 1, NULL)
+    sens[group == 1] <- P[2,2]
+    spec[group == 1] <- P[1,1]
+  }else{
+    P1 <- getPW(model, p, 1, summary(uni)$coef[2,1])
+    sens[group == 2] <- P1[2,2]
+    spec[group == 2] <- P1[1,1]
+    P2 <- getPW(model, p, 2, summary(uni)$coef[2,1])
+    sens[group == 2] <- P1[2,2]
+    spec[group == 2] <- P1[1,1]
   }
   
-  while (cnt <fit.n[1] | 
-           ( (est$logLik==-Inf |max(abs(est$coef))>fit.bound) & cnt <fit.n[2])){
-    cnt <- cnt +1
-    if (cnt == 1){
-      glmcoef <- coef(glm.fit(x,y, family=binomial(link = "logit")))
-      start <- glmcoef
-      if(is2group(model)){
-        uni <- RRuni(response=y,model=model,p=p,group=group)
-        start <- c(start, summary(uni)$coef[2,1])
-      }
-    }else{
-      start <- runif (ncol(x),-1e-4, 1e-4)*(3+25*cnt/fit.n[2])^3
-      if(is2group(model)){
-        start <- c(start, runif(1, .35,.95))
-      }
-    }
+  for (cnt in 1:fit.n){
+    # | ( (est$logLik==-Inf |max(abs(est$coef))>fit.bound) & cnt <fit.n[2]) # old scheme: fit.n=c(5,20)
     
-      switch(model,
-             "Warner" = est2 <- RRlog.Warner(x,y,p,start,group, maxit=maxit) ,
-             "UQTknown" = est2 <- RRlog.UQTknown(x,y,p,start,group, maxit=maxit),
-             "UQTunknown" = est2 <- RRlog.UQTunknown(x,y,p,start,group, maxit=maxit),
-             "Mangat" = est2 <- RRlog.Mangat(x,y,p,start,group, maxit=maxit),
-             "Kuk" = est2 <- RRlog.Kuk(x,y,p,start,max(y),group, maxit=maxit),
-             "FR" = est2 <- RRlog.FR(x,y,p,start,group, maxit=maxit),
-             "Crosswise" = {
-               est2 <- RRlog.Warner(x,y,p,start,group, maxit=maxit)
-               est2$model="Crosswise"},
-             "CDM" = est2 <- RRlog.CDM(x,y,p,start,group, maxit=maxit),
-             "CDMsym" = est2 <- RRlog.CDMsym(x,y,p,start,group, maxit=maxit),
-             "SLD" = est2 <- RRlog.SLD(x,y,p,start,group, maxit=maxit)
-             )
+    # random dependent variable to get different starting values for EM:
+    yy <- ifelse(rbinom(n, 1, min(.6,(cnt-1)/fit.n)) == 1, rbinom(n, 1, .5), y)
+    #     print(sum(yy == y) /n)   # proporiton of identical RR outcomes for starting values
+    glm.mod <- glm.fit(x, yy, family=binomial(link = "logit"))
+    
+    #     print(paste(Sys.time(), "Start EM"))
+    ####################### EM Algorithm: Magder & Hughes (1997)
+    EM.cnt <- 0
+    repeat{
+      EM.cnt <- EM.cnt+1
+      eb <- glm.mod$fitted.values
+      beta <- glm.mod$coef
       
+      # Expectation:
+      EY <- ifelse(y==0,(1-sens)*eb/((1-sens)*eb+spec*(1-eb)),
+                   sens*eb/(sens*eb+(1-spec)*(1-eb)))
+      
+      # Maximization:
+      suppressWarnings(glm.mod <- glm.fit(x, EY, family = binomial(link="logit"), 
+                                          control=list(maxit=5000), start=beta))
+      # stopping criterium
+      if(EM.cnt >= EM.max | sqrt(sum((glm.mod$coef - beta)^2)) < 1e-5) break
+    }
+    #     print(EM.cnt)
+    #   z <- model.matrix(formula,data=data)
+    #   glm.mod$var <- solve(t(z)%*%(z*(eb*(1-eb) - EY*(1-EY))))
+    
+    # starting values for optim
+    start <- coef(glm.mod)
+    if(is2group(model)){
+      start <- c(start, summary(uni)$coef[2,1])   # par2: e.g. t for SLD
+    }
+    #     print(paste(Sys.time(), " - Start optim"))
+    
+    ####################### optim estimation
+    switch(model,
+           "Warner" = est2 <- RRlog.Warner(x,y,p,start,group, maxit=optim.max) ,
+           "UQTknown" = est2 <- RRlog.UQTknown(x,y,p,start,group, maxit=optim.max),
+           "UQTunknown" = est2 <- RRlog.UQTunknown(x,y,p,start,group, maxit=optim.max),
+           "Mangat" = est2 <- RRlog.Mangat(x,y,p,start,group, maxit=optim.max),
+           "Kuk" = est2 <- RRlog.Kuk(x,y,p,start,max(y),group, maxit=optim.max),
+           "FR" = est2 <- RRlog.FR(x,y,p,start,group, maxit=optim.max),
+           "Crosswise" = {
+             est2 <- RRlog.Warner(x,y,p,start,group, maxit=optim.max)
+             est2$model="Crosswise"},
+           "CDM" = est2 <- RRlog.CDM(x,y,p,start,group, maxit=optim.max),
+           "CDMsym" = est2 <- RRlog.CDMsym(x,y,p,start,group, maxit=optim.max),
+           "SLD" = est2 <- RRlog.SLD(x,y,p,start,group, maxit=optim.max)
+    )
+    
     if (!is.na(est2$logLik) && est2$logLik > est$logLik) 
-        est <- est2
+      est <- est2
   }
-#   if (cnt == fit.n[2]) warning(paste0("Maximum number of fitting replications reached (fit.n=",fit.n[2],"). This could indicate extreme and/or unstable parameter estimates. Consider re-fitting the model (e.g., using fit.n=c(5,1000) and/or fit.bound=25)"))
+  #   print(Sys.time())
+  #   if (cnt == fit.n[2]) warning(paste0("Maximum number of fitting replications reached (fit.n=",fit.n[2],"). This could indicate extreme and/or unstable parameter estimates. Consider re-fitting the model (e.g., using fit.n=c(5,1000) and/or fit.bound=25)"))
+  if(est$convergence != 0)
+    warning(paste0("optim$convergence=",est$convergence,
+                   ". Check convergence of model (e.g. by refitting using fit.n=c(20,20)."))
   
   est$n <- length(y)
   est$n.dq <- sum(group==0)
@@ -112,9 +154,9 @@ RRlog.default <-function(formula,data,model,p,group, LR.test=TRUE, fit.n=c(10,10
   names(est$coefficients) <- est$param
   try({
     est$vcov <- solve(-est$hessian)
-   names(est$gradient) <- est$param
+    names(est$gradient) <- est$param
     colnames(est$hessian) <- est$param
-   rownames(est$hessian) <- est$param
+    rownames(est$hessian) <- est$param
     colnames(est$vcov) <- est$param
     rownames(est$vcov) <- est$param
   }, silent=T)
@@ -166,11 +208,12 @@ RRlog.default <-function(formula,data,model,p,group, LR.test=TRUE, fit.n=c(10,10
     coef <- coef[-est$npar]
   }
   try({
-    est$fitted.values <- as.vector( x %*% coef)
+    latent.values <- as.vector( x %*% coef)
+    est$fitted <- exp(latent.values)/(1+exp(latent.values))
     ## pi schätzen
-    e <- exp(est$fitted.values)
+    e <- exp(latent.values)
     est$pi <- mean(e/(1+e))
-    est$fit.n <- cnt
+    est$fit.n <- fit.n
   }, silent=T)
   
   # SE: Scheers & Dayton 1988: propagation of error  page 970 
@@ -206,7 +249,7 @@ RRlog.default <-function(formula,data,model,p,group, LR.test=TRUE, fit.n=c(10,10
 # formula interface: from formula to design matrix
 
 #' @export
-RRlog.formula <- function(formula,data=list(),model,p,group, ...){
+RRlog.formula <- function(formula, data=list(), model, p, group, ...){
   model <- match.arg(model,c("Warner","UQTknown","UQTunknown","Mangat","Kuk","FR","Crosswise","CDM","CDMsym","SLD"))
   
   if ( model %in% c("UQTunknown","SLD","CDM","CDMsym") &&  !missing(data) ){
@@ -221,34 +264,64 @@ RRlog.formula <- function(formula,data=list(),model,p,group, ...){
   names(y) <- all.vars(formula)[1]
   
   # send to default function:
-  est <- RRlog.default(x,y,model,p,group, ...)
+  est <- RRlog.default(x, y, model, p, group, ...)
   est$call <- match.call()
   est$formula <- formula
+  est$model.frame <- mf
   est
 }
 
 
-# predict values in response variable (different for logisitc regression ?!)
-# predict.RRlog <- function(object, newdata=NULL, ...)
-# {
-#   if(is.null(newdata))
-#     y <- fitted(object)
-#   else{
-#     if(!is.null(object$formula)){
-#       ## model has been fitted using formula interface
-#       x <- model.matrix(object$formula, newdata)
-#     }
-#     else{
-#       x <- newdata
-#     }
-#     y <- as.vector(x %*% coef(object))
-#     y <- exp(y)/(1+exp(y))
-#   }
-#   y
-# }
+#' Predict Individual Prevalences of the RR Attribute
+#' 
+#' Predictions of the loglinear RR model for the individual probabilities of having the sensitive RR attribute.
+#' 
+#' @param object A fitted \code{\link{RRlog}} model
+#' @param newdata An optional vector, matrix, or data.frame with values on the predictor variables. Note that for matrices, the order of predictors should match the order of predictors in the formula. Uses the fitted values of the model if omitted.
+#' @param se.fit Get standard errors for the fitted/predicted values (using the error variance and df of the original RR model).
+#' @param ci Confidence level for confidence interval. If 0, no boundaries are returned.
+#' @param ... ignored
+#' @export
+predict.RRlog <- function(object, newdata=NULL, se.fit=FALSE, 
+                          ci= 0.95, ...)
+{
+  if(is.null(newdata))
+    y <- fitted(object)
+  else{
+    if(!is.null(object$formula)){
+      newdata <- data.frame(newdata, predict=1)
+      ## model has been fitted using formula interface
+      pred.formula <- update(object$formula, predict~.)
+      x <- model.matrix(pred.formula, newdata, na.action=na.exclude)
+    }
+    else{
+      x <- newdata
+    }
+    y <- as.vector(x %*% coef(object))
+    y <- exp(y)/(1+exp(y))
+  }
+  if(!se.fit & ci == 0){
+    return(y)
+  }else{
+    vcov <- vcov(object)
+    if(is2group(object$model)){
+      k <- length(object$coef)
+      vcov <- vcov[1:k,1:k]
+    }
+    predict.vcov <- x %*% vcov %*% t(x)
+    predict.se <- diag(sqrt(predict.vcov))
+    zcrit <- qnorm((1-ci)/2, lower.tail=F)
+    ci.lower <- y - predict.se*zcrit
+    ci.upper <- y + predict.se*zcrit
+    if(se.fit & ci!=0)
+      return(cbind(predict=y, se=predict.se, ci.lower=ci.lower, ci.upper=ci.upper))
+    else if(se.fit)
+      return(cbind(predict=y, se=predict.se))
+    else
+      return(cbind(predict=y, ci.lower=ci.lower, ci.upper=ci.upper))
+  }
+}
 
-#' @aliases RRlog
-#' @method print RRlog
 #' @export
 print.RRlog <- function(x, ...)
 {
@@ -259,8 +332,6 @@ print.RRlog <- function(x, ...)
 }
 
 
-#' @aliases RRlog
-#' @method summary RRlog
 #' @export
 summary.RRlog <- function(object, ...)
 {
@@ -315,13 +386,11 @@ summary.RRlog <- function(object, ...)
 }
 
 
-#' @aliases RRlog
-#' @method print summary.RRlog
 #' @export
 print.summary.RRlog <- function(x, ...){
   cat("Call:\n")
   print(x$call)
-  cat("\nModel:\n")
+  cat("\nRR Model:\n")
   write(x$modelInfo,"")
   cat("\nModel fit:\n")
   print(x$fitInfo)
@@ -335,15 +404,16 @@ print.summary.RRlog <- function(x, ...){
   #                piSE = ",round(x$piSE,6),") 
 }
 
-#' @aliases RRlog
-#' @method logLik RRlog
+#' @export
+fitted.RRlog <- function(object, ...){
+  return(object$fitted)
+}
+
 #' @export
 logLik.RRlog <- function(object, ...){
   return(object$logLik)
 }
 
-#' @aliases RRlog
-#' @method vcov RRlog
 #' @export
 vcov.RRlog <- function(object, ...){
   return(object$vcov)

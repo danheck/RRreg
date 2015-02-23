@@ -3,10 +3,10 @@
 #' Linear randomized response regression
 #' 
 #' Linear regression for a continuous criterion, using randomized-response (RR) variables as predictors.
-#' @param formula a continuous criterion is predicted by one or more categorical RR variables defined by \code{models}. If the number of predictors exceeds the number defined by the vector \code{models}, the remaining predictors are treated as non-randomized variables (e.g., direct questions). At the moment, only additive effects (no interactions) can be used.
+#' @param formula a continuous criterion is predicted by one or more categorical RR variables defined by \code{models}. If the number of predictors exceeds the number defined by the vector \code{models}, the remaining predictors are treated as non-randomized variables (e.g., direct questions). Interactions including any of the RR variables cannot be included.
 #' @param data an optional data frame, list or environment, containing the variables in the model. 
-#' @param models vector specifying RR model(s) in order of appearance in formula
-#' @param p.list list of randomization probabilities for RR models in the same order as specified in \code{models}. Note, that the randomization probabilities p must be provided in a \code{\link{list}}, e.g., \code{list(p=c(.2, .3))}
+#' @param models character vector specifying RR model(s) in order of appearance in formula. Available models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"custom"} (custom: a randomization matrix must be specified in the corresponding element of \code{p.list}, where the entry \code{p[i,j]} defines the probability of responding i (i-th row) given a true state of j (j-th column)).
+#' @param p.list list of randomization probabilities for RR models in the same order as specified in \code{models}. Note, that the randomization probabilities p must be provided in a \code{\link{list}}, e.g., \code{list(p=c(.2, .3))}. See \code{\link{RRuni}} for details.
 # LR.test if true, regression coefficients are tested by a likelihood ratio test by stepwise exclusion of each predictor
 #' @param group vector or matrix specifying group membership by the indices 1 and 2. Only for multigroup RR models, e.g., \code{UQTunknown}, \code{CDM} or \code{SLD}
 #' @param Kukrep defines the number of repetitions in Kuk's card playing method
@@ -29,11 +29,13 @@
 #' 
 #' # generate a third predictor and continuous dependent variables
 #' dat$nonRR <- rnorm(500, 5, 1)
-#' dat$depvar <- 2*dat$true - 3*dat2$true + .5*dat$nonRR +rnorm(500, 1, 7) 
+#' dat$depvar <- 2*dat$true - 3*dat2$true + 
+#'                        .5*dat$nonRR +rnorm(500, 1, 7) 
 #' 
-#' # analyze with RRlin and compare to regression on directly measured variables
+#' # use RRlin and compare to regression on non-RR variables
 #' linreg <- RRlin(depvar~response+FR+nonRR, data=dat,
-#'                 models=c("Warner","FR"),p.list=list(.3, c(.1,.15)), fit.n=1)
+#'                 models=c("Warner","FR"),
+#'                 p.list=list(.3, c(.1,.15)), fit.n=1)
 #' summary(linreg)
 #' summary(lm(depvar~true +trueFR+nonRR, data=dat))
 #' @rdname RRlin
@@ -41,8 +43,9 @@
 #' @import parallel
 #' @import foreach
 #' @export
-RRlin <- function(formula, data, models, p.list, group=NULL, Kukrep=1, 
-                  bs.n=0, nCPU=1, maxit=500, fit.n = 10, pibeta=0.05) {
+RRlin <- function(formula, data, models, p.list, group=NULL, 
+                  Kukrep=1, bs.n=0, nCPU=1, maxit=1000, 
+                  fit.n = 5, pibeta=0.05) {
   #   UseMethod("RRlin")
   
   # formula interface: from formula to design matrix
@@ -69,6 +72,10 @@ RRlin <- function(formula, data, models, p.list, group=NULL, Kukrep=1,
     u <- NULL
     U <- 0
   }
+  
+  ### check for interactions of RR variables
+#   if(length(all.vars(formula))-1 != ncol(x)-ifelse(intercept, 1, 0))
+#     warning("No interactions including any RR-variables are allowed (the interaction term will not be corrected for the additional randomness due to the RR procedure). Interactions including only directly observed variables are allowed.")
   
   if (missing(group)){
     group <- matrix(1, length(y), M, dimnames = list(NULL,paste0("g",1:M)))
@@ -173,6 +180,7 @@ RRlin <- function(formula, data, models, p.list, group=NULL, Kukrep=1,
     colnames(x) <- c("(Intercept)",nam)
   }
   
+  
   ####################
   # STARTING VALUES ##
   # standard linear regression
@@ -222,14 +230,14 @@ RRlin <- function(formula, data, models, p.list, group=NULL, Kukrep=1,
     }else{
       pi.estR <- rowMeans(pi.est)* runif(length(pi.est[,1]),.5,1.5)
       beta1 <- beta*runif(length(beta), .3, 3)
-      sigma <- sigma*runif(1,.3,3)
+      sigma1 <- sigma*runif(1,.3,3)
     }
-     
+    
     pi.estR[pi.estR<0] <- 0
     pi.estR[pi.estR>1] <- 1
     pi.estR <- pi.estR/sum(pi.estR)
     
-    phi <- c(beta,sigma=sigma1,pi=pi.estR)
+    phi <- c(beta1,sigma=sigma1,pi=pi.estR)
     phi <- phi[-length(phi)]  # last pi is a fixed parameter: sum(pi)=1 !
     nbeta <- length(beta)
     npi <- length(pi.estR)
@@ -255,9 +263,9 @@ RRlin <- function(formula, data, models, p.list, group=NULL, Kukrep=1,
     }
   }
   
-#   if(est$convergence !=0){
-#     warning("The L-BFGS-B fitting algorithm did not converge. If model$convergence==1, try to fit the model with a larger number of maximum iterations, e.g., maxit=500.")
-#   }
+  #   if(est$convergence !=0){
+  #     warning("The L-BFGS-B fitting algorithm did not converge. If model$convergence==1, try to fit the model with a larger number of maximum iterations, e.g., maxit=500.")
+  #   }
   
   # calculate last value of pi: fixed by sum
   phi <- est$par
@@ -277,7 +285,7 @@ RRlin <- function(formula, data, models, p.list, group=NULL, Kukrep=1,
     res$vcov <- solve(-est$hessian)
     dimnames(res$hessian) <- list(names(phi) , names(phi) )
     dimnames(res$vcov) <- list(names(phi) , names(phi) )
-    }, silent=T)
+  }, silent=T)
   
   res$df <- nrow(unique(cbind(y,x))) -length(phi)
   
@@ -402,9 +410,6 @@ RRlin <- function(formula, data, models, p.list, group=NULL, Kukrep=1,
 }
 
 
-
-#' @aliases RRlin
-#' @method print RRlin
 #' @export
 print.RRlin <- function(x, ...)
 {
@@ -418,8 +423,6 @@ print.RRlin <- function(x, ...)
 }
 
 
-#' @aliases RRlin
-#' @method summary RRlin
 #' @export
 summary.RRlin <- function(object, ...)
 {
@@ -464,8 +467,6 @@ summary.RRlin <- function(object, ...)
 }
 
 
-#' @aliases RRlin
-#' @method print summary.RRlin
 #' @export
 print.summary.RRlin <- function(x, ...){
   cat("Call:\n")
@@ -487,15 +488,11 @@ print.summary.RRlin <- function(x, ...){
   }
 }
 
-#' @aliases RRlin
-#' @method logLik RRlin
 #' @export
 logLik.RRlin <- function(object, ...){
   return(object$logLik)
 }
 
-#' @aliases RRlin
-#' @method vcov RRlin
 #' @export
 vcov.RRlin <- function(object, ...){
   return(object$vcov)

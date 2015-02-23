@@ -20,9 +20,11 @@ RRlog.UQTknown <- function(x,y,p,start,group, maxit=1000){
   
 #   print(grad)
 #   print(grad(RRlog.UQTknown.ll,est$par,cov=x,y=y,prand=p,group=group))
-  res <- list(model="UQTknown", pString=paste0("probability of answering sensitive question = ",p[1],"; prevalence of irrelevant question = ",p[2]),param=colnames(x), coefficients=coef, logLik=logLik,
+  res <- list(model="UQTknown", pString=paste0("probability of answering sensitive question = ",
+                                               round(p[1],3),"; prevalence of irrelevant question = ",
+                                               round(p[2],3)),param=colnames(x), coefficients=coef, logLik=logLik,
            gradient=grad,hessian=hessian,
-           iter=iter)
+           iter=iter, convergence=est$convergence)
   return(res)
 }
 

@@ -2,10 +2,31 @@
 #' 
 #' Analyse a data vector \code{response} with a specified RR model (e.g., \code{Warner}) with known randomization probability \code{p}
 #' 
-#'  @param response either vector of responses containing 0 (No) and 1 (Yes) or name of response variable in \code{data}. In Kuk's card playing method (\code{Kuk}), the observed response variable gives the number of red cards. For the Forced Response (\code{FR}) model, response values are integers from 0 to (m-1), where 'm' is the number of response categories. 
+#'  @param response either vector of responses containing 0='no' and 1='yes' or name of response variable in \code{data}. In Kuk's card playing method (\code{Kuk}), the observed response variable gives the number of red cards. For the Forced Response (\code{FR}) model, response values are integers from 0 to (m-1), where 'm' is the number of response categories. 
 #'  @param data optional \code{data.frame} containing the response variable
-#'  @param model choose RR model. Available models: \code{"Warner","UQTknown","UQTunknown","Mangat","Kuk","FR","Crosswise","CDM","CDMsym","SLD", "mix.norm", "mix.exp","mix.unknown"}. See \code{vignette('RRreg')} for detailed specifications.
-#'  @param p randomization probability. For the Cheating Detection Model (\code{CDM}) or the Stochastic Lie Detector (\code{SLD}): a vector with two values. For the Forced Response model (\code{FR}): a vector of the length of the number of categories
+#'  @param model defines RR model. Available models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"},\code{"FR"}, \code{"Crosswise"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"mix.norm"}, \code{"mix.exp"},\code{"mix.unknown"}. See argument \code{p} or type \code{vignette('RRreg')} for detailed specifications.
+#'  @param p randomization probability defined as a single probability for
+#'  \itemize{
+#'  \item Warner: Probabiltiy to get sensitive Question 
+#'  \item Mangat: Prob. for noncarriers to respond truthfully (i.e., with No=0)
+#'  \item Crosswise: Prevalence of 'yes' responses for unrelated question (response category is coded as 1=['no-no' or 'yes-yes']; 0=['yes-no' or 'no-yes'])
+#'  } 
+#'  and as a two-valued vector of probabilities for 
+#'  \itemize{
+#'  \item Kuk: Probability of red cards in first and second set, respectively (red=1, black=0); 
+#'  \item Unrelated Question (UQTknown): Prob. to respond to sensitive question and known prevalence of 'yes' responses to unrelated question 
+#'  \item Unrelated Question (UQTunknown): Prob. to respond to sensitive question in group 1 and 2, respectively
+#'  \item Cheating Detection (CDM): Prob. to be prompted to say yes in group 1 and 2, respectively
+#'  \item Symmetric CDM: 4-valued vector: Prob. to be prompted to say 'yes'/'no' in group 1 and 'yes'/'no' in group 2
+#'  \item Stochastic Lie Detector (SLD): Prob. for noncarriers to reply with 0='no' in group 1 and 2, respectively
+#'  \item Forced Response model (\code{FR}): m-valued vector (m=number of response categories) with the probabilities of being prompted to select response categories 0,1,..,m-1, respectively (requires \code{sum(p)<1})
+#'  }
+#'  For the continuous RR models:
+#'  \itemize{
+#'  \item mix.norm: 3-valued vector - Prob. to respond to sensitive question and mean and SD of the masking normal distribution of the unrelated question
+#'  \item mix.exp: 2-valued vector - Prob. to respond to sensitive question and mean of the masking exponential distribution of the unrelated question
+#'  \item mix.unknown: 2-valued vector - Prob. of responding to sensitive question in group 1 and 2, respectively
+#'  }
 #'  @param group a group vector of the same length as \code{response} containing values 1 or 2, only required for two-group models, which specify different randomization probabilities for two groups, e.g., \code{CDM} or \code{SLD}. If a data.frame \code{data} is provided, the variable \code{group} is searched within it.
 #' @param MLest if \code{TRUE}, least-squares estimates of pi outside of [0,1] are corrected to obtain maximum likelihood estimates
 #' @return an \code{RRuni} object, can by analyzed by using \code{\link{summary}}
@@ -20,8 +41,10 @@
 #' 
 #' # Generate data in line with the Stochastic Lie Detector 
 #' # assuming that 90% of the respondents answer truthfully
-#' genData2 <- RRgen(n=1000, pi=.3, model="SLD", p=c(.2,.8), complyRates=c(.8,1),groupRatio=0.4)
-#' analyse2 <- RRuni(response=genData2$response, model="SLD", p=c(.2,.8), group=genData2$group)
+#' genData2 <- RRgen(n=1000, pi=.3, model="SLD", p=c(.2,.8), 
+#'                   complyRates=c(.8,1),groupRatio=0.4)
+#' analyse2 <- RRuni(response=genData2$response, model="SLD", 
+#'                   p=c(.2,.8), group=genData2$group)
 #' summary(analyse2)
 #' @export
 RRuni<-function(response, data, model, p,group = NULL, MLest=TRUE){
@@ -71,8 +94,6 @@ RRuni<-function(response, data, model, p,group = NULL, MLest=TRUE){
   return(res)
 }
 
-#' @aliases RRuni
-#' @method print RRuni
 #' @export
 print.RRuni<-function(x,...){
   cat("RR model: \n")
@@ -94,8 +115,6 @@ print.RRuni<-function(x,...){
   }
 }
 
-#' @aliases RRuni
-#' @method summary RRuni
 #' @export
 summary.RRuni<-function(object,...){
   zval <- object$pi/object$piSE
@@ -150,8 +169,6 @@ summary.RRuni<-function(object,...){
 }
 
 
-#' @aliases RRuni
-#' @method print summary.RRuni
 #' @export
 print.summary.RRuni<-function(x,...){
   cat("Call:\n")
@@ -165,4 +182,3 @@ print.summary.RRuni<-function(x,...){
   }
 }
 
-# plot.RRuni necessary?

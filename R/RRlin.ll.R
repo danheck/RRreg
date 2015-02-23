@@ -45,7 +45,7 @@ RRlin.ll <- function(phi, nbeta, y, u, gidx, U, intercept, n.star, PWarray, PWpp
     for (j in 1:K){
       xx <- matrix(patterns[j,], Ng, M, T)
       if (U>0){
-        xx <- cbind(xx, u[gidx == g])
+        xx <- cbind(xx, u[gidx == g,,drop=FALSE])
       }
       if (intercept){
         xx <- cbind(1,xx)
@@ -64,5 +64,7 @@ RRlin.ll <- function(phi, nbeta, y, u, gidx, U, intercept, n.star, PWarray, PWpp
     sec[g] <- t(n.star[,g]) %*% log( PWarray[,,g] %*% pi.true )
   }
   ll <- sum (first,sec)
+  if(ll == -Inf)
+    ll <- -9e300
   ll
 }

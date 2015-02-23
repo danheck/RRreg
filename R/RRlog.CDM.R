@@ -24,10 +24,10 @@ RRlog.CDM <- function(x,y,p,start,group,setGamma=FALSE, maxit=1000){
   # print(grad)
   #print(grad(RRlog.CDM.ll,est$par,cov=x,y=y,prand=p,group=group,setGamma=setGamma))
   res <- list(model="CDM",
-              pString=paste0("forced Yes = ",p[1],"/",p[2], " (group 1/2)"),
+              pString=paste0("forced Yes = ",round(p[1],3),"/",round(p[2],3), " (group 1/2)"),
               coefficients=coef,
               logLik=logLik, param=c(colnames(x),"gamma"),
-              gradient=grad,hessian=hessian,iter=iter)
+              gradient=grad,hessian=hessian,iter=iter, convergence=est$convergence)
   return(res)
 }
 
@@ -120,10 +120,11 @@ RRlog.CDMsym <- function(x,y,p,start,group,setGamma=FALSE, maxit=1000){
 #   print(grad)
 #   print(grad(RRlog.CDMsym.ll,est$par,cov=x,y=y,prand=p,group=group,setGamma=setGamma))
 res <- list(model="CDMsym",
-            pString=paste0("forced Yes/No=",p[1],"/",p[2]," (group 1) ; forced Yes/No=",p[3],"/",p[4]," (group 2)"),
+            pString=paste0("forced Yes/No=",round(p[1],3),"/",round(p[2],3),
+                           " (group 1) ; forced Yes/No=",round(p[3],3),"/",round(p[4],3)," (group 2)"),
             coefficients=coef,
             logLik=logLik, param=c(colnames(x),"gamma"),
-            gradient=grad, hessian=hessian,iter=iter)
+            gradient=grad, hessian=hessian,iter=iter, convergence=est$convergence)
 return(res)
 }
 

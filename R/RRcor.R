@@ -4,7 +4,7 @@
 #' @param x a numeric vector, matrix or data frame.
 #' @param y \code{NULL} (default) or a vector, matrix or data frame with compatible dimensions to \code{x}. 
 #' @param models a vector defining which RR design is used for each variable. Must be in the same order as variables appear in \code{x} and \code{y} (by columns). Available discrete models: \code{Warner}, \code{Kuk}, \code{FR}, \code{Mangat}, \code{UQTknown}, \code{UQTunknown}, \code{Crosswise}, \code{SLD} and \code{direct} (i.e., no randomized response design). Available continuous models: \code{mix.norm}, \code{mix.exp}.
-#' @param p.list a \code{list} containing the randomization probabilities of the RR models defined in \code{models}. Either, all \code{direct}-variables (i.e., no randomized response) in \code{models} can be excluded in \code{p.list}; or, if specified, randomization probabilities \code{p} are ignored for \code{direct}-variables.
+#' @param p.list a \code{list} containing the randomization probabilities of the RR models defined in \code{models}. Either, all \code{direct}-variables (i.e., no randomized response) in \code{models} can be excluded in \code{p.list}; or, if specified, randomization probabilities \code{p} are ignored for \code{direct}-variables. See \code{\link{RRuni}} for a detailed specification of p.
 #' @param group a matrix defining the group membership of each participant (values 1 and 2) for all multiple group models(\code{SLD}, \code{UQTunknown}). If only one of these models is included in \code{models}, a vector can be used. For more than one model, each column should contain one grouping variable 
 #' @param bs.n number of samples used to get bootstrapped standard errors
 #' @param bs.type to get boostrapped standard errors, use \code{"se.p"} for the parametric and/or \code{"se.n"} for the nonparametric bootstrap. Use \code{"pval"} to get p-values from the parametric bootstrap (assuming a true correlation of zero). Note that \code{bs.n} has to be larger than 0. The parametric bootstrap is based on the assumption, that the continuous variable is normally distributed within groups defined by the true state of the RR variable. For polytomous forced response (FR) designs, the RR variable is assumed to have equally spaced distances between categories (i.e., that it is interval scaled)
@@ -453,8 +453,6 @@ res
 }
 
 
-#' @aliases RRcor
-#' @method print RRcor
 #' @export
 print.RRcor<-function(x,...){
 #   cat("Call: \n")

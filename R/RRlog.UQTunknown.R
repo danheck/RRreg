@@ -24,10 +24,10 @@ RRlog.UQTunknown <- function(x,y,p,start,group,setPiUQ=FALSE, maxit=1000){
 #   print(grad)
 #   print(grad(RRlog.UQTunknown.ll,est$par,cov=x,y=y,prand=p,group=group,setPiUQ=setPiUQ))
   res <- list(model="UQTunknown",
-              pString=paste0("probability of answering sensitive question = ",p[1],"/",p[2]," (group 1/2)"),
+              pString=paste0("probability of answering sensitive question = ",round(p[1],3),"/",round(p[2],3)," (group 1/2)"),
               coefficients=coef,
               logLik=logLik, param=c(colnames(x),"piUQ"),
-              gradient=grad,hessian=hessian,iter=iter)
+              gradient=grad,hessian=hessian,iter=iter, convergence=est$convergence)
   return(res)
 }
 

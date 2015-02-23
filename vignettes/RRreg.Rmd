@@ -116,7 +116,7 @@ cor(x=data.W$true, y=data.W$cov)
 Alternatively, we can run a logistic regression to predict the probability of cocaine use. In the `formula` below, the Warner RR variable is defined as criterion on the left side, whereas the continuous covariate is used as predictor on the right. The interface is similar to that of the standard linear regression in R (i.e., `lm()`).
 
 ```{r}
-log1 <- RRlog(formula=response~cov, data=data.W, model="Warner", p=.2, LR.test=TRUE, fit.n = c(1,5))
+log1 <- RRlog(formula=response~cov, data=data.W, model="Warner", p=.2, LR.test=TRUE, fit.n = 1)
 summary(log1)
 ```
 
@@ -196,7 +196,7 @@ group <- rep(1:0, each=500)
 # include interaction of question format and age (here, the rescaled z-variable z.age)
 z.age <- c(rnorm(500, mean=RR$true*2,sd=3), rnorm(500, mean=0,sd=3))
 # fit full model (i.e., test difference in prevalence estimates and interaction)
-fit <- RRlog(response ~ group * z.age, model="Warner", p=.35, group=group, LR.test=TRUE, fit.n = c(1,5)) 
+fit <- RRlog(response ~ group * z.age, model="Warner", p=.35, group=group, LR.test=TRUE, fit.n = 1) 
 summary(fit)
 # get prevalence estimate for RR and DQ
 logit1 <- coef(fit) %*% c(1, 1, mean(z.age), mean(z.age))
@@ -424,7 +424,7 @@ RR2 <- RRgen(1000, pi=.6, model="SLD", p=c(.3 ,.7), complyRates=c(.9,1))
 cov <- RR1$true + RR2$true + rnorm(1000, 0, 3)
 
 ### logistic regression (dependent RR variable)
-logmod <- RRlog(RR1$response ~ cov, model="SLD", p=c(.2,.8), group=RR1$group, fit.n = c(1,5))
+logmod <- RRlog(RR1$response ~ cov, model="SLD", p=c(.2,.8), group=RR1$group, fit.n = 1)
 summary(logmod)
 
 ### group matrix for RRlin and RRcor: use multiple group vectors in one matrix

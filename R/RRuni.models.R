@@ -251,7 +251,7 @@ RRuni.mix.unknown<-function(response,p,group){
   num <- (1-p[2])*(p[1]*pi+(1-p[1])*piUQ)^2-(1-p[1])*(p[2]*pi+(1-p[2]*piUQ))^2
   x.var<- var(response[group==2]) - pi^2 + num/(p[1]-p[2])
   
-  pstring <- paste0("'p[1]='",round(p[1],4)," (p[2]=",round(p[2],4),"): probability of answering sensitive (irrelevant) question")
+  pstring <- paste0("'p[1]='",round(p[1],4)," and p[2]=",round(p[2],4),": probability of responding to sensitive question in group 1 and 2, respectively")
   res <- list(model="mix.unknown",call=paste0("Continuous mixture RR design with probability of truthful responding ",pstring),pi=pi,piSE=piSE,piUQ=piUQ, piUQSE=piUQSE,n=length(response),y.var=y.var, x.var=x.var)
 #   print(x.var)
 #   print(y.var)

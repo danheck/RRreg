@@ -1,3 +1,12 @@
+RRreg 0.3.0 (February 2015)
+===========
+
+* Logistic regression in RRlog now uses a combination of EM algorithm and gradient-based optimization (previously, only optim was used)
+* Compute predicted values (incl. SE and CI) for logistic RR regression by predict.RRlog
+* Bugfixes in RRlin for multiple nonRR predictors and infinite log-likelihood
+* More detailed documentation (specification of p in RRuni, available models for RRlin)
+
+
 RRreg 0.2.0 (November 2014)
 ===========
 

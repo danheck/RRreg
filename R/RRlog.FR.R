@@ -22,9 +22,9 @@ RRlog.FR <- function(x,y,p,start,group, maxit=1000){
   
 #   print(grad)
 #   print(grad(RRlog.FR.ll,est$par,cov=x,y=y,prand=p,group=group))
-  res=list(model="FR",pString=paste("p1 = ",p[1],"; p2 = ",p[2],sep=""),
+  res=list(model="FR",pString=paste("p1 = ",round(p[1],3),"; p2 = ",round(p[2],3),sep=""),
            coefficients=coef,logLik=logLik,param=colnames(x),
-           gradient=grad, hessian=hessian,iter=iter)
+           gradient=grad, hessian=hessian,iter=iter, convergence=est$convergence)
   return(res);
 }
 

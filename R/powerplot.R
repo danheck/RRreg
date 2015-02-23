@@ -22,7 +22,7 @@
 #' @examples 
 #' # Not run
 #' # pplot <- powerplot(100, n=c(150,250), cor=c(0,.3,.5),
-#' #                   method="RRlog",pi=.6, model="Warner", p=.3)
+#' #                   method="RRlog", pi=.6, model="Warner", p=.3)
 #' # plot(pplot)
 #' @seealso \code{\link{RRsimu}} for Monte-Carlo simulation / parametric bootstrap
 #' @export
@@ -75,17 +75,20 @@ powerplot <- function(numRep, n=c(100,500,1000), pi, cor=c(0,.1,.3), b.log=NULL,
   out
 }
 
-#' @aliases powerplot
-#' @method print powerplot
 #' @export
 print.powerplot <- function(x, ...){
+  cat("Use plot(powerplot(...)) to get a graph.\n")
   print(x$res)
 }
 
-#' @aliases powerplot
-#' @method plot powerplot
+#'Plot power of multivariate RR methods
+#'
+#' Plot estimated power from Monte Carlo simulation as a function of the sample size, separately for different effect sizes and multivariate RR methods
+#' @param x a \code{\link{powerplot}} object
+#' @param ... ignored
+#' 
 #' @export
-plot.powerplot <- function(x, y, ...){
+plot.powerplot <- function(x,  ...){
   res <- x$res
   dims <- dim(res)
   dimnam <- dimnames(res)

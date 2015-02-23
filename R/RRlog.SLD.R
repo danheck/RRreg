@@ -22,10 +22,10 @@ RRlog.SLD <- function(x,y,p,start,group,setT=FALSE, maxit=1000){
 #   print(grad)
 #   print(grad(func=RRlog.SLD.ll,x=est$par,cov=x,y=y,prand=p,group=group,setT=setT))
   res <- list(model="SLD",
-              pString=paste("p1 = ",p[1],"; p2 = ",p[2],sep=""),
+              pString=paste("p1 = ",round(p[1],3),"; p2 = ",round(p[2],3),sep=""),
               coefficients=coef,
               logLik=logLik,param=c(colnames(x),"t"),
-              gradient=grad,hessian=hessian,iter=iter)
+              gradient=grad,hessian=hessian,iter=iter, convergence=est$convergence)
   return(res)
 }
 

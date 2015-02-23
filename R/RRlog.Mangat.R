@@ -22,9 +22,9 @@ RRlog.Mangat <- function(x,y,p,start,group, maxit=1000){
   
 #   print(grad)
 #   print(grad(RRlog.Mangat.ll,est$par,cov=x,y=y,prand=p,group=group))
-  res <- list(model="Mangat",pString=paste0("p = ",p),
+  res <- list(model="Mangat",pString=paste0("p = ",round(p,3)),
               coefficients=coef, logLik=logLik,param=colnames(x),
-              gradient=grad,hessian=hessian,iter=iter)
+              gradient=grad,hessian=hessian,iter=iter, convergence=est$convergence)
   return(res)
 }
 

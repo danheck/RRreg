@@ -20,9 +20,9 @@ RRlog.Warner <- function(x,y,p,start,group, maxit=1000){
     ,error = function(e) {})
 #   print(RRlog.Warner.llgrad(est$par,x,y,p,group))
 #   print(grad(RRlog.Warner.ll,est$par,cov=x,y=y,prand=p,group=group))
-  res <- list(model="Warner",pString=paste0("p = ",p),
+  res <- list(model="Warner",pString=paste0("p = ",round(p,3)),
            coefficients=coef, logLik=logLik,param=colnames(x),
-           gradient=grad,hessian=hessian,iter=iter)
+           gradient=grad,hessian=hessian,iter=iter, convergence=est$convergence)
   return(res)
 }
 

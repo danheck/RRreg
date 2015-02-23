@@ -21,9 +21,10 @@ RRlog.Kuk <- function(x,y,p,start,rep,group, maxit=1000){
   
 #   print(grad)
   
-  res <- list(model="Kuk",pString=paste("p1 = ",p[1],"; p2 = ",p[2],sep=""), coefficients=coef, logLik=logLik,param=colnames(x),
+  res <- list(model="Kuk",pString=paste("p1 = ",round(p[1],3),"; p2 = ",round(p[2],3),sep=""), 
+              coefficients=coef, logLik=logLik,param=colnames(x),
            gradient=grad,hessian=hessian,rep=rep,
-           iter=iter)
+           iter=iter, convergence=est$convergence)
   return(res);
 }
 

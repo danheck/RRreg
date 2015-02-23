@@ -7,8 +7,8 @@
 #' e.g., \code{"Warner"}. True states are either provided by a vector \code{trueState} or drawn randomly from a Bernoulli distribution. Useful for simulation and testing purposes, e.g., power analysis.
 #' @param n sample size of generated data
 #' @param pi.true true proportion in population
-#' @param model specifes the RR model, one of: \code{"Warner","UQTknown","UQTunknown","Mangat","Kuk","FR","Crosswise","CDM","CDMsym","SLD", "mix.norm", "mix.exp"}. See \code{vignette("RRreg")} for details. 
-#' @param p randomization probability (depending on model, either a real value or vector, see \code{\link{RRuni}} for details)
+#' @param model specifes the RR model, one of: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"},  \code{"mix.norm"},  \code{"mix.exp"}. See \code{vignette("RRreg")} for details. 
+#' @param p randomization probability (depending on model, see \code{\link{RRuni}} for details)
 #' @param complyRates vector with two values giving the proportions of carriers and non-carriers who adhere to the instructions, respectively
 #' @param sysBias probability of responding 'yes' (coded as 1) in case of non-compliance for carriers and non-carriers of the sensitive attribute, respectively. If \code{sysBias=c(0,0)}, carriers and non-carriers systematically give the nonsensitive response 'no' (also known as self-protective(SP)-'no' responses). If \code{sysBias=c(0,0.5)}, carriers always respond 'no' whereas non-carriers randomly select a response category. Note that \code{sysBias = c(0.5,0.5)} might be the best choice for \code{Kuk} and \code{Crosswise}. For the m-categorical \code{FR} model, \code{sysBias} can be given as a probability vector for categories 0 to (m-1).
 #' @param groupRatio proportion of participants in group 1. Only required for two-group models, e.g., \code{SLD} and \code{CDM}
