@@ -1,0 +1,50 @@
+
+## IRT RR model
+# Fox (2005)
+
+# INPUT
+# missclassification matrices in form of an array (separate for each item possible):
+# P[k,l] = probability to respond 1 (=yes) given a true state of l (0 or 1) for item k
+
+
+# N: number of respondents
+# J=1: number of groups (for hierarchical model)
+# K: numer of items
+
+# Y: N x J matrix with responses (1=yes, 0=no)
+# X1: level-1 design matrix (person predictors)
+#### irrelevant here X2: level-2 design matrix
+
+
+model{
+
+  for(i in 1:N){
+    for(k in 1:K){
+      
+      # distribution of RR responses: model dependent
+      # Y[i,k] ~ dbern(p[i,k])
+      Y[i,k] ~ dbern(P[k, Y_true[i,k]+1])
+      
+      # RR model: probability to respond 1=yes
+      # (defined by misclassification matrix P)
+      # p[i,k] <- P[k,1]*(1-pi[i,k]) + P[k,2]*pi[i,k]
+      
+      Y_true[i,k] ~ dbern(pi[i,k])
+      
+      # IRT model: probability for true state
+      pi[i,k] <- phi(a[k] * theta[i] - b[k])
+    }
+  }
+  
+  # fixing the scale of theta
+  for(i in 1:N){
+    theta[i] ~ dnorm(0, 1)
+  }
+    
+  # priors on item parameters
+  for(k in 1:K){
+    a[k] ~ dunif(0, itemPrior)
+    b[k] ~ dunif(-itemPrior, itemPrior)
+  }
+
+}

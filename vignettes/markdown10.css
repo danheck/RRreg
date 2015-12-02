@@ -1,13 +1,13 @@
 #TOC {
   position: fixed;
   left: 0;
-  top: 0;
-  width: 220px;
+  top: 1;
+  width: 230px;
   height: 100%;
   overflow:auto;
 }
 
-*{margin:0;padding:0;}
+*{margin:6;padding:0;}
 body {
 	 font:13.34px helvetica,arial,freesans,clean,sans-serif;
 	 color:black;

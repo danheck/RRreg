@@ -45,7 +45,7 @@
 #' @export
 RRlin <- function(formula, data, models, p.list, group=NULL, 
                   Kukrep=1, bs.n=0, nCPU=1, maxit=1000, 
-                  fit.n = 5, pibeta=0.05) {
+                  fit.n = 3, pibeta=0.05) {
   #   UseMethod("RRlin")
   
   # formula interface: from formula to design matrix
@@ -443,7 +443,7 @@ summary.RRlin <- function(object, ...)
   )
   #    rownames(pcoef) <- paste("pi =",rownames(pcoef))
   fitInfo <- c(N=object$N, logLik= object$logLik, df=object$df)
-  p.char <- unlist( as.character(object$p.list))
+  p.char <- unlist( as.character(lapply(object$p.list, round, 3)))
   
   res <- list(call=object$call, 
               RRvariables = object$RRvariables, p.char = p.char,models=object$models,
@@ -480,8 +480,8 @@ print.summary.RRlin <- function(x, ...){
   cat("\nCoefficients (beta):\n")
   printCoefmat( round(x$bcoef,5))
   cat(paste0("\nResidual standard error (sigma): ",round(x$sigma,3), "; N=",x$N,"\n"))
-  cat("\nPrevalence estimates for combinations of RR responses:\n")
-  printCoefmat(round(x$pcoef,5))
+#   cat("\nPrevalence estimates for combinations of RR responses:\n")
+#   printCoefmat(round(x$pcoef,5))
   if(x$bs.n>0){
     cat(paste0("\n\nResults of nonparametric bootstrap (",x$bs.n," samples):\n"))
     printCoefmat(round(x$bs.tab,4))

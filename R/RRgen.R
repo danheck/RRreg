@@ -6,14 +6,14 @@
 #' @description The method \code{RRgen} generates data according to a specified RR model, 
 #' e.g., \code{"Warner"}. True states are either provided by a vector \code{trueState} or drawn randomly from a Bernoulli distribution. Useful for simulation and testing purposes, e.g., power analysis.
 #' @param n sample size of generated data
-#' @param pi.true true proportion in population
-#' @param model specifes the RR model, one of: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"},  \code{"mix.norm"},  \code{"mix.exp"}. See \code{vignette("RRreg")} for details. 
+#' @param pi.true true proportion in population (a vector for m-categorical \code{"FR"} or \code{"custom"} model)
+#' @param model specifes the RR model, one of: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"},  \code{"mix.norm"},  \code{"mix.exp"}, \code{"custom"}. See \code{vignette("RRreg")} for details. 
 #' @param p randomization probability (depending on model, see \code{\link{RRuni}} for details)
 #' @param complyRates vector with two values giving the proportions of carriers and non-carriers who adhere to the instructions, respectively
-#' @param sysBias probability of responding 'yes' (coded as 1) in case of non-compliance for carriers and non-carriers of the sensitive attribute, respectively. If \code{sysBias=c(0,0)}, carriers and non-carriers systematically give the nonsensitive response 'no' (also known as self-protective(SP)-'no' responses). If \code{sysBias=c(0,0.5)}, carriers always respond 'no' whereas non-carriers randomly select a response category. Note that \code{sysBias = c(0.5,0.5)} might be the best choice for \code{Kuk} and \code{Crosswise}. For the m-categorical \code{FR} model, \code{sysBias} can be given as a probability vector for categories 0 to (m-1).
+#' @param sysBias probability of responding 'yes' (coded as 1) in case of non-compliance for carriers and non-carriers of the sensitive attribute, respectively. If \code{sysBias=c(0,0)}, carriers and non-carriers systematically give the nonsensitive response 'no' (also known as self-protective(SP)-'no' responses). If \code{sysBias=c(0,0.5)}, carriers always respond 'no' whereas non-carriers randomly select a response category. Note that \code{sysBias = c(0.5,0.5)} might be the best choice for \code{Kuk} and \code{Crosswise}. For the m-categorical \code{"FR"} or \code{"custom"} model, \code{sysBias} can be given as a probability vector for categories 0 to (m-1).
 #' @param groupRatio proportion of participants in group 1. Only required for two-group models, e.g., \code{SLD} and \code{CDM}
 #' @param Kukrep Number of repetitions of Kuk's procedure (how often red and black cards are drawn)
-#' @param trueState optional vector containing true states of participants (i.e., 1 for carriers and 0 for noncarriers of sensitive attribute; for \code{FR}: values between 1 and number of response categories) which will be randomized according to the defined procedure (if specified, \code{n} and \code{pi.true} are ignored)
+#' @param trueState optional vector containing true states of participants (i.e., 1 for carriers and 0 for noncarriers of sensitive attribute; for \code{FR}: values from 0,1,...,M-1 (M = number of response categories) which will be randomized according to the defined procedure (if specified, \code{n} and \code{pi.true} are ignored)
 #' @return \code{data.frame} including the variables \code{true} and \code{response} (and for \code{SLD} and \code{CDM} a third variable \code{group}) 
 #'@details If \code{trueState} is specified, the randomized response procedure will be simulated for this vector, otherwise a random vector of length \code{n} with true proportion \code{pi.true} is drawn. Respondents answer biases can be simulated by adjusting the compliance rates: if \code{complyRates} is set to \code{c(1,1)}, all respondents adhere to the randomization procedure. If one or both rates are smaller than 1, \code{sysBias} determines whether noncompliant respondents systematically choose the nonsensitive category or whether they answer randomly. 
 #'
@@ -44,14 +44,15 @@ RRgen <- function(n,pi.true, model, p,
                   groupRatio=.5, Kukrep=1,trueState=NULL){
   model <- match.arg(model, c("Warner","UQTknown","UQTunknown","Mangat",
                               "Kuk","FR","Crosswise","CDM","CDMsym","SLD",
-                              "mix.norm", "mix.exp"))
-  
+                              "mix.norm", "mix.exp", "custom"))
+  true <- NULL
   if(!is.null(trueState)){
+    trueState <- as.numeric(trueState)
     RRcheck.xp(model,trueState,p,"trueState")
     n <- length(trueState)
     true <- trueState
     pi.true <- mean(trueState)
-    if (model == "FR" && length(p)>2){
+    if (model %in% c("FR", "custom") && nrow(as.matrix(p))>2){
       pi.true <- table(true)/length(true)
     }
     if (model %in% c("mix.norm")){
@@ -61,8 +62,9 @@ RRgen <- function(n,pi.true, model, p,
       pi.true <- c(mean(trueState))
     }
   }
-  if (model=="FR" && length(pi.true)==1) pi.true <- c(1-pi.true,pi.true) 
-    
+  if (model %in% c("custom", "FR") && length(pi.true)==1) 
+    pi.true <- c(1-pi.true,pi.true) 
+  
   # check input  
   RRcheck.p(model,p)
   RRcheck.pi(model,pi.true,n)
@@ -70,12 +72,14 @@ RRgen <- function(n,pi.true, model, p,
   RRcheck.rate(complyRates[2])
   RRcheck.groupRatio(groupRatio)
   if ( any(complyRates != 1 ) ){
-    if (model == "FR" && length(pi.true)>1 && 
-          (length(sysBias)!=length(p) || sum(sysBias)!=1 || any(sysBias<0) || any(sysBias>1))  ){
-      warning("For the m-categorical FR model, the argument 'sysBias' must be a probability vector of the same length as 'p'. sysBias is set to equal guessing across categories automatically.")
+    if (model %in% c("custom", "FR") &&
+        (length(sysBias)!=nrow(as.matrix(p)) || sum(sysBias)!=1 || any(sysBias<0) || any(sysBias>1))  ){
+      warning("For the m-categorical FR/custom model, the argument 'sysBias' must be a probability vector 
+              of the same length as 'p'. sysBias is set to equal guessing across categories automatically.")
       sysBias <- rep(1,length(pi.true))/length(pi.true)
-    }else if (min(sysBias)<0 || max(sysBias)>1 || length(sysBias) !=2)
-      stop("The argument 'sysBias' gives the probabilities of 'no'-responses in case of non-compliance for carriers and non-carriers, respectively (e.g., sysBias = c(0, 0.5).")
+    }else if(!(model %in% c("custom", "FR")) && (min(sysBias)<0 || max(sysBias)>1 || length(sysBias) !=2))
+        stop("The argument 'sysBias' gives the probabilities of 'no'-responses in case of non-compliance 
+           for carriers and non-carriers, respectively (e.g., sysBias = c(0, 0.5).")
   }
   # initialisiere
   response <- rep(0,n)
@@ -100,26 +104,34 @@ RRgen <- function(n,pi.true, model, p,
     response <- ifelse(randNum<p[1], true, mask)  
   }
   # Forced response: multinomial response categories possible
-  else if (model=="FR" && length(pi.true>1)){
-    numCat <- length(p)
-    if (numCat != length(p)){
-      stop("The length of vector 'pi.true' and 'p' has to match in the 'FR' model")
+  else if (model %in% c("FR", "custom")){ # && length(pi.true>1)){
+    numCat <- nrow(as.matrix(p))
+    if (numCat != length(pi.true)){
+      stop("The length of vector 'pi.true' and 'p' has to match in the 'FR'/'custom' model")
     }
     # distribute values across categories acording to 'pi.true'
     if (is.null(trueState)){
       true <- findInterval(runif(n),cumsum(pi.true))
     } 
-    # return response 'i' with probability 'p[i]', otherwise true response x
     
-    chooseCat <- findInterval(runif(n),cumsum(p));
-    responseComply <- ifelse(chooseCat==length(p),
-                             true,
-                             chooseCat) 
-
+    if(model == "FR"){
+      # return response 'i' with probability 'p[i]', otherwise true response x
+      chooseCat <- findInterval(runif(n),cumsum(p))
+      responseComply <- ifelse(chooseCat==length(p),
+                               true,
+                               chooseCat) 
+    }else if (model == "custom"){
+      pcumsum <- apply(p[,true+1], 2, cumsum)
+      responseComply <- apply( rbind(pcumsum, runif(n)), 2, function(xx) findInterval(xx[numCat+1], xx[1:numCat]))
+    }
+    
+    if(missing(complyRates) || all(complyRates ==1))
+      complyRates <- rep(1, numCat)
     if ( any(complyRates!=1) && length(complyRates) != numCat){
-        warning("For the polytomous forced response ('FR') model,'complyRates' must have the same length as 'p', defining the compliance rate for each of the true states separately.")
-    }else{
-      complyRates <- rep(1,numCat)
+      warning("For the polytomous forced response ('FR'/'custom') model,'complyRates' 
+                must have the same length as 'p', defining the compliance rate for 
+                each of the true states separately.")
+      
     }
     responseNonComply <- findInterval(runif(n),cumsum(sysBias))
     
@@ -132,9 +144,9 @@ RRgen <- function(n,pi.true, model, p,
                        responseComply ,     # participants comply
                        responseNonComply)   # participants don't comply
     
-  
-  ##############################
-  # for dichotomous models
+    
+    ##############################
+    # for dichotomous models
   }else{
     if (model %in% c("CDM","CDMsym")){
       # adjustment, so pi.true will fit to the estimation
@@ -145,7 +157,7 @@ RRgen <- function(n,pi.true, model, p,
     if (is.null(trueState)){
       true <- rbinom(n,1,pi.true[1])
     }
-
+    
     # unbiased response according to instructions:
     switch(model,
            "FR" = {
@@ -180,7 +192,7 @@ RRgen <- function(n,pi.true, model, p,
            "UQTunknown" = {
              if (length(pi.true)==1){
                pi.true <- c(pi.true,runif(1,.2,.8))
-#                warning(paste0("The prevalence of the unrelated question was randomly set to ", round(pi.true[2],3),". To explicitly choose the prevalence, set 'pi.true=c(pi.sensitive, pi.unrelated)'"),call.=F)
+               #                warning(paste0("The prevalence of the unrelated question was randomly set to ", round(pi.true[2],3),". To explicitly choose the prevalence, set 'pi.true=c(pi.sensitive, pi.unrelated)'"),call.=F)
              }
              randUQ <- runif(n)
              nn1 <- round(n*groupRatio)
@@ -232,10 +244,10 @@ RRgen <- function(n,pi.true, model, p,
            })
     
     # biased answer (nonComply)
-#     if (model %in% c("Kuk" ,"Crosswise") && sysBias!=0.5){
-#       sysBias <- 0.5
-#       #warning("Parameter 'sysBias' is ignored since it is not meaningful for Kuk's or Crosswise model.")
-#     }
+    #     if (model %in% c("Kuk" ,"Crosswise") && sysBias!=0.5){
+    #       sysBias <- 0.5
+    #       #warning("Parameter 'sysBias' is ignored since it is not meaningful for Kuk's or Crosswise model.")
+    #     }
     if (model =="Kuk"){
       responseNonComplyC <- rbinom(n,Kukrep,sysBias[1])    # Kuk: always random answer in case of  non-compliance
       responseNonComplyNC <- rbinom(n,Kukrep,sysBias[2])
@@ -256,7 +268,7 @@ RRgen <- function(n,pi.true, model, p,
     comply[true==0] <- ifelse(randNum<complyRates[2] ,1,0)[true==0] 
   }
   
-
+  
   # construct data frame
   data <- data.frame(true,comply,response)
   if (model %in% c("UQTunknown","SLD","CDM","CDMsym") ){

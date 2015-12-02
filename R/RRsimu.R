@@ -15,7 +15,7 @@
 #' @param method vector specifying which RR methods to be used in each replication. For a single RR variable, the methods \code{\link{RRuni}}, \code{\link{RRcor}},\code{\link{RRlog}}, and \code{\link{RRlin}} are available. For 2 RR variables, only \code{\link{RRcor}} is available.
 #' @param alpha significance threshold for testing the logistic regression parameter \code{beta}
 #' @param groupRatio proportion of participants in group 1. Only for two-group models (e.g., \code{"SLD"}) (for 2 RR variables: \code{vector})
-#' @param MLest correct estimates of \code{RRuni} if pi is outside of [0,1]
+#' @param MLest concerns \code{\link{RRuni}}: whether to use \code{optim} to get ML instead of moment estimates (only relevant if pi is outside of [0,1])
 #' @param getPower whether to compute power for \code{method="RRcor"} (performs an additional bootstrap assuming independence)
 #' @param nCPU integer: how many processors to use? (use 'max' for automatic detection on Windows)
 #' @return A list containing
@@ -44,11 +44,12 @@
 RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0, 
                    complyRates=c(1,1), sysBias=c(0,0), 
                    method=c("RRuni","RRcor","RRlog","RRlin"), 
-                   alpha=0.05, groupRatio=0.5, MLest=TRUE, 
+                   alpha=0.05, groupRatio=0.5, MLest=FALSE, 
                    getPower=TRUE, nCPU=1){
   try(stopCluster(cl.tmp), silent = T)
   
-  modelNames <- c("Warner","UQTknown","UQTunknown","Mangat","Kuk","FR","Crosswise","direct","CDM","CDMsym","SLD")
+  modelNames <- c("Warner","UQTknown","UQTunknown","Mangat","Kuk",
+                  "FR","Crosswise","direct","CDM","CDMsym","SLD","custom")
   model <- pmatch(model, modelNames, duplicates.ok=T )
   model <- modelNames[model]
   
@@ -83,7 +84,7 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
       # if (class(complyRates)!= "list") complyRates <- list(complyRates)
       # if only one RR variable included: transform correlation to mean difference
       diffMean <- sqrt(cor^2/(pi[1]*(1-pi[1])*(1-cor^2))) * sign(cor)
-      if (model == "FR" & length(pi)>2){
+      if (model %in% c("custom", "FR") & length(pi)>2){
         ppi <- pi
         if (min(pi)==0){
           ppi <- pi + .001
@@ -162,8 +163,8 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
       uni1 <- RRuni(response=dat$response,model=model,p=p,group=group,MLest=MLest)  
       if ("RRuni" %in% method){
         parEsts[cnt,"pi.true"] <- table(dat$true)["1"]/n
-        parEsts[cnt,"pi.RRuni"] <- uni1$pi[ifelse(model=="FR",2,1)]
-        parEsts[cnt,"piSE.RRuni"] <- uni1$piSE[ifelse(model=="FR",2,1)]
+        parEsts[cnt,"pi.RRuni"] <- uni1$pi[ifelse(model %in% c("custom","FR"),2,1)]
+        parEsts[cnt,"piSE.RRuni"] <- uni1$piSE[ifelse(model %in% c("custom","FR"),2,1)]
         
         if (model %in% c("CDMsym","CDM")){
           parEsts[cnt,"pi.true"] <- table(dat[dat$comply==1,"true"])["1"]/n
@@ -192,7 +193,6 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
         
         try({log1 <- RRlog(response~cov,data=dat,model=model,p=p,group=group, 
                            LR.test=T, fit.n=1)
-             print(log1)
              parEsts[cnt,"beta.RRlog"] <- log1$coefficients["cov"]
              parEsts[cnt,"betaSE.RRlog"] <- sqrt(log1$vcov["cov","cov"])
              parEsts[cnt,"beta.deltaG2.RRlog"] <- -2*log1$deltaLogLik["cov"]
@@ -355,12 +355,12 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
 print.RRsimu <- function(x,...){
   if (length(x$model) ==1)
     cat( paste0(x$model," ; n= ",x$n,"; randomization probability: ", 
-                gsub(", ",", ",toString(x$p)),"\n" ))
+                gsub(", ",", ",toString(round(x$p,3))),"\n" ))
   if (length(x$model) ==2){
     cat( paste0("\n",x$model[1]," ; n= ",x$n,"; randomization probability: ",
-                gsub(", ",", ",toString(x$p[[1]]))))
+                gsub(", ",", ",toString(round(x$p[[1]],3)))))
     cat( paste0("\n",x$model[2]," ; n= ",x$n,"; randomization probability: ",
-                gsub(", ",", ",toString(x$p[[2]])),"\n" ))
+                gsub(", ",", ",toString(round(x$p[[2]],3))),"\n" ))
   }  
   cat(paste0("\nMean estimates and SEs (",x$numRep," replications):\n"))
   print( round(x$results,5))

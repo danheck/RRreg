@@ -72,6 +72,8 @@ powerplot <- function(numRep, n=c(100,500,1000), pi, cor=c(0,.1,.3), b.log=NULL,
               complyRates = complyRates, sysBias = sysBias, 
               groupRatio=groupRatio, alpha=alpha)
   class(out) <- "powerplot"
+  plot(out)
+  
   out
 }
 
@@ -122,7 +124,7 @@ plot.powerplot <- function(x,  ...){
     }
     
     ll <- 1
-    plot(n, res[,1,i],type="o", ylim=0:1, ylab=paste0("Power"), 
+    plot(n, res[,1,i],type="o", ylim=0:1, ylab=paste0("Power (pi = ",x$pi,")"), 
          xlab="Sample size", bty='L', 
          main=main)
     if (length(cor)>1){
@@ -135,6 +137,7 @@ plot.powerplot <- function(x,  ...){
      abline(h=x$alpha, lty="dotted")
   }
   plot.new()
-  legend("center", legend=cor, pch=ll, lty=ll, col=cols[1:length(cor)], title=leg)
+  par(mar=rep(0,4))
+  legend("left", legend=cor, pch=ll, lty=ll, col=cols[1:length(cor)], title=leg)
   par(mfrow=c(1,1) , xpd=xpd, mar=mar, oma=oma)
 }

@@ -12,7 +12,11 @@ Depends:
 Imports:
     parallel,
     doParallel,
-    foreach
+    foreach,
+    stats,
+    grDevices,
+    graphics,
+    lme4
 Suggests:
     knitr
 Description: Univariate and multivariate methods to analyze
@@ -20,13 +24,15 @@ Description: Univariate and multivariate methods to analyze
     Randomized response: A survey technique for eliminating evasive answer
     bias. Journal of the American Statistical Association, 60, 63–69).
     Besides univariate estimates of true proportions, RR variables can be used
-    for correlations, as dependent variable in a logistic regression and as
-    predictors in a linear regression. For simulation and bootstrap purposes,
-    RR data can be generated according to several models.
+    for correlations, as dependent variable in a logistic regression (with or
+    without random effects), as predictors in a linear regression, or as
+    dependent variable in a beta-binomial ANOVA. For simulation and bootstrap
+    purposes, RR data can be generated according to several models.
 License: GPL-2
 Encoding: UTF-8
 LazyLoad: yes
 URL: http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg/
 VignetteBuilder: knitr
-Version: 0.3.0
-Date: 2015-02-23
+Version: 0.5.0
+Date: 2015-11-12
+RoxygenNote: 5.0.0

@@ -90,7 +90,7 @@ RRuni.FR<-function(response,p){
   callText <- ""
   
   for (i in 1:numCat){
-    lambda[i] <- table(response)[i]/n
+    lambda[i] <- table(factor(response, levels=0:(numCat-1)))[i]/n
     pi[i] <- (lambda[i]-p[i])/pTrue
     piSE[i] <- sqrt((lambda[i]*(1-lambda[i]))/(pTrue^2*n))
     callText <- paste(callText,"p",i-1,"=",p[i]," , ",sep="")
@@ -170,7 +170,7 @@ RRuni.CDMsym<-function(response,p,group){
   piSE <- sqrt( p[3]^2 *l1.var +p[1]^2*l2.var ) / abs(pi.denom)
   gammaSE <- sqrt( (1-p[3]-p[4])^2*l1.var + (1-p[1]-p[2])^2*l2.var ) / abs(gamma.denom)
   res=list(model="CDMsym",call=paste0("Cheater Detection Model (symmetric); for group 1: p1 = ",p[1]," , p2 = ",p[2],"; for group 2: p3 = ",p[3],", p4 = ",p[4]," (probabilities of directed 'Yes'/'No' answers)"),
-           pi=pi,piSE=piSE,beta=beta,gamma=gamma,gammaSE=gammaSE,n=c(n1,n2))
+           pi=pi,piSE=piSE,beta=beta, betaSE=NA, gamma=gamma,gammaSE=gammaSE,n=c(n1,n2))
   return(res)
 } 
 
@@ -257,3 +257,18 @@ RRuni.mix.unknown<-function(response,p,group){
 #   print(y.var)
   return(res)
 } 
+
+
+RRuni.custom <- function(response, p, group){
+  freq <- table(factor(response, levels=0:(ncol(p)-1)))
+  n <- sum(freq)
+  lambda <- freq/n
+  Pinv <- solve(p)
+  pi <- c(Pinv %*% lambda)
+  # van den hout, van der heijden 2002
+  piCov <- (Pinv %*% ( diag(lambda) - lambda %*% t(lambda))%*% t(Pinv) )/(n-1)
+  piSE <- sqrt(diag(piCov))
+  res <- list(model="custom",call=paste0("RR as misclassification"),
+              pi=pi,piSE=piSE, n=n) #,y.var=y.var, x.var=x.var)
+  return(res)
+}
