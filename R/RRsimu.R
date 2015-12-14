@@ -110,10 +110,9 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
     parEsts <- matrix(NA,nrow=replic,ncol=nvar)
     colnames(parEsts) <- nn
     parEsts <- as.data.frame(parEsts)
-    cnt <- 1 ; maxtrys <- 5 ; trys <- 0
+    cnt <- 1 ; max.tries <- 3  #; trys <- 0
     #     okcor <- T; oklog <- T; oklin <- T; 
     while(cnt <= replic){
-      trys <- trys+1
       
       # generate normal data dependent on true value on RR variable
       # k : loop through true states
@@ -150,77 +149,107 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
       else 
         group <- dat$group
       
-      # analyse with RRcor and RRlog
-      if ("RRcor" %in% method){
-        cor1 <- RRcor(x=dat[,c("response","cov")],
-                      models=c(model,"d"),p.list= list(p,1),
-                      group=group )  
-        parEsts[cnt,"cor.true"] <- cor(dat$true,dat$cov)
-        parEsts[cnt,"cor.RRcor"] <- cor1$r["cov","response"]
-        if (trys <maxtrys && is.na(cor1$r["cov","response"])) next
-      }
-      
-      uni1 <- RRuni(response=dat$response,model=model,p=p,group=group,MLest=MLest)  
-      if ("RRuni" %in% method){
-        parEsts[cnt,"pi.true"] <- table(dat$true)["1"]/n
-        parEsts[cnt,"pi.RRuni"] <- uni1$pi[ifelse(model %in% c("custom","FR"),2,1)]
-        parEsts[cnt,"piSE.RRuni"] <- uni1$piSE[ifelse(model %in% c("custom","FR"),2,1)]
+      fit.success <- c(RRcor=FALSE, RRlog=FALSE, RRlin=FALSE)
+      for(trys in 1:max.tries){
+        suppressWarnings(try(rm(log1), silent=TRUE))
+        suppressWarnings(try(rm(linmod), silent=TRUE))
         
-        if (model %in% c("CDMsym","CDM")){
-          parEsts[cnt,"pi.true"] <- table(dat[dat$comply==1,"true"])["1"]/n
-          parEsts[cnt,"par2.true"] = 1- colMeans(dat)["comply"]
-          parEsts[cnt,"par2.RRuni"] = uni1$gamma
-          #         parEsts[cnt,"par2SE.RRuni"] = uni1$gammaSE
-        }else if (model== "SLD"){
-          parEsts[cnt,"par2.true"] = colMeans(dat[dat$true==1,])["comply"]
-          parEsts[cnt,"par2.RRuni"] = uni1$t
-          #         parEsts[cnt,"par2SE.RRuni"] = uni1$tSE
+        # analyse with RRcor
+        if (!fit.success[1] && "RRcor" %in% method){
+          cor1 <- RRcor(x=dat[,c("response","cov")],
+                        models=c(model,"d"),p.list= list(p,1),
+                        group=group )  
+          if (!is.na(cor1$r["cov","response"])){
+            parEsts[cnt,"cor.true"] <- cor(dat$true,dat$cov)
+            parEsts[cnt,"cor.RRcor"] <- cor1$r["cov","response"]
+            fit.success[1] <- TRUE
+          }
+        }else{
+          fit.success[1] <- TRUE
+        }
+        
+        # analyse with RRuni
+        if(trys == 1){
+          uni1 <- RRuni(response=dat$response,model=model,p=p,group=group,MLest=MLest)  
+          if ("RRuni" %in% method){
+            parEsts[cnt,"pi.true"] <- table(dat$true)["1"]/n
+            parEsts[cnt,"pi.RRuni"] <- uni1$pi[ifelse(model %in% c("custom","FR"),2,1)]
+            parEsts[cnt,"piSE.RRuni"] <- uni1$piSE[ifelse(model %in% c("custom","FR"),2,1)]
+            
+            if (model %in% c("CDMsym","CDM")){
+              parEsts[cnt,"pi.true"] <- table(dat[dat$comply==1,"true"])["1"]/n
+              parEsts[cnt,"par2.true"] = 1- colMeans(dat)["comply"]
+              parEsts[cnt,"par2.RRuni"] = uni1$gamma
+              #         parEsts[cnt,"par2SE.RRuni"] = uni1$gammaSE
+            }else if (model== "SLD"){
+              parEsts[cnt,"par2.true"] = colMeans(dat[dat$true==1,])["comply"]
+              parEsts[cnt,"par2.RRuni"] = uni1$t
+              #         parEsts[cnt,"par2SE.RRuni"] = uni1$tSE
+            } 
+          }
+        }
+        
+        # analyse with RRlog
+        if (!fit.success[2] && "RRlog" %in% method){
+          #         oklog <- F
+          parEsts[cnt,"beta.true"] <- NA
+          # adjust dependent variable for CDM: having sensitive attribute and commiting in RR design!
+          if (model %in% c("CDMsym","CDM")){
+            dat$true <- dat$true & dat$comply
+          }
+          if(trys == 1)
+            try({
+              glm1 <- glm(true~cov,dat,family=binomial(link = "logit"))
+              parEsts[cnt,"beta.true"] <- glm1$coefficients["cov"]
+              parEsts[cnt,"betaSE.true"] <- summary(glm1)$coef[2,2]    
+            }, silent=T)
+          
+          try({log1 <- RRlog(response~cov,data=dat,model=model,p=p,group=group, 
+                          LR.test=T, fit.n=1)}, silent=T)
+          if (exists("log1", envir= environment()) && 
+              !is.null(log1$coefficients["cov"]) && !is.na(log1$coefficients["cov"])){
+            if(abs(log1$coefficients["cov"])>3){
+              # print(log1)
+              try({log1 <- RRlog(response~cov,data=dat,model=model,p=p,group=group, 
+                                  LR.test=T, fit.n=3)}, silent=T)
+              # print(log1)
+            }
+            parEsts[cnt,"beta.RRlog"] <- log1$coefficients["cov"]
+            suppressWarnings(try(parEsts[cnt,"betaSE.RRlog"] <- sqrt(log1$vcov["cov","cov"]), silent=TRUE))
+            try(parEsts[cnt,"beta.deltaG2.RRlog"] <- -2*log1$deltaLogLik["cov"], silent=TRUE)
+            fit.success[2] <- TRUE
+          }
+        }else{
+          fit.success[2] <- TRUE
         } 
-      }
-      
-      if ("RRlog" %in% method){
-        #         oklog <- F
-        parEsts[cnt,"beta.true"] <- NA
-        # adjust dependent variable for CDM: having sensitive attribute and commiting in RR design!
-        if (model %in% c("CDMsym","CDM")){
-          dat$true <- dat$true & dat$comply
-        }
-        try({
-          glm1 <- glm(true~cov,dat,family=binomial(link = "logit"))
-          parEsts[cnt,"beta.true"] <- glm1$coefficients["cov"]
-          parEsts[cnt,"betaSE.true"] <- summary(glm1)$coef[2,2]    
-        }, silent=T)
         
-        try({log1 <- RRlog(response~cov,data=dat,model=model,p=p,group=group, 
-                           LR.test=T, fit.n=1)
-             parEsts[cnt,"beta.RRlog"] <- log1$coefficients["cov"]
-             parEsts[cnt,"betaSE.RRlog"] <- sqrt(log1$vcov["cov","cov"])
-             parEsts[cnt,"beta.deltaG2.RRlog"] <- -2*log1$deltaLogLik["cov"]
-             #              oklog <- T
-        }, silent=T)
-        if (trys <maxtrys &&  is.na(parEsts[cnt,"beta.RRlog"])) next
-      } 
-      
-      
-      if ("RRlin" %in% method){
-        #         oklin <- F
-        parEsts[cnt,"lincoef.true"] <- NA
-        # adjust dependent variable for CDM: having sensitive attribute and commiting in RR design!
-        if (model %in% c("CDMsym","CDM")){
-          dat$true <- dat$true & dat$comply
-        }
-        lm1 <- lm(cov~true,dat)
-        parEsts[cnt,"lincoef.true"] <- coef(lm1)["true"]
-        parEsts[cnt,"lincoefSE.true"] <- sqrt(vcov(lm1)["true","true"])
         
-        try({linmod <- RRlin(cov~response,data=dat,models=model,p.list=list(p),
-                             group=group, fit.n=1)
-             parEsts[cnt,"lincoef.RRlin"] <- linmod$beta["response"]
-             parEsts[cnt,"lincoefSE.RRlin"] <- sqrt(vcov(linmod)["response","response"])
-             parEsts[cnt,"lincoef.deltaG2.RRlin"] <- -2*logLik(linmod)["response"]
-             #              oklin <- T
-        }, silent=T)
-        if (trys <maxtrys &&  is.na(parEsts[cnt,"lincoef.RRlin"])) next
+        # analyse with RRlin
+        if (!fit.success[3] && "RRlin" %in% method){
+          #         oklin <- F
+          parEsts[cnt,"lincoef.true"] <- NA
+          # adjust dependent variable for CDM: having sensitive attribute and commiting in RR design!
+          if (model %in% c("CDMsym","CDM")){
+            dat$true <- dat$true & dat$comply
+          }
+          lm1 <- lm(cov~true,dat)
+          parEsts[cnt,"lincoef.true"] <- coef(lm1)["true"]
+          parEsts[cnt,"lincoefSE.true"] <- sqrt(vcov(lm1)["true","true"])
+          
+          try(linmod <- RRlin(cov~response,data=dat,models=model,p.list=list(p),
+                               group=group, fit.n=1), silent=T)
+          if (exists("linmod", envir= environment()) && 
+              !is.null(linmod$beta["response"]) && !is.na(linmod$beta["response"])){
+            parEsts[cnt,"lincoef.RRlin"] <- linmod$beta["response"]
+            parEsts[cnt,"lincoefSE.RRlin"] <- sqrt(vcov(linmod)["response","response"])
+            parEsts[cnt,"lincoef.deltaG2.RRlin"] <- -2*logLik(linmod)["response"]
+            fit.success[3] <- TRUE
+          }
+        }else{
+          fit.success[3] <- TRUE
+        }
+        if(all(fit.success))
+          break
       }
       cnt <- cnt+1
     }
@@ -306,8 +335,17 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
   NAs <-  colSums(is.na(parEsts))
   results <- data.frame(Mean=colMeans(parEsts,na.rm =T),
                         #                         SE=bs.se(parEsts,)
-                        SE=apply(parEsts,2,sd,na.rm =T)
+                        SD=apply(parEsts,2,sd,na.rm =T)
   )
+  # use online estimates between quantiles(.01, .99)
+  for(i in 1:nrow(results)){
+    if(!is.na(results[i,1])){
+      sel <- parEsts[,i] >= quantile(parEsts[,i], probs = .01, na.rm=TRUE) &
+        parEsts[,i] <= quantile(parEsts[,i], probs = .99, na.rm=TRUE)
+      results[i,1] <- mean(parEsts[sel,i],na.rm =T)
+      results[i,2] <- sd(parEsts[sel,i],na.rm =T)
+    }
+  }
   ####################################### COMPUTE POWER ###########################################
   power <- rep(-1,4) 
   names(power) <-  c("RRuni(z-test)", "RRcor(par_bootstrap)","RRlog(LR-test)","RRlin(Wald-test)")
@@ -316,7 +354,7 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
     power[1] <- sum( pnorm(z_val,lower.tail=F) < alpha, na.rm =T)/ (nrow(parEsts)-NAs["pi.RRuni"])
   }
   if ("RRcor" %in% method && getPower){
-    simH0 <- RRsimu(numRep=numRep, n=n, pi=pi, model = model, 
+    simH0 <- RRsimu(numRep=numRep, n=n, pi=pi, model = model, cor=0,
                     p=p, MLest=TRUE, complyRates =complyRates,
                     sysBias = sysBias, groupRatio=groupRatio, 
                     method="RRcor",getPower=F, nCPU=nCPU)
@@ -343,7 +381,8 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
   
   sim <- list(parEsts = parEsts, results = results, power = power,
               model=model,p=p,n=n,numRep=numRep, alpha=alpha,
-              complyRates=complyRates, sysBias=sysBias, groupRatio=groupRatio)
+              complyRates=complyRates, sysBias=sysBias, groupRatio=groupRatio,
+              method=method)
   class(sim) <- "RRsimu"
   sim
 }
@@ -354,18 +393,37 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
 #' @export
 print.RRsimu <- function(x,...){
   if (length(x$model) ==1)
-    cat( paste0(x$model," ; n= ",x$n,"; randomization probability: ", 
+    cat( paste0(x$model," ; n= ",x$n,
+                "; randomization probability: ", 
                 gsub(", ",", ",toString(round(x$p,3))),"\n" ))
   if (length(x$model) ==2){
-    cat( paste0("\n",x$model[1]," ; n= ",x$n,"; randomization probability: ",
+    cat( paste0("\n",x$model[1],
+                " ; n= ",x$n,
+                "; randomization probability: ",
                 gsub(", ",", ",toString(round(x$p[[1]],3)))))
-    cat( paste0("\n",x$model[2]," ; n= ",x$n,"; randomization probability: ",
+    cat( paste0("\n",x$model[2],
+                " ; n= ",x$n,
+                "; randomization probability: ",
                 gsub(", ",", ",toString(round(x$p[[2]],3))),"\n" ))
   }  
-  cat(paste0("\nMean estimates and SEs (",x$numRep," replications):\n"))
-  print( round(x$results,5))
+  cat(paste0("\nBootstrapped mean and SD of parameters (",x$numRep," replications):\n"))
+  print( round(x$results[,1:2],5))
   cat(paste0("\nPower on alpha=",x$alpha," level:\n"))
   print( round(x$power,5))
+  sel <- x$results[,3] > x$numRep* .05
+  if(any(sel)){
+    warning("Fitting routines did fail in \n  ",
+            paste(x$results[,3]*100/x$numRep, collapse=","), 
+                  "% of bootstrap samples for:\n      ", 
+            paste(rownames(x$results)[sel], collapse="; "), ", respectively.", 
+            "\n  This might be due to extreme prevalence rates (e.g., pi=.01).")
+  }
+  
+  # if("RRlog" %in% x$method){
+  #     warning("Fitting routines did fail in more than 5% of bootstrap samples for:\n      ", 
+  #             paste(rownames(x$results)[sel], collapse="; "), 
+  #             "\n  This might be due to extreme prevalence rates (e.g., pi=.01).")
+  # }
 }
 
 # Plot Results of Monte Carlo Simulation
@@ -413,6 +471,7 @@ plot.RRsimu <- function(x,...){
       #     else if (nn[i]=="beta.prob.RRlog"){
       #       curve(dunif, col = "blue", add = TRUE,n=500)
       #     }
+      
     }
   }
   par(mfrow=c(1,1))

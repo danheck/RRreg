@@ -122,7 +122,8 @@ RRuni.SLD<-function(response,p,group){
     (lambda1*(1-lambda1))/n1*(((p1-p2)*(p2+lambda2-1))/(p1-p2+lambda1-lambda2)^2)^2+
       (lambda2*(1-lambda2))/n2*(((p1-p2)*(p1+lambda1-1))/(p1-p2+lambda1-lambda2)^2)^2  )
   
-  res <- list(model="SLD",call=paste("Stochastic Lie Detector with p1 =",p1,", p2 =",p2),
+  res <- list(model="SLD",call=paste("Stochastic Lie Detector with p1 =",
+                                     round(p1,4),", p2 =",round(p2,4)),
               pi=pi,piSE=piSE,t=t,tSE=tSE,n=c(n1,n2))
   return(res)
 } 
@@ -147,7 +148,8 @@ RRuni.CDM<-function(response,p,group){
   gamma <- 1 + ((p2-1)*lambda1+(1-p1)*lambda2)/(p1-p2)
   gammaSE <- sqrt(((p2-1)^2*lambda1*(1-lambda1)/n1+(1-p1)^2*lambda2*(1-lambda2)/n2)/((p1-p2)^2))
   
-  res=list(model="CDM",call=paste("Cheater Detection Model with p1 =",p1,", p2 =",p2),
+  res=list(model="CDM",call=paste("Cheater Detection Model with p1 =",
+                                  round(p1,4),", p2 =",round(p2,4)),
            pi=pi,piSE=piSE,beta=beta,betaSE=betaSE,gamma=gamma,gammaSE=gammaSE,n=c(n1,n2))
   return(res)
 } 

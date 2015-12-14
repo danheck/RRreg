@@ -433,16 +433,16 @@ vcov.RRlog <- function(object, ...){
 #' 
 #' Plot the predictions of a fitted  logistic RR regression model. Data are not included directly, as these are not directly interpretable due to the RR design.
 #' 
-#'  @param x a fitted \link{RRlog} object
-#'  @param predictor character name of a predictor of the model to be fitted
-#'  @param center.preds whether to compute predictions by assuming that all other predictors are at their respective mean values (if FALSE: all other predictors set to zero)
-#'  @param plot.mean whether to plot mean of predictor as vertical line
-#'  @param ci level for confidence intervals. Set to 0 to omit.
-#'  @param xlim if provided, these boundaries are used for the predictor on the x-axis
-#'  @param steps number of steps for plotting
-#'  @param ... other arguments passed to the function \link{plot}
+#' @param x a fitted \link{RRlog} object
+#' @param predictor character name of a predictor of the model to be fitted
+#' @param center.preds whether to compute predictions by assuming that all other predictors are at their respective mean values (if FALSE: all other predictors set to zero)
+#' @param plot.mean whether to plot mean of predictor as vertical line
+#' @param ci level for confidence intervals. Set to 0 to omit.
+#' @param xlim if provided, these boundaries are used for the predictor on the x-axis
+#' @param steps number of steps for plotting
+#' @param ... other arguments passed to the function \link{plot}
 #'  
-#'  @examples
+#' @examples
 #'  # generate data
 #'  n <- 500
 #'  x <- data.frame(x1=rnorm(n))

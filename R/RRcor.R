@@ -329,7 +329,7 @@ p.char <- character(m)
 for (i in 1:m){
   if (models[i]!="direct"){
     for (k in 1:length(p.list[[i]])){
-      p.char[i] <- paste(p.char[i],(p.list[[i]][k]))
+      p.char[i] <- paste(p.char[i], round(p.list[[i]][k],4))
     }
   } 
 }

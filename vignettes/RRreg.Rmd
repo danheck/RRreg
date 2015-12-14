@@ -1,5 +1,7 @@
 ---
 title: "RRreg manual"
+author: "Daniel W. Heck"
+date: "`r Sys.Date()`"
 output:
   html_document:
     css: markdown10.css
@@ -11,17 +13,17 @@ output:
   pdf_document:
     toc: yes
     toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{An Introduction to the RRreg package}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
 ---
-<!--
-%\VignetteEngine{knitr::knitr}
-%\VignetteIndexEntry{An Introduction to the RRreg package}
--->
+
 
 Correlation and regression analysis for randomized response designs
 
-Daniel W. Heck, <dheck@mail.uni-mannheim.de>
+Contact: <dheck@mail.uni-mannheim.de>
 
-Last update: October 2015
 
 # Introduction
 
