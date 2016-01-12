@@ -48,5 +48,4 @@ NULL
 #' @name minarets
 #' @usage data(minarets)
 # @format A data frame with 1621 rows and 6 variables
-
 NULL

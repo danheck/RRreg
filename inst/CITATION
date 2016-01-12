@@ -1,10 +1,10 @@
 bibentry("Manual",
-		title="RRreg: An R Package for Correlation and Regression Analyses of Randomized Response Data",
+		title="RRreg: Correlation and Regression Analyses for Randomized Response Data",
 		author="Daniel W. Heck and Morten Moshagen",
-		year="2015",
-		note="(Version 0.6.0)",
+		year="2016",
+		note="R package version 0.6.1)",
 		
-		textVersion = "Heck, D.W. & Moshagen, M. (2015). RRreg: An R Package for Correlation and Regression Analyses of Randomized Response Data (Version 0.6.0). http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg/",
+		textVersion = "Heck, D.W. & Moshagen, M. (2016). RRreg: Correlation and Regression Analyses for Randomized Response Data. R package version 0.6.1. https://CRAN.R-project.org/package=RRreg",
 		
-		url="http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg/",
+		url="https://CRAN.R-project.org/package=RRreg",
 		mheader = "To cite RRreg in publications use:")

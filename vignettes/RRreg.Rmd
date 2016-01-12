@@ -15,7 +15,7 @@ output:
     toc_depth: 2
 vignette: >
   %\VignetteIndexEntry{An Introduction to the RRreg package}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 

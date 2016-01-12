@@ -196,6 +196,11 @@ RRlog.default <-function(formula, data, model, p, group, n.response=1, LR.test=T
       par2fix <- fix.par2(model)
       try(est.res <- RRlog.fit(model, x, y, n.response, p, start[1:ncol(x)], 
                                group, setPar2=par2fix, maxit=optim.max))
+      cnt <- 0
+      while(is.na(est.res$logLik) && cnt<5){
+        cnt <- cnt + 1
+        try(est.res <- RRlog.fit(model, x, y, n.response, p, rnorm(ncol(x),0,.2), 
+                                 group, setPar2=par2fix, maxit=optim.max))}
       deltaLogLik[est$npar] <- est.res$logLik - est$logLik
     }
     
