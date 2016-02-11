@@ -5,7 +5,7 @@
 #' Linear regression for a continuous criterion, using randomized-response (RR) variables as predictors.
 #' @param formula a continuous criterion is predicted by one or more categorical RR variables defined by \code{models}. If the number of predictors exceeds the number defined by the vector \code{models}, the remaining predictors are treated as non-randomized variables (e.g., direct questions). Interactions including any of the RR variables cannot be included.
 #' @param data an optional data frame, list or environment, containing the variables in the model. 
-#' @param models character vector specifying RR model(s) in order of appearance in formula. Available models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"custom"} (custom: a randomization matrix must be specified in the corresponding element of \code{p.list}, where the entry \code{p[i,j]} defines the probability of responding i (i-th row) given a true state of j (j-th column)).
+#' @param models character vector specifying RR model(s) in order of appearance in formula. Available models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"custom"} (custom: a randomization matrix must be specified in the corresponding element of \code{p.list}, where the entry \code{p[i,j]} defines the probability of responding i (i-th row) given a true state of j (j-th column)).
 #' @param p.list list of randomization probabilities for RR models in the same order as specified in \code{models}. Note, that the randomization probabilities p must be provided in a \code{\link{list}}, e.g., \code{list(p=c(.2, .3))}. See \code{\link{RRuni}} for details.
 # LR.test if true, regression coefficients are tested by a likelihood ratio test by stepwise exclusion of each predictor
 #' @param group vector or matrix specifying group membership by the indices 1 and 2. Only for multigroup RR models, e.g., \code{UQTunknown}, \code{CDM} or \code{SLD}
@@ -109,7 +109,8 @@ RRlin <- function(formula, data, models, p.list, group=NULL,
   #   intercept <- formula[[4]]
   
   # INPUT
-  modelNames <- c("Warner","UQTknown","UQTunknown","Mangat","Kuk","FR","Crosswise","CDM","CDMsym","SLD","custom")
+  modelNames <- c("Warner","UQTknown","UQTunknown","Mangat","Kuk","FR",
+                  "Crosswise","Triangular","CDM","CDMsym","SLD","custom")
   models <- pmatch(models, modelNames, duplicates.ok=T )
   models <- modelNames[models]
   #   M <- length(models)

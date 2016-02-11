@@ -12,7 +12,7 @@ RRcor(x, y = NULL, models, p.list, group = NULL, bs.n = 0,
 
 \item{y}{\code{NULL} (default) or a vector, matrix or data frame with compatible dimensions to \code{x}.}
 
-\item{models}{a vector defining which RR design is used for each variable. Must be in the same order as variables appear in \code{x} and \code{y} (by columns). Available discrete models: \code{Warner}, \code{Kuk}, \code{FR}, \code{Mangat}, \code{UQTknown}, \code{UQTunknown}, \code{Crosswise}, \code{SLD} and \code{direct} (i.e., no randomized response design). Available continuous models: \code{mix.norm}, \code{mix.exp}.}
+\item{models}{a vector defining which RR design is used for each variable. Must be in the same order as variables appear in \code{x} and \code{y} (by columns). Available discrete models: \code{Warner}, \code{Kuk}, \code{FR}, \code{Mangat}, \code{UQTknown}, \code{UQTunknown}, \code{Crosswise}, \code{Triangular}, \code{SLD} and \code{direct} (i.e., no randomized response design). Available continuous models: \code{mix.norm}, \code{mix.exp}.}
 
 \item{p.list}{a \code{list} containing the randomization probabilities of the RR models defined in \code{models}. Either, all \code{direct}-variables (i.e., no randomized response) in \code{models} can be excluded in \code{p.list}; or, if specified, randomization probabilities \code{p} are ignored for \code{direct}-variables. See \code{\link{RRuni}} for a detailed specification of p.}
 

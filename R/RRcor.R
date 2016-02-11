@@ -3,7 +3,7 @@
 #' \code{RRcor} calculates bivariate Pearson correlations of variables measured with or without RR.
 #' @param x a numeric vector, matrix or data frame.
 #' @param y \code{NULL} (default) or a vector, matrix or data frame with compatible dimensions to \code{x}. 
-#' @param models a vector defining which RR design is used for each variable. Must be in the same order as variables appear in \code{x} and \code{y} (by columns). Available discrete models: \code{Warner}, \code{Kuk}, \code{FR}, \code{Mangat}, \code{UQTknown}, \code{UQTunknown}, \code{Crosswise}, \code{SLD} and \code{direct} (i.e., no randomized response design). Available continuous models: \code{mix.norm}, \code{mix.exp}.
+#' @param models a vector defining which RR design is used for each variable. Must be in the same order as variables appear in \code{x} and \code{y} (by columns). Available discrete models: \code{Warner}, \code{Kuk}, \code{FR}, \code{Mangat}, \code{UQTknown}, \code{UQTunknown}, \code{Crosswise}, \code{Triangular}, \code{SLD} and \code{direct} (i.e., no randomized response design). Available continuous models: \code{mix.norm}, \code{mix.exp}.
 #' @param p.list a \code{list} containing the randomization probabilities of the RR models defined in \code{models}. Either, all \code{direct}-variables (i.e., no randomized response) in \code{models} can be excluded in \code{p.list}; or, if specified, randomization probabilities \code{p} are ignored for \code{direct}-variables. See \code{\link{RRuni}} for a detailed specification of p.
 #' @param group a matrix defining the group membership of each participant (values 1 and 2) for all multiple group models(\code{SLD}, \code{UQTunknown}). If only one of these models is included in \code{models}, a vector can be used. For more than one model, each column should contain one grouping variable 
 #' @param bs.n number of samples used to get bootstrapped standard errors
@@ -113,7 +113,9 @@ RRcor <- function(x, y=NULL, models, p.list, group=NULL, bs.n=0, bs.type=c("se.n
     colnames(X) <- ynames
     m <- my
   }
-  modelNames <- c("Warner","UQTknown","UQTunknown","Mangat","Kuk","FR","Crosswise","direct","SLD", "mix.norm","mix.exp", "mix.unknown")
+  modelNames <- c("Warner","UQTknown","UQTunknown","Mangat",
+                  "Kuk","FR","Crosswise","Triangular","direct","SLD", 
+                  "mix.norm","mix.exp", "mix.unknown")
   models <- pmatch(models, modelNames, duplicates.ok=T )
   models <- modelNames[models]
   n <- nrow(X)

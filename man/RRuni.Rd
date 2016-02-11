@@ -11,7 +11,7 @@ RRuni(response, data, model, p, group = NULL, MLest = TRUE)
 
 \item{data}{optional \code{data.frame} containing the response variable}
 
-\item{model}{defines RR model. Available models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"},\code{"FR"}, \code{"Crosswise"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"mix.norm"}, \code{"mix.exp"},\code{"mix.unknown"}, or \code{"custom"}. See argument \code{p} or type \code{vignette('RRreg')} for detailed specifications.}
+\item{model}{defines RR model. Available models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"},\code{"FR"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"mix.norm"}, \code{"mix.exp"},\code{"mix.unknown"}, or \code{"custom"}. See argument \code{p} or type \code{vignette('RRreg')} for detailed specifications.}
 
 \item{p}{randomization probability (see details or \code{vignette("RRreg")})}
 
@@ -30,7 +30,8 @@ Each RR design \code{model} differs in the definition of the randomization proba
  \itemize{
  \item \code{"Warner"}: Probabiltiy to get sensitive Question 
  \item \code{"Mangat"}: Prob. for noncarriers to respond truthfully (i.e., with No=0)
- \item \code{"Crosswise"}: Prevalence of 'yes' responses for unrelated question (response category is coded as 1=['no-no' or 'yes-yes']; 0=['yes-no' or 'no-yes'])
+ \item \code{"Crosswise"}: Probability to respond 'yes' to irrelevant second question (coding of responses: 1=['no-no' or 'yes-yes']; 0=['yes-no' or 'no-yes'])
+ \item \code{"Triangular"}: Probability to respond 'yes' to irrelevant second question (coding of responses: 0='no' to both questions (='circle'); 1='yes' to at least one question ('triangle'))
  } 
  and as a two-valued vector of probabilities for 
  \itemize{

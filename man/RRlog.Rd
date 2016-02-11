@@ -12,7 +12,7 @@ RRlog(formula, data, model, p, group, n.response = 1, LR.test = TRUE,
 
 \item{data}{\code{data.frame}, in which variables can be found (optional)}
 
-\item{model}{Available RR models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"custom"}. See \code{vignette("RRreg")} for details.}
+\item{model}{Available RR models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"custom"}. See \code{vignette("RRreg")} for details.}
 
 \item{p}{randomization probability/probabilities (depending on model, see \code{\link{RRuni}} for details)}
 

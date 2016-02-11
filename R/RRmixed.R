@@ -4,7 +4,7 @@
 #' 
 #' @param formula two-sided formula including random and fixed effects (see below or \code{\link{glmer}} for details)
 #' @param data an optional data frame with variables named in formula
-#' @param model type of RR design. Only 1-group RR designs are supported at the moment (i.e., \code{"Warner"}, \code{"FR"}, \code{"UQTknown"}, \code{"Crosswise"}, \code{"Kuk"}, \code{"Mangat"}, \code{"custom"}). See \code{\link{RRuni}} or \code{vignette(RRreg)} for details.
+#' @param model type of RR design. Only 1-group RR designs are supported at the moment (i.e., \code{"Warner"}, \code{"FR"}, \code{"UQTknown"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"Kuk"}, \code{"Mangat"}, \code{"custom"}). See \code{\link{RRuni}} or \code{vignette(RRreg)} for details.
 #' @param p randomization probability 
 #' @param ... further arguments passed to \code{\link{glmer}}
 #' @return an object of class \code{glmerMod}

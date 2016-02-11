@@ -44,16 +44,16 @@ Additionally, three functions can be used to generate data for robustness studie
 * [powerplot](#powerplot): Monte Carlo simulation to plot the power of the methods `RRuni`,`RRcor`, `RRlog`, or `RRlin` either for one RR and one continuous non-RR variable
 
 
-In the following, cocaine abuse is used as a running example to demonstrate the RR analysis with `RRreg`. The following RR designs are included in the package: [UQTknown](#UQTknown), [Mangat](#Mangat), [Kuk](#Kuk), [FR](#FR), [Crosswise](#Crosswise), [UQTunknown](#UQTunknown), [CDM](#CDM), [CDMsym](#CDMsym), [SLD](#SLD)
+In the following, cocaine abuse is used as a running example to demonstrate the RR analysis with `RRreg`. The following RR designs are included in the package: [UQTknown](#UQTknown), [Mangat](#Mangat), [Kuk](#Kuk), [FR](#FR), [Crosswise](#Crosswise), [Triangular](#Triangular), [UQTunknown](#UQTunknown), [CDM](#CDM), [CDMsym](#CDMsym), [SLD](#SLD)
 
 &nbsp; 
 
-# Statistical functions
+# Statistical Methods
 
 <a id="Warner"></a>
 <a id="RRuni"></a>
 
-### Univariate analysis
+### Univariate Analysis
 
 The original RR design proposed by Warner in 1965 works as follows: With randomization probability `p`, participants are supposed to answer to the question 'Have you ever used cocaine?', and with counter-probability `1-p`, the question is reversed, i.e., 'Have you never used cocaine?'. As a randomization device, dices or coin flips with known probabilities may be used. The model is depicted in the following figure:
 
@@ -83,7 +83,7 @@ The `response` variable containing 1 for *yes* and 0 for *no* responses can eith
 
 &nbsp; 
 
-### Multivariate analysis
+### Multivariate Analysis
 
 First, we generate a continuous, non-RR variable. According to our simulation, respondents carrying the sensitive attribute (i.e., cocaine users) have higher scores on this covariate:
 
@@ -96,7 +96,7 @@ data.W$cov[data.W$true==0] <- rnorm(sum(data.W$true == 0))
 
 &nbsp; 
 
-#### RRcor
+#### RRcor: RR correlations
 
 Now, we can estimate the bivariate (point-biserial) correlation between the dichotomous Warner RR variable and the continuous covariate:
 
@@ -116,7 +116,7 @@ cor(x=data.W$true, y=data.W$cov)
 
 <a id="RRlog"></a>
 
-#### RRlog
+#### RRlog: Logistic RR Regression
 
 Alternatively, we can run a logistic regression to predict the probability of cocaine use. In the `formula` below, the Warner RR variable is defined as criterion on the left side, whereas the continuous covariate is used as predictor on the right. The interface is similar to that of the standard linear regression in R (i.e., `lm()`).
 
@@ -137,7 +137,7 @@ glm(formula=true~cov, data=data.W, family=binomial(link = "logit"))
 
 <a id="RRmixed"></a>
 
-#### RRmixed
+#### RRmixed: Logistic RR Regression with Mixed Effects
 
 If the data are nested (e.g., students within schools), the logistic regression can be extended to include random effects. In R, the package `lme4` allows for flexible generalized linear mixed models (GLMMs) which include RR logistic regression as a special case. The function `RRmixed` uses the function `glmer`of `lme4` and an adjusted link function. However, at the moment this can only be used with one-group RR models that assume the same link function for all responses.
 
@@ -163,7 +163,7 @@ mixmod
 
 <a id="RRlin"></a>
 
-#### RRlin
+#### RRlin: RR Predictors in a Linear Regression
 
 Third, we can use the Warner RR variable as predictor in a linear regression:
 
@@ -209,7 +209,7 @@ To include many RR variables as predictors, very large sample sizes are required
 
 
 
-# Testing RR vs. direct questioning (DQ)
+# Testing RR vs. Direct Questioning (DQ)
 
 The method `RRlog` can be used to test whether an RR design leads to higher prevalence estimates than direct questioning (DQ). For one-groups designs (such as the Warner model), define a vector with indices 0 for all participants who were questioned by DQ and indices 1 for participants questioned by the RR design and include this dummy variable as predictor. For two-group designs (see below), define a dummy variable contrasting DQ and RR as before, and define a vector with indices 0 for participants questioned by DQ and indices 1 and 2 denoting the group of the RR design.
 
@@ -240,7 +240,7 @@ cat(exp(logit2) / (1+ exp(logit2)))
 
 &nbsp; 
 
-# Other RR models using one group
+# Specification of RR Models Using One Group
 
 In the following, several other available RR models are listed, which can be used throughout the package functions. For each model, the randomization probability `p` must be given as defined below.
 
@@ -248,7 +248,7 @@ In the following, several other available RR models are listed, which can be use
 
 <a id="UQTknown"></a>
 
-#### Unrelated question techique with known prevalance (UQTknown)
+#### Unrelated Question Techique with Known Prevalance (UQTknown)
 
 `model = 'UQTknown'`
 
@@ -262,7 +262,7 @@ In this RR design, participants either respond to the sensitive question or to a
 
 <a id="Mangat"></a>
 
-#### Mangat
+#### Mangat's RR Design
 
 `model = 'Mangat'`
 
@@ -276,7 +276,7 @@ In Mangat's model, carriers of the critical attribute are always provided with t
 
 <a id="Kuk"></a>
 
-#### Kuk
+#### Kuk's RR Design
 
 `model = 'Kuk'`
 
@@ -294,7 +294,7 @@ Note that the procedure can be applied repeatedly to obtain more reliable estima
 
 <a id="FR"></a>
 
-#### Forced response (FR)
+#### Forced Response (FR)
 
 `model = 'FR'`
 
@@ -322,16 +322,33 @@ For instance, having the categories `0,1,2,3,4` and `complyRates=c(1,1,1,.8,.5),
 
 <a id="Crosswise"></a>
 
-#### Crosswise model
+#### Crosswise Model
 
 `model = 'Crosswise'`
 
 Concerning the model equations, the Crosswise model is technically identical to the Warner model. However, instead of answering to the sensitive question directly, respondents are instructed to respond to the sensitive and an irrelevant question simultaneously, according to the following scheme:
 
-* If your answer is *yes* to both questions or *no* to both questions, respond with *yes* (coded as 1)
-* If your answer is *yes* to one and *no* to the other question, respond with *no* (coded as 0)
+* If your answer is *yes* to both questions or *no* to both questions, choose Option A (coded as 1)
+* If your answer is *yes* to one and *no* to the other question, choose Option B (coded as 0)
 
 ![title](figures/Crosswise.jpg)
+
+For the irrelevant question, the prevalence of *yes* responses  has to be known beforehand and is specified in RRreg by `p` (e.g., for the irrelevant question 'Is Your birthday in March or April?', `p = 2/12`). 
+
+* Yu, J.-W., Tian, G.-L., & Tang, M.-L. (2008). Two new models for survey sampling with sensitive characteristic: Design and analysis. *Metrika, 67*, 251-263. 
+
+&nbsp;
+
+<a id="Triangular"></a>
+
+#### Triangular Model
+
+`model = 'Triangular'`
+
+The Triangular model is technically similar to the Mangat's RR model. However, instead of answering to the sensitive question directly, respondents are instructed to respond to the sensitive and an irrelevant question simultaneously, according to the following scheme:
+
+* If your answer is *no* to both questions, respond with Option A (coded as 0, the `circle' in Yu et al., 2008)
+* If your answer is *yes* to at least one of the two questions, respond with Option B (coded as 1; the `triangle' in Yu et al., 2008)
 
 For the irrelevant question, the prevalence of *yes* responses  has to be known beforehand and is specified in RRreg by `p` (e.g., for the irrelevant question 'Is Your birthday in March or April?', `p = 2/12`). 
 
@@ -361,7 +378,10 @@ To specify a custom misclassification matrix, the arguments `model = "custom"` a
 
 <a id="two-group"></a>
 
-# Two-group models
+
+
+
+# Specification of RR Models Using Two Groups
 
 For several reasons, RR designs were proposed that require two independent random samples (groups). Historically, the second group was used to estimate the prevalence of the irrelevant question in the UQT. Alternatively, two groups allow for a second parameter, quantifying cheating or compliance with the RR procedure. 
 
@@ -373,7 +393,7 @@ Note that in the functions `RRcor` and `RRlin`, the second parameter of these tw
 
 <a id="UQTunknown"></a>
 
-#### Unrelated question techique with unknown prevalance (UQTunknown)
+#### Unrelated Question Technique with Unknown Prevalance (UQTunknown)
 
 `model = 'UQTunknown'`
 
@@ -398,7 +418,7 @@ Note that Moor's variant of the UQT with unknown prevalence can be used by setti
 
 <a id="CDM"></a>
 
-#### Cheating detection model (CDM)
+#### Cheating Detection Model (CDM)
 
 `model = 'CDM'`
 
@@ -445,7 +465,7 @@ The randomization probabilities must meet these restrictions:
 
 <a id="SLD"></a>
 
-#### Stochastic lie detector (SLD)
+#### Stochastic Lie Detector (SLD)
 
 `model = 'SLD'`
 
@@ -464,9 +484,11 @@ The randomization probabilities must differ across groups to render the model id
  
 &nbsp;
 
+
+
 <a id="two-group-code-example"></a>
  
-#### Code examples for two-group models
+#### Code Examples for Two-Group Models
 
 ```{r}
 ### generate 2 two-group RR variables and a continuous covariate

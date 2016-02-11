@@ -5,6 +5,13 @@ The package RRreg provides univariate and multivariate methods for randomized re
 
 ### Links
 
-The package can also be downloaded from CRAN ([http://cran.r-project.org/web/packages/RRreg/](http://cran.r-project.org/web/packages/RRreg/)) or by typing `install.packages("RRreg")` in an active R session.
+The package can be downloaded from CRAN by typing `install.packages("RRreg")` in an active R session.
+
+To get the most recent version, `RRreg` can also directly be installed from GitHub by:
+```
+install.packages("devtools")
+library("devtools")
+install_github("danheck/RRreg")
+```
 
 The manual is available within R by typing `vignette('RRreg')`.

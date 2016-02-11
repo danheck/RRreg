@@ -23,6 +23,19 @@ RRuni.Crosswise<-function(response,p){
 } 
 
 ########################################
+# Triangular model (Yu, Tian, Tang, 2007)
+RRuni.Triangular <-function(response,p){
+  n <- length(response)
+  lambda <- sum(response)/n # = triangle!
+  pi <- 1-(1-lambda)/(1-p)
+  piSE <- sqrt( lambda*(1-lambda)/(n*(1-p)^2) )
+  # sqrt( pi*(1-pi)/((n-1)*(1-p)^2) )  
+  res <- list(model="Triangular",call=paste("Triangular Model with p =",p),
+              pi=pi,piSE=piSE,n=n)
+  return(res)
+} 
+
+########################################
 # Unrelated Question Technique (UQTknown) ()
 RRuni.UQTknown<-function(response,p){
   n <- length(response)

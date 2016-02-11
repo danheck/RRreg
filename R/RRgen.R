@@ -7,7 +7,7 @@
 #' e.g., \code{"Warner"}. True states are either provided by a vector \code{trueState} or drawn randomly from a Bernoulli distribution. Useful for simulation and testing purposes, e.g., power analysis.
 #' @param n sample size of generated data
 #' @param pi.true true proportion in population (a vector for m-categorical \code{"FR"} or \code{"custom"} model)
-#' @param model specifes the RR model, one of: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"},  \code{"mix.norm"},  \code{"mix.exp"}, \code{"custom"}. See \code{vignette("RRreg")} for details. 
+#' @param model specifes the RR model, one of: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"},  \code{"mix.norm"},  \code{"mix.exp"}, \code{"custom"}. See \code{vignette("RRreg")} for details. 
 #' @param p randomization probability (depending on model, see \code{\link{RRuni}} for details)
 #' @param complyRates vector with two values giving the proportions of carriers and non-carriers who adhere to the instructions, respectively
 #' @param sysBias probability of responding 'yes' (coded as 1) in case of non-compliance for carriers and non-carriers of the sensitive attribute, respectively. If \code{sysBias=c(0,0)}, carriers and non-carriers systematically give the nonsensitive response 'no' (also known as self-protective(SP)-'no' responses). If \code{sysBias=c(0,0.5)}, carriers always respond 'no' whereas non-carriers randomly select a response category. Note that \code{sysBias = c(0.5,0.5)} might be the best choice for \code{Kuk} and \code{Crosswise}. For the m-categorical \code{"FR"} or \code{"custom"} model, \code{sysBias} can be given as a probability vector for categories 0 to (m-1).
@@ -43,7 +43,7 @@ RRgen <- function(n,pi.true, model, p,
                   complyRates = c(1,1), sysBias = c(0,0),
                   groupRatio=.5, Kukrep=1,trueState=NULL){
   model <- match.arg(model, c("Warner","UQTknown","UQTunknown","Mangat",
-                              "Kuk","FR","Crosswise","CDM","CDMsym","SLD",
+                              "Kuk","FR","Crosswise","Triangular","CDM","CDMsym","SLD",
                               "mix.norm", "mix.exp", "custom"))
   true <- NULL
   if(!is.null(trueState)){
@@ -209,6 +209,11 @@ RRgen <- function(n,pi.true, model, p,
              responseComply <- ifelse(randNum<p,    # see Warner
                                       true,
                                       1-true)             
+           },
+           "Triangular"={
+             responseComply <- ifelse(randNum<p,    # see Mangat
+                                      1,
+                                      true) 
            },
            "CDM" = {
              nn1 <- round(n*groupRatio)

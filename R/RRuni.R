@@ -3,7 +3,7 @@
 #' Analyse a data vector \code{response} with a specified RR model (e.g., \code{Warner}) with known randomization probability \code{p}
 #' @param response either vector of responses containing 0='no' and 1='yes' or name of response variable in \code{data}. In Kuk's card playing method (\code{Kuk}), the observed response variable gives the number of red cards. For the Forced Response (\code{FR}) model, response values are integers from 0 to (m-1), where 'm' is the number of response categories. 
 #' @param data optional \code{data.frame} containing the response variable
-#' @param model defines RR model. Available models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"},\code{"FR"}, \code{"Crosswise"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"mix.norm"}, \code{"mix.exp"},\code{"mix.unknown"}, or \code{"custom"}. See argument \code{p} or type \code{vignette('RRreg')} for detailed specifications.
+#' @param model defines RR model. Available models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"},\code{"FR"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"mix.norm"}, \code{"mix.exp"},\code{"mix.unknown"}, or \code{"custom"}. See argument \code{p} or type \code{vignette('RRreg')} for detailed specifications.
 #' @param p randomization probability (see details or \code{vignette("RRreg")})
 #' @param group a group vector of the same length as \code{response} containing values 1 or 2, only required for two-group models, which specify different randomization probabilities for two groups, e.g., \code{CDM} or \code{SLD}. If a data.frame \code{data} is provided, the variable \code{group} is searched within it.
 #' @param MLest whether to use \code{optim} to get ML instead of moment estimates (only relevant if pi is outside of [0,1])
@@ -11,7 +11,8 @@
 #'  \itemize{
 #'  \item \code{"Warner"}: Probabiltiy to get sensitive Question 
 #'  \item \code{"Mangat"}: Prob. for noncarriers to respond truthfully (i.e., with No=0)
-#'  \item \code{"Crosswise"}: Prevalence of 'yes' responses for unrelated question (response category is coded as 1=['no-no' or 'yes-yes']; 0=['yes-no' or 'no-yes'])
+#'  \item \code{"Crosswise"}: Probability to respond 'yes' to irrelevant second question (coding of responses: 1=['no-no' or 'yes-yes']; 0=['yes-no' or 'no-yes'])
+#'  \item \code{"Triangular"}: Probability to respond 'yes' to irrelevant second question (coding of responses: 0='no' to both questions (='circle'); 1='yes' to at least one question ('triangle'))
 #'  } 
 #'  and as a two-valued vector of probabilities for 
 #'  \itemize{
@@ -76,6 +77,7 @@ RRuni <- function(response, data, model, p, group = NULL, MLest=TRUE){
                 "Kuk" = RRuni.Kuk(response,p),
                 "UQTunknown" = RRuni.UQTunknown(response,p,group),
                 "Crosswise" = RRuni.Crosswise(response,p),
+                "Triangular" = RRuni.Triangular(response,p),
                 "SLD" = RRuni.SLD(response,p,group),
                 "CDM" = RRuni.CDM(response,p,group),
                 "CDMsym" = RRuni.CDMsym(response,p,group),

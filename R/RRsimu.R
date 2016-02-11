@@ -49,7 +49,7 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
   try(stopCluster(cl.tmp), silent = T)
   
   modelNames <- c("Warner","UQTknown","UQTunknown","Mangat","Kuk",
-                  "FR","Crosswise","direct","CDM","CDMsym","SLD","custom")
+                  "FR","Crosswise","Triangular","direct","CDM","CDMsym","SLD","custom")
   model <- pmatch(model, modelNames, duplicates.ok=T )
   model <- modelNames[model]
   

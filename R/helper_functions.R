@@ -1,7 +1,7 @@
 
 # get all available model names
 modelnames <- function() c("Warner","UQTknown","UQTunknown","Mangat","Kuk",
-                           "FR","Crosswise","CDM","CDMsym","SLD", "mix.norm", 
+                           "FR","Crosswise","Triangular","CDM","CDMsym","SLD", "mix.norm", 
                            "mix.exp","mix.unknown", "custom")
 
 # check if an RR model needs two groups

@@ -6,7 +6,7 @@
 #' A dichotomous variable, measured once or more per person by a randomized response method, serves as dependent variable using one or more continuous and/or categorical predictors.
 #' @param formula specifying the regression model, see \code{\link{formula}}
 #' @param data \code{data.frame}, in which variables can be found (optional)
-#' @param model Available RR models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"custom"}. See \code{vignette("RRreg")} for details.
+#' @param model Available RR models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"custom"}. See \code{vignette("RRreg")} for details.
 #\code{"custom"} (custom: the argument \code{p} defines the sensitivity and specificity of the binary RR response, i.e., the probabilities P(1 | 1) and P(0 | 0))
 #'
 #' @param p randomization probability/probabilities (depending on model, see \code{\link{RRuni}} for details)
@@ -61,7 +61,8 @@ RRlog.default <-function(formula, data, model, p, group, n.response=1, LR.test=T
   y <- as.numeric(y)
   n <- length(y)
   model <- match.arg(model,c("Warner","UQTknown","UQTunknown","Mangat",
-                             "Kuk","FR","Crosswise","CDM","CDMsym","SLD","custom"))
+                             "Kuk","FR","Crosswise","Triangular",
+                             "CDM","CDMsym","SLD","custom"))
   
   # no DQ format included
   if (missing(group) || is.null(group)){
@@ -260,7 +261,8 @@ RRlog.default <-function(formula, data, model, p, group, n.response=1, LR.test=T
 #' @export
 RRlog.formula <- function(formula, data=list(), model, p, group, n.response=1,...){
   model <- match.arg(model,c("Warner","UQTknown","UQTunknown","Mangat",
-                             "Kuk","FR","Crosswise","CDM","CDMsym","SLD", "custom"))
+                             "Kuk","FR","Crosswise","Triangular",
+                             "CDM","CDMsym","SLD", "custom"))
   
   if (!missing(data) ){
     try({data <- as.data.frame(data)

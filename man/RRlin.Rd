@@ -12,7 +12,7 @@ RRlin(formula, data, models, p.list, group = NULL, Kukrep = 1, bs.n = 0,
 
 \item{data}{an optional data frame, list or environment, containing the variables in the model.}
 
-\item{models}{character vector specifying RR model(s) in order of appearance in formula. Available models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"custom"} (custom: a randomization matrix must be specified in the corresponding element of \code{p.list}, where the entry \code{p[i,j]} defines the probability of responding i (i-th row) given a true state of j (j-th column)).}
+\item{models}{character vector specifying RR model(s) in order of appearance in formula. Available models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"custom"} (custom: a randomization matrix must be specified in the corresponding element of \code{p.list}, where the entry \code{p[i,j]} defines the probability of responding i (i-th row) given a true state of j (j-th column)).}
 
 \item{p.list}{list of randomization probabilities for RR models in the same order as specified in \code{models}. Note, that the randomization probabilities p must be provided in a \code{\link{list}}, e.g., \code{list(p=c(.2, .3))}. See \code{\link{RRuni}} for details.}
 

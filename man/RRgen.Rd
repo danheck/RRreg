@@ -12,7 +12,7 @@ RRgen(n, pi.true, model, p, complyRates = c(1, 1), sysBias = c(0, 0),
 
 \item{pi.true}{true proportion in population (a vector for m-categorical \code{"FR"} or \code{"custom"} model)}
 
-\item{model}{specifes the RR model, one of: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"},  \code{"mix.norm"},  \code{"mix.exp"}, \code{"custom"}. See \code{vignette("RRreg")} for details.}
+\item{model}{specifes the RR model, one of: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"},  \code{"mix.norm"},  \code{"mix.exp"}, \code{"custom"}. See \code{vignette("RRreg")} for details.}
 
 \item{p}{randomization probability (depending on model, see \code{\link{RRuni}} for details)}
 

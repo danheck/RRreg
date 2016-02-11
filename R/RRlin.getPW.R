@@ -102,7 +102,13 @@ getPW <- function (model, p, group = 1, par2=NULL, Kukrep=1){
          "Crosswise" = PW <- matrix(c(p,       # true 0 -> 0 response
                                       1-p,          # 0 -> 1
                                       1-p,          # 1 -> 0
-                                      p),nrow=2,dimnames= list(0:1,0:1)),   # 1 -> 1
+                                      p),nrow=2,
+                                    dimnames= list(0:1,0:1)),   # 1 -> 1
+         "Triangular" = PW <- matrix(c(1-p,
+                                       p,    # noncarriers: forced to choose triangle with p
+                                       0,1),  # carriers: certainly choose triangle
+                                     nrow=2,   # 0= circle ; 1 = triangle
+                                     dimnames=list(0:1,0:1)),
          "CDM" = PW <-  matrix(c(0,1,
                                  1-p[gr], p[gr], # non-user
                                  1, 0),# cheater
