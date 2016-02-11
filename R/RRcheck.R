@@ -140,6 +140,8 @@ RRcheck.pi <- function(model,pi,n){
     if (pi<0 || pi>1){
       warning("True proportion 'pi' has to be in the interval [0,1]");
     }
+    if(length(pi) > 2)
+      warning("Only first entry of pi.true is used to generate data!")
   }
 }
 
