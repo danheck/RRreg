@@ -75,5 +75,7 @@ RRlog.loglik <- function(param, X, y, model, prand, group, n.response, setPar2=-
   }
   # predicted probability of response=1
   loglik <- sum(dbinom(y, n.response, p1, log = TRUE))
+  if(loglik == -Inf)
+    loglik <- -1e30
   return(loglik)
 }
