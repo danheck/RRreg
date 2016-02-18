@@ -64,6 +64,8 @@ RRlog.default <-function(formula, data, model, p, group, n.response=1, LR.test=T
                              "Kuk","FR","Crosswise","Triangular",
                              "CDM","CDMsym","SLD","custom"))
   
+  checkPerfectSeparation(y,x,n.response)
+  
   # no DQ format included
   if (missing(group) || is.null(group)){
     group=rep(1,n)
@@ -128,7 +130,7 @@ RRlog.default <-function(formula, data, model, p, group, n.response=1, LR.test=T
         EY <- ifelse(y==0,
                      (1-sens)*eb/((1-sens)*eb+    spec*(1-eb)),
                      sens*eb    /(sens*eb    +(1-spec)*(1-eb)))
-        
+
         # Maximization:
         suppressWarnings(glm.mod <- #glm(cbind(EY, n.response-EY)~x+0, family = binomial(link = "logit"),
                            #   control=list(maxit=5000), start=beta))
@@ -137,10 +139,7 @@ RRlog.default <-function(formula, data, model, p, group, n.response=1, LR.test=T
         # stopping criterium
         if(EM.cnt >= EM.max | sqrt(sum((glm.mod$coef - beta)^2)) < 1e-5) break
       }
-      #     print(EM.cnt)
-      #   z <- model.matrix(formula,data=data)
-      #   glm.mod$var <- solve(t(z)%*%(z*(eb*(1-eb) - EY*(1-EY))))
-      
+       
       # starting values for optim
       start <- coef(glm.mod)
       if(is2group(model)){
@@ -157,8 +156,11 @@ RRlog.default <-function(formula, data, model, p, group, n.response=1, LR.test=T
     ####################### optim estimation of full likelihood
     try(est2 <- RRlog.fit(model, x, y, n.response, p, start, group, maxit=optim.max))
     
-    if (!is.na(est2$logLik) && est2$logLik > est$logLik) 
+    if (!is.na(est2$logLik) && est2$logLik > est$logLik){ 
       est <- est2
+    }else{
+      warning("Model did not convergence in the ML estimation using optim.")
+    }
   }
   #   print(Sys.time())
   #   if (cnt == fit.n[2]) warning(paste0("Maximum number of fitting replications reached (fit.n=",fit.n[2],"). This could indicate extreme and/or unstable parameter estimates. Consider re-fitting the model (e.g., using fit.n=c(5,1000) and/or fit.bound=25)"))
@@ -352,6 +354,8 @@ print.RRlog <- function(x, ...)
 summary.RRlog <- function(object, ...)
 {
   se <- sqrt(abs(diag(object$vcov)))
+  if(length(se) == 0)
+    se <- rep(NA, length(object$coef))
   #   tval <- coef(object) / se
   wald_chi <- (object$coef/se)^2
   if (object$model  == "SLD"){
