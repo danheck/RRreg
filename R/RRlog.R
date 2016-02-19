@@ -158,10 +158,11 @@ RRlog.default <-function(formula, data, model, p, group, n.response=1, LR.test=T
     
     if (!is.na(est2$logLik) && est2$logLik > est$logLik){ 
       est <- est2
-    }else{
-      warning("Model did not convergence in the ML estimation using optim.")
     }
   }
+  if(is.null(est$convergence) || est$convergence != 0)
+    warning("Model did not convergence in ML estimation using optim.")
+  
   #   print(Sys.time())
   #   if (cnt == fit.n[2]) warning(paste0("Maximum number of fitting replications reached (fit.n=",fit.n[2],"). This could indicate extreme and/or unstable parameter estimates. Consider re-fitting the model (e.g., using fit.n=c(5,1000) and/or fit.bound=25)"))
   try(if(est$convergence != 0)
