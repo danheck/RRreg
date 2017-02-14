@@ -1,3 +1,7 @@
+[![Rdoc](http://www.rdocumentation.org/badges/version/RRreg)](http://www.rdocumentation.org/packages/RRreg)
+[![Licence](https://img.shields.io/badge/licence-GPL--2-green.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+![](http://cranlogs.r-pkg.org/badges/RRreg)
+
 RRreg
 =====
 
