@@ -68,4 +68,3 @@ Note, that for the FR model with multiple response categories (e.g., from 0 to 4
 #                  model="Warner", p=.2, cor=.3)
 # print(mcsim)
 }
-

@@ -51,13 +51,12 @@ summary(ana)
 # check with true, latent states:
 glm(true~covariate, dat, family=binomial(link="logit"))
 }
-\author{
-Daniel W. Heck
-}
 \references{
 van den Hout, A., van der Heijden, P. G., & Gilchrist, R. (2007). The logistic regression model with response variables subject to randomized response. \emph{Computational Statistics & Data Analysis, 51}, 6060-6069.
 }
 \seealso{
 \code{vignette('RRreg')} or \url{https://dl.dropboxusercontent.com/u/21456540/RRreg/index.html} for a detailed description of the RR models and the appropriate definition of \code{p}
 }
-
+\author{
+Daniel W. Heck
+}

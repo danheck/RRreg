@@ -39,9 +39,6 @@
 #' summary(linreg)
 #' summary(lm(depvar~true +trueFR+nonRR, data=dat))
 #' @rdname RRlin
-#' @import doParallel
-#' @import parallel
-#' @import foreach
 #' @export
 RRlin <- function(formula, data, models, p.list, group=NULL, 
                   Kukrep=1, bs.n=0, nCPU=1, maxit=1000, 

@@ -33,4 +33,3 @@ getPW(model = "UQTunknown", p = c(2/12, .10/12), group=2, par2=.4)
 \references{
 van den Hout, A., & Kooiman, P. (2006). Estimating the Linear Regression Model with Categorical Covariates Subject to Randomized Response. Computational Statistics & Data Analysis, 50(11), 3311–3323.
 }
-

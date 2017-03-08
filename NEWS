@@ -1,8 +1,10 @@
-RRreg 0.6.2 (February 2016)
+RRreg 0.6.2 (March 2017)
 ===========
 
 * New RR Model: Triangular Model
-
+* Fixed image links in vignette
+* Selective import of package functions
+* Updated email address
 
 
 RRreg 0.6.0 (December 2015)

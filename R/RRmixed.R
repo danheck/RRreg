@@ -33,7 +33,6 @@
 #' # fit model:
 #' mod <- RRmixed(resp ~  cov +(1|group), data=d, model="FR", p=p)
 #' summary(mod)
-#' @import lme4
 #' @export
 RRmixed <- function(formula, data, model, p, ...){
   

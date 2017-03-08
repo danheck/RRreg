@@ -53,4 +53,3 @@ Uses the function \code{\link{RRsimu}} to estimate the power of the multivariate
 \seealso{
 \code{\link{RRsimu}} for Monte-Carlo simulation / parametric bootstrap
 }
-

@@ -70,4 +70,3 @@ summary(analyse2)
 \seealso{
 \code{vignette('RRreg')} or \url{https://dl.dropboxusercontent.com/u/21456540/RRreg/index.html} for a detailed description of the RR models and the appropriate definition of \code{p}
 }
-

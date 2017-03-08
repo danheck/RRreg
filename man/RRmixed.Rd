@@ -52,4 +52,3 @@ summary(mod)
 \references{
 van den Hout, A., van der Heijden, P. G., & Gilchrist, R. (2007). The Logistic Regression Model with Response Variables Subject to Randomized Response. Computational Statistics & Data Analysis, 51, 6060–6069.
 }
-

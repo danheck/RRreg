@@ -39,4 +39,3 @@ Plot the predictions of a fitted  logistic RR regression model. Data are not inc
  plot(mod, "x1" ,ci=.95)
  
 }
-

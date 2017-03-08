@@ -14,4 +14,3 @@
 \description{
 Plot estimated power from Monte Carlo simulation as a function of the sample size, separately for different effect sizes and multivariate RR methods
 }
-

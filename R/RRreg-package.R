@@ -7,7 +7,7 @@
 #' Package: \tab RRreg\cr
 #' Type: \tab Package\cr
 #' Version: \tab 0.6.2\cr
-#' Date: \tab 2016-02-11\cr
+#' Date: \tab 2017-03-07\cr
 #' Depends: \tab R (>= 3.0.0)\cr
 #' Imports: \tab parallel, doParallel, foreach, stats, grDevices, graphics, lme4\cr
 #' Suggests: \tab knitr\cr
@@ -22,10 +22,19 @@
 #' @name RRreg-package
 #' @docType package
 # @title The RRreg Package
-#' @author Daniel W. Heck \email{dheck@@mail.uni-mannheim.de} and Morten Moshagen \email{moshagen@@uni-kassel.de}
+#' @author Daniel W. Heck \email{heck@@uni-mannheim.de} and Morten Moshagen \email{morten.moshagen@@uni-ulm.de}
 #' @keywords package
-#' @references Warner, S. L. (1965). Randomized response: A survey technique for eliminating evasive answer bias. \emph{Journal of the American Statistical Association, 60}, 63–69.
-NULL
+#' 
+#' @import stats
+#' @import graphics
+#' @importFrom grDevices adjustcolor
+#' @importFrom doParallel registerDoParallel
+#' @importFrom parallel stopCluster makeCluster
+#' @importFrom foreach foreach %dopar%
+#' @importFrom lme4 glmer
+#' @references 
+#' Warner, S. L. (1965). Randomized response: A survey technique for eliminating evasive answer bias. \emph{Journal of the American Statistical Association, 60}, 63–69.
+"_PACKAGE"
 
 #' Minaret Data
 #' 
@@ -48,4 +57,4 @@ NULL
 #' @name minarets
 #' @usage data(minarets)
 # @format A data frame with 1621 rows and 6 variables
-NULL
+"minarets"

@@ -70,4 +70,3 @@ Fox, J. A., & Tracy, P. E. (1984). Measuring associations with randomized respon
 \seealso{
 \code{vignette('RRreg')} or \url{https://dl.dropboxusercontent.com/u/21456540/RRreg/index.html} for a detailed description of the RR models and the appropriate definition of \code{p}
 }
-

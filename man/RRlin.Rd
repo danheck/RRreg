@@ -55,13 +55,12 @@ linreg <- RRlin(depvar~response+FR+nonRR, data=dat,
 summary(linreg)
 summary(lm(depvar~true +trueFR+nonRR, data=dat))
 }
-\author{
-Daniel W. Heck
-}
 \references{
 van den Hout, A., & Kooiman, P. (2006). Estimating the linear regression model with categorical covariates subject to randomized response. \emph{Computational Statistics & Data Analysis, 50}, 3311-3323.
 }
 \seealso{
 \code{vignette('RRreg')} or \url{https://dl.dropboxusercontent.com/u/21456540/RRreg/index.html} for a detailed description of the RR models and the appropriate definition of \code{p}
 }
-
+\author{
+Daniel W. Heck
+}

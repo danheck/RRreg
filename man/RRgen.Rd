@@ -60,4 +60,3 @@ colMeans(genData)
 \seealso{
 see \code{vignette('RRreg')} for a detailed description of the models and \code{\link{RRlog}}, \code{\link{RRlin}} and \code{\link{RRcor}} for the multivariate analysis of RR data
 }
-

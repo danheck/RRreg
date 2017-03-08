@@ -21,4 +21,3 @@
 \description{
 Predictions of the loglinear RR model for the individual probabilities of having the sensitive RR attribute.
 }
-

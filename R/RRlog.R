@@ -36,9 +36,6 @@
 #' # check with true, latent states:
 #' glm(true~covariate, dat, family=binomial(link="logit"))
 #' @export
-#' @import stats
-#' @importFrom grDevices adjustcolor
-#' @import graphics
 RRlog <- function(formula, data, model, p, group, n.response=1, LR.test=TRUE, 
                   fit.n=3, EM.max=1000, optim.max=500,  ...) UseMethod("RRlog")
 

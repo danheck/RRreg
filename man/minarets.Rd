@@ -4,6 +4,7 @@
 \name{minarets}
 \alias{minarets}
 \title{Minaret Data}
+\format{An object of class \code{data.frame} with 1621 rows and 7 columns.}
 \usage{
 data(minarets)
 }
@@ -23,4 +24,3 @@ The following variables are included:
 }
 }
 \keyword{datasets}
-

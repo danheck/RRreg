@@ -2,8 +2,9 @@
 % Please edit documentation in R/RRreg-package.R
 \docType{package}
 \name{RRreg-package}
-\alias{RRreg}
 \alias{RRreg-package}
+\alias{_PACKAGE}
+\alias{RRreg}
 \title{Correlation and Regression Analyses for Randomized Response Designs}
 \description{
 Univariate and multivariate methods for randomized response (RR) survey designs (e.g., Warner, 1965). Univariate estimates of true proportions can be obtained using \code{\link{RRuni}}. RR variables can be used in multivariate analyses for correlations (\code{\link{RRcor}}), as dependent variable in a logistic regression (\code{\link{RRlog}}), or as predictors in a linear regression (\code{\link{RRlin}}). The function \code{\link{RRgen}} generates single RR data sets, whereas \code{\link{RRsimu}} generates and analyzes RR data repeatedly for simulation and bootstrap purposes. An overview of the available RR designs and examples can be found in the package vignette by \code{vignette('RRreg')}.
@@ -13,7 +14,7 @@ Univariate and multivariate methods for randomized response (RR) survey designs 
 Package: \tab RRreg\cr
 Type: \tab Package\cr
 Version: \tab 0.6.2\cr
-Date: \tab 2016-02-11\cr
+Date: \tab 2017-03-07\cr
 Depends: \tab R (>= 3.0.0)\cr
 Imports: \tab parallel, doParallel, foreach, stats, grDevices, graphics, lme4\cr
 Suggests: \tab knitr\cr
@@ -21,11 +22,17 @@ License: \tab GPL-2\cr
 URL: \tab \url{http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg}\cr
 }
 }
-\author{
-Daniel W. Heck \email{dheck@mail.uni-mannheim.de} and Morten Moshagen \email{moshagen@uni-kassel.de}
-}
 \references{
 Warner, S. L. (1965). Randomized response: A survey technique for eliminating evasive answer bias. \emph{Journal of the American Statistical Association, 60}, 63–69.
 }
-\keyword{package}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg/}
+}
 
+}
+\author{
+Daniel W. Heck \email{heck@uni-mannheim.de} and Morten Moshagen \email{morten.moshagen@uni-ulm.de}
+}
+\keyword{package}

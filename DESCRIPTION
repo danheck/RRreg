@@ -2,11 +2,11 @@ Package: RRreg
 Type: Package
 Title: Correlation and Regression Analyses for Randomized Response Data
 Authors@R: c(person( given="Daniel
-    W.",family="Heck",email="dheck@mail.uni-mannheim.de", role=c("aut","cre")),
-    person(given="Morten",family="Moshagen",email="moshagen@uni-mannheim.de",
+    W.",family="Heck",email="heck@uni-mannheim.de", role=c("aut","cre")),
+    person(given="Morten",family="Moshagen",email="morten.moshagen@uni-ulm.de",
     rol=c("aut")))
 Author: Daniel W. Heck [aut, cre], Morten Moshagen [aut]
-Maintainer: Daniel W. Heck <dheck@mail.uni-mannheim.de>
+Maintainer: Daniel W. Heck <heck@uni-mannheim.de>
 Depends:
     R (>= 3.0.0)
 Imports:
@@ -19,20 +19,12 @@ Imports:
     lme4
 Suggests:
     knitr
-Description: Univariate and multivariate methods to analyze
-    randomized response (RR) survey designs (e.g., Warner, S. L. (1965).
-    Randomized response: A survey technique for eliminating evasive answer
-    bias. Journal of the American Statistical Association, 60, 63–69).
-    Besides univariate estimates of true proportions, RR variables can be used
-    for correlations, as dependent variable in a logistic regression (with or
-    without random effects), as predictors in a linear regression, or as
-    dependent variable in a beta-binomial ANOVA. For simulation and bootstrap
-    purposes, RR data can be generated according to several models.
+Description: Univariate and multivariate methods to analyze randomized response (RR) survey designs (e.g., Warner, S. L. (1965). Randomized response: A survey technique for eliminating evasive answer bias. Journal of the American Statistical Association, 60, 63–69). <doi:10.2307/2283137> Besides univariate estimates of true proportions, RR variables can be used for correlations, as dependent variable in a logistic regression (with or without random effects), as predictors in a linear regression, or as dependent variable in a beta-binomial ANOVA. For simulation and bootstrap purposes, RR data can be generated according to several models.
 License: GPL-2
 Encoding: UTF-8
 LazyLoad: yes
 URL: http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg/
 VignetteBuilder: knitr
 Version: 0.6.2
-Date: 2016-02-11
-RoxygenNote: 5.0.1
+Date: 2017-03-07
+RoxygenNote: 6.0.1

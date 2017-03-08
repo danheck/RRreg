@@ -46,9 +46,6 @@
 #' cor(gData[,c("true","cov","UQTtrue")])
 #' RRcor(x=gData[,c("response","cov","UQTresp")],
 #'       models=c("Kuk","d","UQTknown"),p.list= list(p1,p2) )
-#' @import doParallel
-#' @import parallel
-#' @import foreach
 #' @export
 RRcor <- function(x, y=NULL, models, p.list, group=NULL, bs.n=0, bs.type=c("se.n","se.p","pval"), nCPU=1){
   
