@@ -5,6 +5,7 @@ RRreg 0.6.2 (March 2017)
 * Fixed image links in vignette
 * Selective import of package functions
 * Updated email address
+* Updated vignette
 
 
 RRreg 0.6.0 (December 2015)

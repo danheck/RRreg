@@ -20,11 +20,11 @@ Imports:
 Suggests:
     knitr
 Description: Univariate and multivariate methods to analyze randomized response (RR) survey designs (e.g., Warner, S. L. (1965). Randomized response: A survey technique for eliminating evasive answer bias. Journal of the American Statistical Association, 60, 63–69). <doi:10.2307/2283137> Besides univariate estimates of true proportions, RR variables can be used for correlations, as dependent variable in a logistic regression (with or without random effects), as predictors in a linear regression, or as dependent variable in a beta-binomial ANOVA. For simulation and bootstrap purposes, RR data can be generated according to several models.
-License: GPL-2
+License: GPL-3
 Encoding: UTF-8
 LazyLoad: yes
 URL: http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg/
 VignetteBuilder: knitr
 Version: 0.6.2
-Date: 2017-03-07
+Date: 2017-03-24
 RoxygenNote: 6.0.1

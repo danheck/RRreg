@@ -2,7 +2,9 @@
 title: "RRreg manual"
 author: "Daniel W. Heck"
 date: "`r Sys.Date()`"
-output:  rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    fig_caption: no
 vignette: >
   %\VignetteIndexEntry{An Introduction to the RRreg package}
   %\VignetteEngine{knitr::rmarkdown}
@@ -55,7 +57,8 @@ First, let's load the package and generate a single data frame using the functio
 
 ```{r}
 library(RRreg)
-data.W <- RRgen(n=1000, pi.true=.3, model="Warner", p=.2, complyRates = c(1, 1), sysBias = c(0,0))
+data.W <- RRgen(n=1000, pi.true=.3, model="Warner", p=.2, 
+                complyRates = c(1, 1), sysBias = c(0,0))
 head(data.W)
 ```
 
@@ -64,7 +67,8 @@ In the function `RRgen`, the argument `complyRates` gives the proportions of par
 Now that we have a data set, we can estimate the prevalence of cocaine users by means of `RRuni`:
 
 ```{r}
-warner <- RRuni(response=response, data=data.W, model="Warner", p=.2, MLest=T)
+warner <- RRuni(response=response, data=data.W, 
+                model="Warner", p=.2, MLest=T)
 summary(warner)
 ```
 
@@ -92,7 +96,8 @@ data.W$cov[data.W$true==0] <- rnorm(sum(data.W$true == 0))
 Now, we can estimate the bivariate (point-biserial) correlation between the dichotomous Warner RR variable and the continuous covariate:
 
 ```{r}
-RRcor(x=data.W$response, y=data.W$cov, models=c("Warner", "direct"), p.list=list(.2), bs.n=0, bs.type = c("se.n", "se.p", "pval"), nCPU=1)
+RRcor(x=data.W$response, y=data.W$cov, models=c("Warner", "direct"), 
+      p.list=list(.2), bs.n=0, bs.type = c("se.n", "se.p", "pval"), nCPU=1)
 ```
 
 The argument `models` defines which variables given by `x` and `y` are treated as RR variables. `x` and `y` can be vectors and/or data frames/matrices having one variable in each column (the order is then given as following: First, columns of `x` from left to right, and second, columns of `y` from left to right). The randomization probabilities `p.list` have to be in the same order as `models`. No values have to be specified for direct (nonRR) variables. To obtain bootstrapped standard errors, `bs.n` has to be set to a number of bootstrap replications larger than 0. Additionally, `bs.type` defines which kind of bootstrap should be performed (`"se.n"`, `"se.p"`: nonparametric/parametric for standard errors; `"pval"` parametric bootstrap assuming independence for p-values). For faster processing, `nCPU`can be increased to use parallel computation. In our example, we also know the true states of the participants in the data set and can check the results by:
@@ -112,7 +117,8 @@ cor(x=data.W$true, y=data.W$cov)
 Alternatively, we can run a logistic regression to predict the probability of cocaine use. In the `formula` below, the Warner RR variable is defined as criterion on the left side, whereas the continuous covariate is used as predictor on the right. The interface is similar to that of the standard linear regression in R (i.e., `lm()`).
 
 ```{r}
-log1 <- RRlog(formula=response~cov, data=data.W, model="Warner", p=.2, LR.test=TRUE, fit.n = 1)
+log1 <- RRlog(formula=response~cov, data=data.W, 
+              model="Warner", p=.2, LR.test=TRUE, fit.n = 1)
 summary(log1)
 ```
 
@@ -144,7 +150,8 @@ The function `RRmixed` is used as follows:
 ```{r}
 # make random cluster:
 data.W$cluster <- c("a", "b")
-mixmod <- RRmixed(response ~ cov + (1 | cluster), data=data.W, model = "Warner", p = .2)
+mixmod <- RRmixed(response ~ cov + (1 | cluster), 
+                  data=data.W, model = "Warner", p = .2)
 mixmod
 ```
 
@@ -159,7 +166,8 @@ mixmod
 Third, we can use the Warner RR variable as predictor in a linear regression:
 
 ```{r}
-lin1 <- RRlin(formula=cov~response, data=data.W, models="Warner", p.list=.2, bs.n=0, fit.n=1)
+lin1 <- RRlin(formula=cov~response, data=data.W, 
+              models="Warner", p.list=.2, bs.n=0, fit.n=1)
 summary(lin1)
 ```
 
@@ -169,7 +177,8 @@ As a special case, if the number of predictors used in the formula interface is 
 
 ```{r}
 data.W$pred <- rnorm(1000)
-lin2 <- RRlin(formula=cov~response + pred, data=data.W, models="Warner", p.list=list(.2), bs.n=0, fit.n=1)
+lin2 <- RRlin(formula=cov~response + pred, data=data.W, 
+              models="Warner", p.list=list(.2), bs.n=0, fit.n=1)
 summary(lin2)
 ```
 
@@ -185,7 +194,9 @@ It is also possible to include several RR variables as predictors if the randomi
 data.W2 <- RRgen(n=1000, pi.true=.45, model="Warner", p=.35)
 data.W$cov <-2*data.W$true - 3*data.W2$true+ rnorm(1000,1,5)
 data.W$response2 <- data.W2$response
-lin3 <- RRlin(cov ~ response + response2, data=data.W, models=c("Warner", "Warner"), p.list=list(.2, .35), fit.n=1)
+lin3 <- RRlin(cov ~ response + response2, data=data.W, 
+              models=c("Warner", "Warner"), 
+              p.list=list(.2, .35), fit.n=1)
 summary(lin3)
 ```
 
@@ -202,9 +213,9 @@ To include many RR variables as predictors, very large sample sizes are required
 
 # Testing RR vs. Direct Questioning (DQ)
 
-The method `RRlog` can be used to test whether an RR design leads to higher prevalence estimates than direct questioning (DQ). For one-groups designs (such as the Warner model), define a vector with indices 0 for all participants who were questioned by DQ and indices 1 for participants questioned by the RR design and include this dummy variable as predictor. For two-group designs (see below), define a dummy variable contrasting DQ and RR as before, and define a vector with indices 0 for participants questioned by DQ and indices 1 and 2 denoting the group of the RR design.
+The method `RRlog` can be used to test whether an RR design leads to higher prevalence estimates than direct questioning (DQ). For one-groups designs (such as the Warner model), define a vector with indices 0 for all participants who were questioned by DQ and indices 1 for participants questioned by the RR design and include this dummy variable as predictor. For two-group designs (see below), define an effect-coded variable contrasting DQ ($=-1$) and RR ($=+1$), and define a vector with indices 0 for participants questioned by DQ and indices 1 and 2 denoting the group of the RR design.
 
-If the regression coefficient of the dummy predictor is significant, this indicates different prevalence rates between RR and DQ.
+If the regression coefficient of the effect-coded predictor is significant, this indicates different prevalence rates between RR and DQ.
 
 Furthermore, interactions between question format (RR vs. DQ) and other predictors can be tested. For instance, one might want to know whether the regression coefficient of a predictor (e.g., age) differs between question formats (e.g., whether the RR format serves as a more valid criterion). Interactions are included by `formula= RR ~ format + age + format:age`. 
 
@@ -212,20 +223,27 @@ An example is:
 
 ```{r}
 # generate data with different prevalence rates for RR and DQ
-RR <- RRgen(n=500, pi=.4, model="Warner", p=.35)
-DQ <- rbinom(500, 1, .2)
+RR <- RRgen(n = 500, pi = .5, model = "Warner", p = 2/12)
+DQ <- rbinom(500, 1, prob = .35)
 response <- c(RR$response, DQ)
 # dummy variable for RR vs. DQ
 group <- rep(1:0, each=500)
-# include interaction of question format and age (here, the rescaled z-variable z.age)
-z.age <- c(rnorm(500, mean=RR$true*2,sd=3), rnorm(500, mean=0,sd=3))
-# fit full model (i.e., test difference in prevalence estimates and interaction)
-fit <- RRlog(response ~ group * z.age, model="Warner", p=.35, group=group, LR.test=TRUE, fit.n = 1) 
+# predictor variable (effect-coded)
+RR.design <- rep(c(1,-1), each=500)
+# simulate interaction of question format and age 
+# (DQ: no correlation; RR: positive correlation)
+z.age <- scale(c(rnorm(500, mean=RR$true, sd=3), 
+                 rnorm(500, mean=.5, sd=3)))         
+# fit full model 
+# (testing difference in prevalence estimates and interaction)
+fit <- RRlog(response ~ RR.design * z.age, model="Warner", 
+             p=2/12, group=group, LR.test=TRUE, fit.n = 1) 
 summary(fit)
-# get prevalence estimate for RR and DQ
-logit1 <- coef(fit) %*% c(1, 1, mean(z.age), mean(z.age))
+# get prevalence estimate for RR and DQ 
+# (for z.age = 0 = mean(z.age))
+logit1 <- coef(fit) %*% c(1, 1, 0, 1*0)
 cat(exp(logit1) / (1+ exp(logit1)))
-logit2 <- coef(fit) %*% c(1, 0, mean(z.age), 0)
+logit2 <- coef(fit) %*% c(1, -1, 0, -1*0)
 cat(exp(logit2) / (1+ exp(logit2)))
 ```
 
@@ -488,7 +506,8 @@ RR2 <- RRgen(1000, pi=.6, model="SLD", p=c(.3 ,.7), complyRates=c(.9,1))
 cov <- RR1$true + RR2$true + rnorm(1000, 0, 3)
 
 ### logistic regression (dependent RR variable)
-logmod <- RRlog(RR1$response ~ cov, model="SLD", p=c(.2,.8), group=RR1$group, fit.n = 1)
+logmod <- RRlog(RR1$response ~ cov, model="SLD", p=c(.2,.8), 
+                group=RR1$group, fit.n = 1)
 summary(logmod)
 
 ### group matrix for RRlin and RRcor: use multiple group vectors in one matrix
@@ -498,9 +517,11 @@ group <- cbind(RR1$group, RR2$group)
 # note that only the most informative subsets of the data are used (see ?RRcor)
 responses <- cbind(RR1$response, RR2$response, cov)
 colnames(responses) <- c("RR1", "RR2", "cov")
-RRcor( responses, models=c("SLD","SLD","direct"), p.list=list(c(.2,.8), c(.3, .7)), group=group)
+RRcor( responses, models=c("SLD","SLD","direct"), 
+       p.list=list(c(.2,.8), c(.3, .7)), group=group)
 
 # linear model with 2 RR predictors
-linmod <- RRlin(cov ~ RR1$response+RR2$response, models=c("SLD","SLD"), p.list=list(c(.2,.8), c(.3, .7)), group=group, fit.n=1)
+linmod <- RRlin(cov ~ RR1$response+RR2$response, models=c("SLD","SLD"), 
+                p.list=list(c(.2,.8), c(.3, .7)), group=group, fit.n=1)
 summary(linmod)
 ```
