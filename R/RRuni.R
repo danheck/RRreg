@@ -111,7 +111,7 @@ RRuni <- function(response, data, model, p, group = NULL, MLest=TRUE){
     # optimization
     oo <- optim(start, fn=RRuni.ll, method="L-BFGS-B", lower=1e-8, upper=1-1e-8, hessian=T,
                 model=model, response=response, pp=p, group=group, ncat=ncat)
-    SE <- sqrt(diag(solve(oo$hessian)))
+    try(SE <- sqrt(diag(solve(oo$hessian))))
     
     res$pi <- oo$par[1] 
     res$piSE <- SE[1]
