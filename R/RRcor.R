@@ -152,7 +152,8 @@ RRcor <- function(x, y = NULL, models, p.list,
         group.mat[,i] <-  as.numeric(  group[,cnt])  
         cnt <- cnt+1
       }
-      est <- RRuni(X[,i],model=models[i],p=p.list[[i]],group=group.mat[,i],MLest=F)
+      est <- RRuni(X[,i], model=models[i], p=p.list[[i]], 
+                   group=group.mat[,i], MLest = FALSE)
       if(models[i] =="FR"){
         scale <- 1:length(est$pi)-1
         
@@ -357,19 +358,21 @@ for (i in 1:m){
         # how many RR variables in pairwise bootstrap?
         if(sum(models[c(i,j)] == "direct") <2){
           if(models[i] != "direct")
-            RRi <- RRuni(X[,i], model =models[i], p=p.list[[i]], group = group.mat[,i],MLest = T)
+            RRi <- RRuni(X[,i], model =models[i], p=p.list[[i]], 
+                         group = group.mat[,i], MLest = FALSE)
           if(models[j] != "direct")
-            RRj <- RRuni(X[,j], model =models[j], p=p.list[[j]], group = group.mat[,j],MLest = T)
+            RRj <- RRuni(X[,j], model =models[j], p=p.list[[j]], 
+                         group = group.mat[,j], MLest  = FALSE)
           # two RRs
           if(sum(models[c(i,j)] == "direct") ==0){
             if("se.p" %in% bs.type) 
               mcsim <- RRsimu(numRep=bs.n, n=n, pi=c(RRi$pi, RRj$pi), model = models[c(i,j)],
                             p=p.list[c(i,j)], cor=r[i,j], complyRates=list(ci, cj), sysBias=c(0,0),
-                            groupRatio=groupRatios[c(i,j)], method="RRcor", MLest = TRUE, nCPU=nCPU)
+                            groupRatio=groupRatios[c(i,j)], method="RRcor", MLest = FALSE, nCPU=nCPU)
             if("pval" %in% bs.type){
               mcsim.h0 <- RRsimu(numRep=bs.n, n=n, pi=c(RRi$pi, RRj$pi), model = models[c(i,j)],
                               p=p.list[c(i,j)], cor=0, complyRates=list(ci, cj), sysBias=c(0,0),
-                              groupRatio=groupRatios[c(i,j)], method="RRcor", MLest = TRUE, nCPU=nCPU)
+                              groupRatio=groupRatios[c(i,j)], method="RRcor", MLest = FALSE, nCPU=nCPU)
             }
           }else{
             # one RR, one nonRR variable
@@ -379,12 +382,12 @@ for (i in 1:m){
               mcsim <- RRsimu(numRep=bs.n, n=n, pi=ifelse(idx==i, RRi$pi, RRj$pi), model = models[idx],
                             p=unlist(p.list[idx]), cor=r[i,j], complyRates=ifelse(rep(idx,2)==i,ci, cj),
                             sysBias=c(0,0),
-                            groupRatio=groupRatios[idx], method="RRcor", MLest = TRUE, nCPU=nCPU)
+                            groupRatio=groupRatios[idx], method="RRcor", MLest = FALSE, nCPU=nCPU)
             if("pval" %in% bs.type){
               mcsim.h0 <- RRsimu(numRep=bs.n, n=n, pi=ifelse(idx==i, RRi$pi, RRj$pi), model = models[idx],
                               p=unlist(p.list[idx]), cor=0, complyRates=ifelse(rep(idx,2)==i,ci, cj),
                               sysBias=c(0,0),
-                              groupRatio=groupRatios[idx], method="RRcor", MLest = TRUE, nCPU=nCPU)
+                              groupRatio=groupRatios[idx], method="RRcor", MLest = FALSE, nCPU=nCPU)
             }
           }
           if ("se.p" %in% bs.type)
