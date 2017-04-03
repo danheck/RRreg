@@ -19,8 +19,9 @@ RRuni.ll <- function(par, model, response, pp, group, ncat){
   prob <- lapply(P, function(PPP) PPP %*% pi)
   
   # problems for categorical RR: sum(pi) must be 1 !
-  if(any(pi<0) | any(sapply(prob, function(ppp) ppp<0)))
-    return(1e5)
+  prob.negative <- any(pi<0) | any(sapply(prob, function(ppp) ppp<0))
+  if(is.na(prob.negative) || prob.negative)
+    return(1e6)
   
   ll <- -sum(mapply(dmultinom, y, n, prob, log=TRUE))
 
