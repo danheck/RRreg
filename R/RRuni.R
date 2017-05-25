@@ -222,7 +222,7 @@ print.summary.RRuni<-function(x,...){
   cat("\n")
   printCoefmat( round(x$coefficients,6))
   if (x$model=="SLD"){
-    cat("\n(for the parameter t, i.e. probability of true responding of carriers,
+    cat("\n(for the parameter t, i.e., the probability of true responding of carriers,
  the test is H0: t=1; H1: t<1 and the one-sided probability value is given)")
   }
 }
