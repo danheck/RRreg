@@ -1,3 +1,10 @@
+RRreg 0.6.3 (July 2017)
+===========
+
+* Fixed estimated standard error of univariate prevalence estimates (deviding by n-1 instead of n)
+* Fixed univariate estimates for Kuk's method
+
+
 RRreg 0.6.2 (March 2017)
 ===========
 

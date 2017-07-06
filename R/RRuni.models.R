@@ -6,8 +6,9 @@ RRuni.Warner<-function(response,p){
   n <- length(response)
   lambda <- sum(response)/n
   pi <- (lambda+p-1)/(2*p-1)
-  piSE <- sqrt((lambda*(1-lambda))/(n*(2*p-1)^2))  
-  res <- list(model="Warner",call=paste("Warner Model with p =",p),pi=pi,piSE=piSE,n=n)
+  piSE <- sqrt((lambda*(1-lambda))/((n - 1)*(2*p-1)^2))  
+  res <- list(model="Warner",call=paste("Warner Model with p =",p),
+              pi=pi,piSE=piSE,n=n)
   return(res)
 } 
 
@@ -17,8 +18,9 @@ RRuni.Crosswise<-function(response,p){
   n <- length(response)
   lambda <- sum(response)/n
   pi <- (lambda+p-1)/(2*p-1)
-  piSE <- sqrt((lambda*(1-lambda))/(n*(2*p-1)^2))  
-  res <- list(model="Crosswise",call=paste("Crosswise Model with p =",p),pi=pi,piSE=piSE,n=n)
+  piSE <- sqrt((lambda*(1-lambda))/((n - 1)*(2*p-1)^2))  
+  res <- list(model="Crosswise", call=paste("Crosswise Model with p =",p),
+              pi=pi,piSE=piSE,n=n)
   return(res)
 } 
 
@@ -28,7 +30,7 @@ RRuni.Triangular <-function(response,p){
   n <- length(response)
   lambda <- sum(response)/n # = triangle!
   pi <- 1-(1-lambda)/(1-p)
-  piSE <- sqrt( lambda*(1-lambda)/(n*(1-p)^2) )
+  piSE <- sqrt( lambda*(1-lambda)/((n - 1)*(1-p)^2) )
   # sqrt( pi*(1-pi)/((n-1)*(1-p)^2) )  
   res <- list(model="Triangular",call=paste("Triangular Model with p =",p),
               pi=pi,piSE=piSE,n=n)
@@ -41,9 +43,12 @@ RRuni.UQTknown<-function(response,p){
   n <- length(response)
   lambda <- sum(response)/n
   pi <- (lambda-(1-p[1])*p[2])/p[1]
-  piSE <- sqrt((lambda*(1-lambda))/(n*p[1]^2))  
-  pstring <- paste("'p1' =",p[1],"(probability of answering sensitive question) and 'p2' =",p[2],"(probability of answer 'Yes' in unrelated question")
-  res <- list(model="UQTknown",call=paste0("Unrelated Question Technique with known prevalence of unrelated question. ",pstring),pi=pi,piSE=piSE,n=n)
+  piSE <- sqrt((lambda*(1-lambda))/((n - 1)*p[1]^2))  
+  pstring <- paste("'p1' =",p[1],"(probability of answering sensitive question) and 'p2' =",
+                   p[2],"(probability of answer 'Yes' in unrelated question")
+  res <- list(model="UQTknown",
+              call=paste0("Unrelated Question Technique with known prevalence of unrelated question. ",pstring),
+              pi=pi,piSE=piSE,n=n)
   return(res)
 } 
 
@@ -56,11 +61,16 @@ RRuni.UQTunknown<-function(response,p,group){
   lambda1 <- sum(response[s])/n1
   lambda2 <- sum(response[!s])/n2
   pi <- (lambda1*(1-p[2])-lambda2*(1-p[1])) / (p[1]-p[2])
-  piSE <- sqrt( (lambda1*(1-lambda1)*(1-p[2])^2/n1 + lambda2*(1-lambda2)*(1-p[1])^2/n2) / (p[1]-p[2])^2 ) 
+  piSE <- sqrt( (lambda1*(1-lambda1)*(1-p[2])^2/(n1 - 1) + 
+                   lambda2*(1-lambda2)*(1-p[1])^2/(n2 - 1)) / (p[1]-p[2])^2 ) 
   piUQ <- (p[2]*lambda1-p[1]*lambda2) / ( p[2]-p[1])
-  piUQSE <- sqrt ( (p[2]^2*lambda1*(1-lambda1)/n1 +p[1]^2*lambda2*(1-lambda2)/n2)  / (p[1]-p[2])^2 )
-  pstring <- paste("'p1' =",p[1]," and 'p2' =",p[2],"(probability of answering the sensitive question in group 1 and group 2 respectively)")
-  res <- list(model="UQTunknown",call=paste0("Unrelated Question Technique with unknown prevalence of unrelated question.",pstring), pi=pi, piSE=piSE, piUQ=piUQ, piUQSE=piUQSE, n=n1+n2)
+  piUQSE <- sqrt ( (p[2]^2*lambda1*(1-lambda1)/(n1 - 1) +
+                      p[1]^2*lambda2*(1-lambda2)/(n2 - 1))  / (p[1]-p[2])^2 )
+  pstring <- paste("'p1' =",p[1]," and 'p2' =",p[2],
+                   "(probability of answering the sensitive question in group 1 and group 2 respectively)")
+  res <- list(model="UQTunknown", 
+              call = paste0("Unrelated Question Technique with unknown prevalence of unrelated question.",pstring), 
+              pi=pi, piSE=piSE, piUQ=piUQ, piUQSE=piUQSE, n=n1+n2)
   return(res)
 } 
 
@@ -71,21 +81,29 @@ RRuni.Mangat<-function(response,p){
   lambda <- sum(response)/(n)
   pi <- (lambda-1+p)/p
   piSE <- sqrt(lambda*(1-lambda)/( (n-1)*p^2 )  )  
-  res <- list(model="Mangat",call=paste0("Mangat's Model with p =",p, " (probability for noncarriers to respond with 'Yes'"),pi=pi,piSE=piSE,n=n)
+  res <- list(model="Mangat",
+              call=paste0("Mangat's Model with p =",p, " (probability for noncarriers to respond with 'Yes'"),
+              pi=pi,piSE=piSE,n=n)
   return(res)
 }
 
 ########################################
 # Kuk's model (Kuk, 1990) 
-RRuni.Kuk<-function(response,p){
+RRuni.Kuk<-function(response, p, rep = 1){
   # number of repetitions: how often the procedure was applied 
-  rep <- max(response)
+  # rep <- Kukrep
+  if(max(response) > rep)
+    stop("'Kukrep' needs to be adjusted (minimum: ", rep, ")")
   n <- length(response)
   lambda <- sum(response)/(n*rep)
   pi <- (lambda-p[2])/(p[1]-p[2])
   phi <- pi*p[1]+(1-pi)*p[2]
-  piSE <- sqrt( phi*(1-phi)/(rep*n*(p[1]-p[2])^2) + (1-1/rep)*pi*(1-pi)/n)  
-  res <- list(model="Kuk",call=paste("Kuk's Model with ",rep," repetitions and p1 =",p[1],", p2 =",p[2]),pi=pi,piSE=piSE,n=n,Kukrep=rep)
+  # V1 <- phi * (1-phi) / (n-1)*(p[1] - p[2])^2
+  # Vk <- 1/rep * V1 + pi*(1-pi)/(n-1) * (1 - 1/rep)
+  piSE <- sqrt( phi*(1-phi)/( (rep*n -1)*(p[1]-p[2])^2) + (1-1/rep)*pi*(1-pi)/(n -1))
+  res <- list(model="Kuk",
+              call=paste("Kuk's Model with ",rep," repetitions and p1 =",p[1],", p2 =",p[2]),
+              pi=pi,piSE=piSE,n=n,Kukrep=rep)
   return(res)
 } 
 
@@ -105,12 +123,13 @@ RRuni.FR<-function(response,p){
   for (i in 1:numCat){
     lambda[i] <- table(factor(response, levels=0:(numCat-1)))[i]/n
     pi[i] <- (lambda[i]-p[i])/pTrue
-    piSE[i] <- sqrt((lambda[i]*(1-lambda[i]))/(pTrue^2*n))
+    piSE[i] <- sqrt((lambda[i]*(1-lambda[i]))/(pTrue^2*(n - 1)))
     callText <- paste(callText,"p",i-1,"=",p[i]," , ",sep="")
   }
   res <- list(model="FR",call=paste("Forced Response (FR) Model with ",numCat,
-                                    " response categories and randomization probabilities ",callText),pi=pi,piSE=piSE,n=n)
-  return(res)
+                                    " response categories and randomization probabilities ",callText),
+              pi=pi,piSE=piSE,n=n)
+  res
 } 
 
 
@@ -127,18 +146,16 @@ RRuni.SLD<-function(response,p,group){
   lambda2 <- sum(response[group==2])/n2
   
   pi <- ((lambda2-lambda1)+(p2-p1))/(p2-p1)
-  piSE <- sqrt(
-    (lambda1*(1-lambda1))/(n1*(p1-p2)^2)+
-      (lambda2*(1-lambda2))/(n2*(p2-p1)^2))
+  piSE <- sqrt((lambda1*(1-lambda1))/((n1 - 1)*(p1-p2)^2)+
+               (lambda2*(1-lambda2))/((n2 - 1)*(p2-p1)^2))
   t <- (lambda2*(1-p1)-lambda1*(1-p2))/((lambda2-lambda1)+(p2-p1))
-  tSE <- sqrt(
-    (lambda1*(1-lambda1))/n1*(((p1-p2)*(p2+lambda2-1))/(p1-p2+lambda1-lambda2)^2)^2+
-      (lambda2*(1-lambda2))/n2*(((p1-p2)*(p1+lambda1-1))/(p1-p2+lambda1-lambda2)^2)^2  )
+  tSE <- sqrt((lambda1*(1-lambda1))/(n1 - 1)*(((p1-p2)*(p2+lambda2-1))/(p1-p2+lambda1-lambda2)^2)^2+
+              (lambda2*(1-lambda2))/(n2 - 1)*(((p1-p2)*(p1+lambda1-1))/(p1-p2+lambda1-lambda2)^2)^2  )
   
   res <- list(model="SLD",call=paste("Stochastic Lie Detector with p1 =",
                                      round(p1,4),", p2 =",round(p2,4)),
               pi=pi,piSE=piSE,t=t,tSE=tSE,n=c(n1,n2))
-  return(res)
+  res
 } 
 
 ########################################
@@ -153,18 +170,19 @@ RRuni.CDM<-function(response,p,group){
   lambda2 <- sum(response[group==2])/n2
   
   pi <- (p2*lambda1-p1*lambda2)/(p2-p1)
-  piSE <- sqrt(( p1^2*lambda2*(1-lambda2)/n2+
-                p2^2*lambda1*(1-lambda1)/n1)/(p1-p2)^2)
+  piSE <- sqrt((p1^2*lambda2*(1-lambda2)/(n2 - 1)+
+                p2^2*lambda1*(1-lambda1)/(n1 - 1))/(p1-p2)^2)
   beta <- (lambda2-lambda1)/(p2-p1)
-  betaSE <- sqrt(
-    (lambda2*(1-lambda2)/n2+lambda1*(1-lambda1)/n1)/(p1-p2)^2)
+  betaSE <- sqrt((lambda2*(1-lambda2)/(n2 - 1)+
+                  lambda1*(1-lambda1)/(n1 - 1))/(p1-p2)^2)
   gamma <- 1 + ((p2-1)*lambda1+(1-p1)*lambda2)/(p1-p2)
-  gammaSE <- sqrt(((p2-1)^2*lambda1*(1-lambda1)/n1+(1-p1)^2*lambda2*(1-lambda2)/n2)/((p1-p2)^2))
+  gammaSE <- sqrt(((p2-1)^2*lambda1*(1-lambda1)/(n1 - 1)+
+                   (1-p1)^2*lambda2*(1-lambda2)/(n2 - 1))/((p1-p2)^2))
   
   res=list(model="CDM",call=paste("Cheater Detection Model with p1 =",
                                   round(p1,4),", p2 =",round(p2,4)),
            pi=pi,piSE=piSE,beta=beta,betaSE=betaSE,gamma=gamma,gammaSE=gammaSE,n=c(n1,n2))
-  return(res)
+  res
 } 
 
 ########################################
@@ -180,11 +198,13 @@ RRuni.CDMsym<-function(response,p,group){
   gamma.denom <- p[1]*(1-p[4])-p[3]*(1-p[2])
   gamma <- ( (p[1]-lambda1)*(1-p[3]-p[4])-(p[3]-lambda2)*(1-p[1]-p[2])) / gamma.denom
   beta <- 1-pi-gamma
-  l1.var <- lambda1*(1-lambda1)/n1
-  l2.var <- lambda2*(1-lambda2)/n2
+  l1.var <- lambda1*(1-lambda1)/(n1 - 1)
+  l2.var <- lambda2*(1-lambda2)/(n2 - 1)
   piSE <- sqrt( p[3]^2 *l1.var +p[1]^2*l2.var ) / abs(pi.denom)
   gammaSE <- sqrt( (1-p[3]-p[4])^2*l1.var + (1-p[1]-p[2])^2*l2.var ) / abs(gamma.denom)
-  res=list(model="CDMsym",call=paste0("Cheater Detection Model (symmetric); for group 1: p1 = ",p[1]," , p2 = ",p[2],"; for group 2: p3 = ",p[3],", p4 = ",p[4]," (probabilities of directed 'Yes'/'No' answers)"),
+  res=list(model="CDMsym",call=paste0("Cheater Detection Model (symmetric); for group 1: p1 = ",
+                                      p[1],", p2 = ",p[2],"; for group 2: p3 = ",
+                                      p[3],", p4 = ",p[4]," (probabilities of directed 'Yes'/'No' answers)"),
            pi=pi,piSE=piSE,beta=beta, betaSE=NA, gamma=gamma,gammaSE=gammaSE,n=c(n1,n2))
   return(res)
 } 
@@ -232,8 +252,11 @@ RRuni.mix.norm<-function(response,p){
   pi <- (mean.obs - (1-pt) * p[2]) / pt
   n <- length(response)
   piSE <- sd(response)/(sqrt(n)*p)
-  pstring <- paste0("'p[1]'=",round(p[1],4)," (probability of answering sensitive question), 'p[2]'=",p[2]," (p[3]=",p[3],"): mean (SD) of masking distribution")
-  res <- list(model="mix.norm",call=paste0("Continuous mixture RR design with probability of truthful responding ",pstring),pi=pi,piSE=piSE,n=n)
+  pstring <- paste0("'p[1]'=",round(p[1],4)," (probability of answering sensitive question), 'p[2]'=",
+                    p[2]," (p[3]=",p[3],"): mean (SD) of masking distribution")
+  res <- list(model="mix.norm",
+              call=paste0("Continuous mixture RR design with probability of truthful responding ",pstring),
+              pi=pi,piSE=piSE,n=n)
   return(res)
 } 
 
@@ -243,8 +266,11 @@ RRuni.mix.exp<-function(response,p){
   pi <- (mean.obs - (1-pt) * p[2]) / pt
   n <- length(response)
   piSE <- sd(response)/(sqrt(n)*p)  
-  pstring <- paste0("'p[1]'=",round(p[1],4)," (probability of answering sensitive question), 'p[2]'=",p[2],": mean and SD of exponential masking distribution")
-  res <- list(model="mix.norm",call=paste0("Continuous mixture RR design with probability of truthful responding ",pstring),pi=pi,piSE=piSE,n=n)
+  pstring <- paste0("'p[1]'=",round(p[1],4)," (probability of answering sensitive question), 'p[2]'=",
+                    p[2],": mean and SD of exponential masking distribution")
+  res <- list(model="mix.norm",
+              call=paste0("Continuous mixture RR design with probability of truthful responding ",pstring),
+              pi=pi,piSE=piSE,n=n)
   return(res)
 } 
 
@@ -267,7 +293,9 @@ RRuni.mix.unknown<-function(response,p,group){
   x.var<- var(response[group==2]) - pi^2 + num/(p[1]-p[2])
   
   pstring <- paste0("'p[1]='",round(p[1],4)," and p[2]=",round(p[2],4),": probability of responding to sensitive question in group 1 and 2, respectively")
-  res <- list(model="mix.unknown",call=paste0("Continuous mixture RR design with probability of truthful responding ",pstring),pi=pi,piSE=piSE,piUQ=piUQ, piUQSE=piUQSE,n=length(response),y.var=y.var, x.var=x.var)
+  res <- list(model="mix.unknown",
+              call=paste0("Continuous mixture RR design with probability of truthful responding ",pstring),
+              pi=pi,piSE=piSE,piUQ=piUQ, piUQSE=piUQSE,n=length(response),y.var=y.var, x.var=x.var)
 #   print(x.var)
 #   print(y.var)
   return(res)

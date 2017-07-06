@@ -4,20 +4,22 @@
 \alias{RRuni}
 \title{Univariate analysis of randomized response data}
 \usage{
-RRuni(response, data, model, p, group = NULL, MLest = TRUE)
+RRuni(response, data, model, p, group = NULL, MLest = TRUE, Kukrep = 1)
 }
 \arguments{
-\item{response}{either vector of responses containing 0='no' and 1='yes' or name of response variable in \code{data}. In Kuk's card playing method (\code{Kuk}), the observed response variable gives the number of red cards. For the Forced Response (\code{FR}) model, response values are integers from 0 to (m-1), where 'm' is the number of response categories.}
+\item{response}{either vector of responses containing 0='no' and 1='yes' or name of response variable in \code{data}.For the Forced Response (\code{FR}) model, response values are integers from 0 to (m-1), where 'm' is the number of response categories.  In Kuk's card playing method (\code{Kuk}), the observed response variable gives the number of red cards.}
 
 \item{data}{optional \code{data.frame} containing the response variable}
 
-\item{model}{defines RR model. Available models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"},\code{"FR"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"mix.norm"}, \code{"mix.exp"},\code{"mix.unknown"}, or \code{"custom"}. See argument \code{p} or type \code{vignette('RRreg')} for detailed specifications.}
+\item{model}{defines RR model. Available models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"FR"}, \code{"Kuk"},\code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"mix.norm"}, \code{"mix.exp"},\code{"mix.unknown"}, or \code{"custom"}. See argument \code{p} or type \code{vignette('RRreg')} for detailed specifications.}
 
 \item{p}{randomization probability (see details or \code{vignette("RRreg")})}
 
 \item{group}{a group vector of the same length as \code{response} containing values 1 or 2, only required for two-group models, which specify different randomization probabilities for two groups, e.g., \code{CDM} or \code{SLD}. If a data.frame \code{data} is provided, the variable \code{group} is searched within it.}
 
 \item{MLest}{whether to use \code{optim} to get ML instead of moment estimates (only relevant if pi is outside of [0,1])}
+
+\item{Kukrep}{number of repetitions of Kuk's card-drawing method}
 }
 \value{
 an \code{RRuni} object, can by analyzed by using \code{\link{summary}}
