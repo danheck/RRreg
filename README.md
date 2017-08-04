@@ -3,7 +3,7 @@
 [![Licence](https://img.shields.io/badge/licence-GPL--2-green.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 [![monthly downloads](http://cranlogs.r-pkg.org/badges/RRreg)](http://cranlogs.r-pkg.org/badges/RRreg)
 [![total downloads](http://cranlogs.r-pkg.org/badges/grand-total/RRreg)](http://cranlogs.r-pkg.org/badges/grand-total/RRreg)
-[![Research software impact](http://depsy.org/api/package/cran/RRreg/badge.svg)](http://depsy.org/package/r/RRreg)
+<!--[![Research software impact](http://depsy.org/api/package/cran/RRreg/badge.svg)](http://depsy.org/package/r/RRreg)-->
 
 RRreg
 =====
