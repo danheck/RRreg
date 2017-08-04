@@ -1,4 +1,5 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/RRreg)](http://cran.r-project.org/package=RRreg)
+[![Build Status](https://travis-ci.org/danheck/RRreg.svg?branch=master)](https://travis-ci.org/danheck/RRreg)
 [![Licence](https://img.shields.io/badge/licence-GPL--2-green.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 [![monthly downloads](http://cranlogs.r-pkg.org/badges/RRreg)](http://cranlogs.r-pkg.org/badges/RRreg)
 [![total downloads](http://cranlogs.r-pkg.org/badges/grand-total/RRreg)](http://cranlogs.r-pkg.org/badges/grand-total/RRreg)
