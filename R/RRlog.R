@@ -219,12 +219,21 @@ RRlog.default <-function(formula, data, model, p, group, n.response=1, LR.test=T
   }
   try({
     latent.values <- as.vector( x %*% coef)
-    est$fitted <- exp(latent.values)/(1+exp(latent.values))
-    ## pi schätzen
+    if (!is2group(model)){
+      P <- getPW(model, p)
+      est$fitted <- P[2,1]+(P[2,2] - P[2,1])/(1+exp(-latent.values))
+    } else{
+      est$fitted <- rep(NA, length(latent.values))
+      for (i in 1:2){
+        P <- getPW(model, p, par2fix, group = i)
+        est$fitted[group == i] <- P[2,1]+(P[2,2] - P[2,1])/(1+exp(-latent.values[group == i]))     
+      }
+    }
+    ## pi estimate
     e <- exp(latent.values)
-    est$pi <- mean(e/(1+e))
+    est$pi <- mean(e/(1+e))  #mean cheating rate
     est$fit.n <- fit.n
-  }, silent=T)
+  }, silent = TRUE)
   
   # SE: Scheers & Dayton 1988: propagation of error  page 970 
   # ableitung von pi = e/(1+e) nach den coeffizienten (gradient)
