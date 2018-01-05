@@ -1,6 +1,7 @@
 language: r
 sudo: false
+cache: packages
 r:
   - devel
-repos:
-  CRAN: https://cloud.r-project.org
+r_binary_packages:
+ - lme4
