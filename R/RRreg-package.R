@@ -31,7 +31,8 @@
 #' @importFrom foreach foreach %dopar%
 #' @importFrom lme4 glmer
 #' @references 
-#' Warner, S. L. (1965). Randomized response: A survey technique for eliminating evasive answer bias. \emph{Journal of the American Statistical Association, 60}, 63–69.
+#' Warner, S. L. (1965). Randomized response: A survey technique for eliminating 
+#' evasive answer bias. \emph{Journal of the American Statistical Association, 60}, 63–69.
 "_PACKAGE"
 
 #' Minaret Data
