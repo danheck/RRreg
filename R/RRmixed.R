@@ -63,7 +63,7 @@ RRmixed <- function(formula, data, model, p, const = .0001, ...){
   ######### fit model using lme4
   args <- list(...)
   if (is.null(args$mustart))
-    args$mustart <- runif(nrow(data), p[1] + const, p[2] - const)
+    args$mustart <- runif(nrow(data), min(p) + const, max(p) - const)
   if (is.null(args$control))
     args$control = lme4::glmerControl(nAGQ0initStep = FALSE,
                                       optimizer = "bobyqa")
@@ -96,11 +96,13 @@ RRloglink <- function (p = c(0, 1), const = .0001){
   c <- p[1]
   d <- p[2] - p[1]
   linkfun <- function(mu){
-    suppressWarnings(eta <- log(mu - c) - log(c + d - mu))  # stability if mu<p[1] or mu>p[2]
-    below <- mu < p[1] + const
-    above <- mu > p[2] - const
-    eta[below] <- 2*log(const) + qlogis(mu[below] / (c + 2 * const))
-    eta[above] <- - 2*log(const) + qlogis((mu[above] - p[2] + 2 * const) / (1 - p[2] + 2 * const))
+    suppressWarnings(eta <- log((mu - c)/(c + d - mu)))  # stability if mu<p[1] or mu>p[2]
+    
+    below <- mu < min(p) + const
+    above <- mu > max(p) - const
+    slope <- ifelse(p[1] < p[2], 1, -1)
+    eta[below] <- slope * (2*log(const) + qlogis(mu[below] / (min(p) + 2 * const)))
+    eta[above] <- slope * (-2*log(const) + qlogis((mu[above] - max(p) + 2 * const) / (1 - max(p) + 2 * const)))
     eta
   }
   linkinv <- function(eta) c + d/(1 + exp(-eta))
@@ -126,3 +128,11 @@ RRloglink <- function (p = c(0, 1), const = .0001){
 # 
 # # stability checks:
 # curve(RRloglink(p = c(.2, .9))$linkfun(x))
+# p <- getPW("Warner", p = .9)
+# p <- getPW("UQTknown", p = c(.1,.8), par2 = .1)
+# # c(p[1], p[2]-p[1])
+# par(mfrow=c(1,2))
+# curve(RRloglink(p = c(.1,.6))$linkfun(x))
+# abline(v=c(.1,.6))
+# curve(RRloglink(p = c(.6,.11))$linkfun(x))
+# abline(v=c(.1,.6))
