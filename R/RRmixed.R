@@ -6,8 +6,13 @@
 #' @param data an optional data frame with variables named in formula
 #' @param model type of RR design. Only 1-group RR designs are supported at the moment (i.e., \code{"Warner"}, \code{"FR"}, \code{"UQTknown"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"Kuk"}, \code{"Mangat"}, \code{"custom"}). See \code{\link{RRuni}} or \code{vignette(RRreg)} for details.
 #' @param p randomization probability 
+#' @param const the RR link function is not defined for small and/or large probabilities 
+#'    (the boundaries depend on \code{model} and \code{p}). To increase robustness of the estimation, 
+#'    these probabilities smaller and larger than the respective boundaries 
+#'    (plus/minus a constant defined via \code{const}) are smoothed by separate logit-link functions.
 #' @param ... further arguments passed to \code{\link{glmer}}
 #' @return an object of class \code{glmerMod}
+#' 
 #' @details 
 #' Some examples for formula:
 #' \itemize{
@@ -16,7 +21,18 @@
 #'  \item{both random slope and intercept:   }{ \code{response ~ covariate +(covariate | group)}}
 #'  \item{level-2 predictor (must have constant values within groups!):   }{ \code{response ~ lev2 + (1|group)}}
 #' }
+#' 
+#' Note that parameter estimation will be unstable and might fail if the observed
+#' responses are not in line with the model. For instance, a Forced-Response
+#' model (\code{model="FR"}) with \code{p=c(0,1/4)} requires that expected
+#' probabilities for responses are in the interval [.25,1.00]. If the observed 
+#' proportion of responses is very low (<<.25), intercepts will be estimated to 
+#' be very small (<<0) and/or parameter estimation might fail. See 
+#' \code{\link[lme4]{glmer}} for setting better starting values and \code{\link[lme4]{lmerControl}}
+#' for further options to increase stability.
+#' 
 #' @references  van den Hout, A., van der Heijden, P. G., & Gilchrist, R. (2007). The Logistic Regression Model with Response Variables Subject to Randomized Response. Computational Statistics & Data Analysis, 51, 6060–6069.
+#' 
 #' @examples 
 #' # generate data with a level-1 predictor 
 #' d <- data.frame(group=factor(rep(LETTERS[1:20],each=50)), 
@@ -34,20 +50,34 @@
 #' mod <- RRmixed(resp ~  cov +(1|group), data=d, model="FR", p=p)
 #' summary(mod)
 #' @export
-RRmixed <- function(formula, data, model, p, ...){
+RRmixed <- function(formula, data, model, p, const = .0001, ...){
   
   ######### check if model is allowed
   model <- match.arg(model, modelnames())
-  if(is2group(model) | isContinuous(model) )
-     stop("Only one-group, dichotomous RR models allowed at the moment (see ?RRmixed)")
+  if (is2group(model) | isContinuous(model) )
+    stop ("Only one-group, dichotomous RR models allowed at the moment (see ?RRmixed)")
   
   ######### get link function
   p <- getPW(model, p)[2,]
   
   ######### fit model using lme4
-  mod <- glmer(formula, data, family=binomial(link=RRloglink(p)), ...)
-
-  return(mod)
+  args <- list(...)
+  if (is.null(args$mustart))
+    args$mustart <- runif(nrow(data), p[1] + const, p[2] - const)
+  if (is.null(args$control))
+    args$control = lme4::glmerControl(nAGQ0initStep = FALSE,
+                                      optimizer = "bobyqa")
+  if (is.null(args$start)){
+    glmer_formula <- lme4::glFormula(formula, data)
+    args$start <- list(fixef = runif(ncol(glmer_formula$X), -.3, .3))
+  }
+  
+  input <- c(args, list(formula = formula, data = data, 
+                        family=binomial(link=RRloglink(p = p, const = const))))
+  mod <- do.call("glmer", args = input)
+  mod@call$data <- substitute(data)
+  mod@call$control <- list(...)$control
+  mod
 }
 
 
@@ -61,28 +91,38 @@ RRmixed <- function(formula, data, model, p, ...){
 # p(1) = p(1|0)*(1-pi)     + p(1|1)*pi
 # p(1) = p(1|0)- p(1|0)*pi + p(1|1)*pi
 # p(1) = p(1|0) + (p(1|1)-p(1|0))*pi
-RRloglink <- function(p=c(0,1))
-{
+#' @importFrom stats qlogis
+RRloglink <- function (p = c(0, 1), const = .0001){
   c <- p[1]
   d <- p[2] - p[1]
-  linkfun <- function(mu) log((mu-c)/(c+d-mu))
-  linkinv <- function(eta) c+d/(1+exp(-eta)) # (c+(c+d)* exp(eta))/(exp(eta)+1)
-  mu.eta <- function(eta) (exp(eta)* d)/(exp(eta)+1)^2
+  linkfun <- function(mu){
+    suppressWarnings(eta <- log(mu - c) - log(c + d - mu))  # stability if mu<p[1] or mu>p[2]
+    below <- mu < p[1] + const
+    above <- mu > p[2] - const
+    eta[below] <- 2*log(const) + qlogis(mu[below] / (c + 2 * const))
+    eta[above] <- - 2*log(const) + qlogis((mu[above] - p[2] + 2 * const) / (1 - p[2] + 2 * const))
+    eta
+  }
+  linkinv <- function(eta) c + d/(1 + exp(-eta))
+  mu.eta <- function(eta) (exp(eta) * d)/(exp(eta) + 1)^2
   valideta <- function(eta) TRUE
-  link <- paste0("logRR(", paste0(p,collapse=","), ")")
-  simulate <- 
-    structure(list(linkfun = linkfun, linkinv = linkinv,
-                   mu.eta = mu.eta, valideta = valideta, name = link),
-              class = "link-glm")
+  link <- paste0("logRR(", paste0(p, collapse = ","), ")")
+  simulate <- structure(list(linkfun = linkfun, linkinv = linkinv, 
+                             mu.eta = mu.eta, valideta = valideta, name = link), 
+                        class = "link-glm")
 }
 
-# Basic checks for link function:
-# vv <- logRR(p=c(.1,.9))
+# # Basic checks for link function:
+# vv <- RRloglink(p=c(.1,.9))
 # ## check invertibility
 # xx <- seq(-30,30, length=100)
-# plot(xx, sapply(xx, function(x) vv$linkfun(vv$linkinv(x))), type="l") 
+# plot(xx, sapply(xx, function(x) vv$linkfun(vv$linkinv(x))), type="l")
 # abline(0,1, col="red")
-# library("numDeriv")
+# 
+# library(numDeriv)
 # all.equal(grad(vv$linkinv,1),vv$mu.eta(1))  ## check derivative
 # plot(xx, sapply(xx, vv$mu.eta), type="l")
 # lines(xx, sapply(xx, function(x) grad(vv$linkinv,x)), col="red")
+# 
+# # stability checks:
+# curve(RRloglink(p = c(.2, .9))$linkfun(x))

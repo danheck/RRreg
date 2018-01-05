@@ -4,7 +4,7 @@
 \alias{RRmixed}
 \title{Mixed Effects Logistic Regression for RR Data}
 \usage{
-RRmixed(formula, data, model, p, ...)
+RRmixed(formula, data, model, p, const = 1e-04, ...)
 }
 \arguments{
 \item{formula}{two-sided formula including random and fixed effects (see below or \code{\link{glmer}} for details)}
@@ -14,6 +14,11 @@ RRmixed(formula, data, model, p, ...)
 \item{model}{type of RR design. Only 1-group RR designs are supported at the moment (i.e., \code{"Warner"}, \code{"FR"}, \code{"UQTknown"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"Kuk"}, \code{"Mangat"}, \code{"custom"}). See \code{\link{RRuni}} or \code{vignette(RRreg)} for details.}
 
 \item{p}{randomization probability}
+
+\item{const}{the RR link function is not defined for small and/or large probabilities 
+(the boundaries depend on \code{model} and \code{p}). To increase robustness of the estimation, 
+these probabilities smaller and larger than the respective boundaries 
+(plus/minus a constant defined via \code{const}) are smoothed by separate logit-link functions.}
 
 \item{...}{further arguments passed to \code{\link{glmer}}}
 }
@@ -31,6 +36,15 @@ Some examples for formula:
  \item{both random slope and intercept:   }{ \code{response ~ covariate +(covariate | group)}}
  \item{level-2 predictor (must have constant values within groups!):   }{ \code{response ~ lev2 + (1|group)}}
 }
+
+Note that parameter estimation will be unstable and might fail if the observed
+responses are not in line with the model. For instance, a Forced-Response
+model (\code{model="FR"}) with \code{p=c(0,1/4)} requires that expected
+probabilities for responses are in the interval [.25,1.00]. If the observed 
+proportion of responses is very low (<<.25), intercepts will be estimated to 
+be very small (<<0) and/or parameter estimation might fail. See 
+\code{\link[lme4]{glmer}} for setting better starting values and \code{\link[lme4]{lmerControl}}
+for further options to increase stability.
 }
 \examples{
 # generate data with a level-1 predictor 
