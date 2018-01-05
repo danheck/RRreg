@@ -34,7 +34,7 @@
 #'  \item \code{"mix.unknown"}: 2-valued vector - Prob. of responding to sensitive question in group 1 and 2, respectively
 #'  }
 #' @return an \code{RRuni} object, can by analyzed by using \code{\link{summary}}
-#' @seealso \code{vignette('RRreg')} or \url{https://dl.dropboxusercontent.com/u/21456540/RRreg/index.html} for a detailed description of the RR models and the appropriate definition of \code{p} 
+#' @seealso \code{vignette('RRreg')} or \url{http://www.dwheck.de/separate_content/RRregManual/index.html} for a detailed description of the RR models and the appropriate definition of \code{p} 
 #' @examples 
 #' # Generate responses of 1000 people according to Warner's model
 #' # with an underlying true proportion of .3

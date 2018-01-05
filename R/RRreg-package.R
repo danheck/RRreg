@@ -13,7 +13,7 @@
 #' License: \tab GPL-2\cr
 # LazyLoad: \tab yes\cr
 #' URL: \tab \url{http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg}\cr
-# Vignette: \tab \url{https://dl.dropboxusercontent.com/u/21456540/RRreg/index.html}\cr
+# Vignette: \tab \url{http://www.dwheck.de/separate_content/RRregManual/index.html}\cr
 #' }
 #' 
 #' @aliases RRreg-package RRreg

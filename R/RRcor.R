@@ -24,7 +24,7 @@
 #' 
 #' Note that the continuous RR model \code{mix.norm} with the randomization parameter \code{p=c(p.truth, mean, SD)} assumes that participants respond either to the sensitive question with probability \code{p.truth} or otherwise to a known masking distribution with known mean and SD. The estimated correlation only depends on the mean and SD and does not require normality. However, the assumption of normality is used in the parametric bootstrap to obtain standard errors.
 #' 
-#' @seealso \code{vignette('RRreg')} or \url{https://dl.dropboxusercontent.com/u/21456540/RRreg/index.html} for a detailed description of the RR models and the appropriate definition of \code{p} 
+#' @seealso \code{vignette('RRreg')} or \url{http://www.dwheck.de/separate_content/RRregManual/index.html} for a detailed description of the RR models and the appropriate definition of \code{p} 
 #' @references Fox, J. A., & Tracy, P. E. (1984). Measuring associations with randomized response. \emph{Social Science Research, 13}, 188-197.
 #' @examples 
 #' # generate first RR variable

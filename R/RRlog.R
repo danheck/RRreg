@@ -22,7 +22,7 @@
 #' @param ... ignored
 #' @details The logistic regression model is fitted first by an EM algorithm, in which the dependend RR variable is treated as a misclassified binary variable (Magder & Hughes, 1997). The results are used as starting values for a Newton-Raphson based optimization by \code{\link{optim}}.
 #' @author Daniel W. Heck
-#' @seealso \code{vignette('RRreg')} or \url{https://dl.dropboxusercontent.com/u/21456540/RRreg/index.html} for a detailed description of the RR models and the appropriate definition of \code{p} 
+#' @seealso \code{vignette('RRreg')} or \url{http://www.dwheck.de/separate_content/RRregManual/index.html} for a detailed description of the RR models and the appropriate definition of \code{p} 
 #' @return Returns an object \code{RRlog} which can be analysed by the generic method \code{\link{summary}}
 #' @references van den Hout, A., van der Heijden, P. G., & Gilchrist, R. (2007). The logistic regression model with response variables subject to randomized response. \emph{Computational Statistics & Data Analysis, 51}, 6060-6069. 
 #' @examples
