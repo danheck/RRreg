@@ -21,7 +21,8 @@ URL: \tab \url{http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg}\cr
 }
 }
 \references{
-Warner, S. L. (1965). Randomized response: A survey technique for eliminating evasive answer bias. \emph{Journal of the American Statistical Association, 60}, 63–69.
+Warner, S. L. (1965). Randomized response: A survey technique for eliminating 
+evasive answer bias. \emph{Journal of the American Statistical Association, 60}, 63–69.
 }
 \seealso{
 Useful links:
