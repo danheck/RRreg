@@ -4,7 +4,7 @@
 \alias{RRmixed}
 \title{Mixed Effects Logistic Regression for RR Data}
 \usage{
-RRmixed(formula, data, model, p, const = 1e-04, ...)
+RRmixed(formula, data, model, p, const = 1e-04, adjust_control = FALSE, ...)
 }
 \arguments{
 \item{formula}{two-sided formula including random and fixed effects (see below or \code{\link{glmer}} for details)}
@@ -19,6 +19,10 @@ RRmixed(formula, data, model, p, const = 1e-04, ...)
 (the boundaries depend on \code{model} and \code{p}). To increase robustness of the estimation, 
 these probabilities smaller and larger than the respective boundaries 
 (plus/minus a constant defined via \code{const}) are smoothed by separate logit-link functions.}
+
+\item{adjust_control}{whether to adjust the control arguments for \code{glmer}, 
+which might help in case of convergence issues for some models. \code{\link[lme4]{lmerControl}} settings
+are changed to \code{nAGQ0initStep = FALSE} and \code{optimizer = "bobyqa"}.}
 
 \item{...}{further arguments passed to \code{\link{glmer}}}
 }

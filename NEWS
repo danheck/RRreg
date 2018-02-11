@@ -1,4 +1,4 @@
-RRreg 0.6.4 (January 2018)
+RRreg 0.6.5 (February 2018)
 ===========
 
 * Improved stability of RRmixed(): Better starting values and estimation options

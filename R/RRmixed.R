@@ -10,6 +10,9 @@
 #'    (the boundaries depend on \code{model} and \code{p}). To increase robustness of the estimation, 
 #'    these probabilities smaller and larger than the respective boundaries 
 #'    (plus/minus a constant defined via \code{const}) are smoothed by separate logit-link functions.
+#' @param adjust_control whether to adjust the control arguments for \code{glmer}, 
+#'    which might help in case of convergence issues for some models. \code{\link[lme4]{lmerControl}} settings
+#'    are changed to \code{nAGQ0initStep = FALSE} and \code{optimizer = "bobyqa"}.
 #' @param ... further arguments passed to \code{\link{glmer}}
 #' @return an object of class \code{glmerMod}
 #' 
@@ -50,7 +53,8 @@
 #' mod <- RRmixed(resp ~  cov +(1|group), data=d, model="FR", p=p)
 #' summary(mod)
 #' @export
-RRmixed <- function(formula, data, model, p, const = .0001, ...){
+RRmixed <- function(formula, data, model, p, const = .0001, 
+                    adjust_control = FALSE, ...){
   
   ######### check if model is allowed
   model <- match.arg(model, modelnames())
@@ -64,7 +68,7 @@ RRmixed <- function(formula, data, model, p, const = .0001, ...){
   args <- list(...)
   if (is.null(args$mustart))
     args$mustart <- runif(nrow(data), min(p) + const, max(p) - const)
-  if (is.null(args$control))
+  if (adjust_control)
     args$control = lme4::glmerControl(nAGQ0initStep = FALSE,
                                       optimizer = "bobyqa")
   if (is.null(args$start)){
