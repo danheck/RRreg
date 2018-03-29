@@ -4,13 +4,17 @@
 \alias{predict.RRlog}
 \title{Predict Individual Prevalences of the RR Attribute}
 \usage{
-\method{predict}{RRlog}(object, newdata = NULL, se.fit = FALSE, ci = 0.95,
-  ...)
+\method{predict}{RRlog}(object, newdata = NULL, type = "response",
+  se.fit = FALSE, ci = 0.95, ...)
 }
 \arguments{
 \item{object}{A fitted \code{\link{RRlog}} model}
 
 \item{newdata}{An optional vector, matrix, or data.frame with values on the predictor variables. Note that for matrices, the order of predictors should match the order of predictors in the formula. Uses the fitted values of the model if omitted.}
+
+\item{type}{\code{"link"} gives predicted values on the logit scale, 
+\code{"response"} on the probability scale 
+(note: predicted probablities refer to having the sensitive RR attribute, not to the probability of responding).}
 
 \item{se.fit}{Get standard errors for the fitted/predicted values (using the error variance and df of the original RR model).}
 
@@ -19,5 +23,5 @@
 \item{...}{ignored}
 }
 \description{
-Predictions of the loglinear RR model for the individual probabilities of having the sensitive RR attribute.
+Predictions of the loglinear RR model for the individual probabilities (or logits) of having the sensitive RR attribute.
 }
