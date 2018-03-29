@@ -28,6 +28,11 @@
 #' @importFrom parallel stopCluster makeCluster
 #' @importFrom foreach foreach %dopar%
 #' @importFrom lme4 glmer
+#' @section Citation:
+#' If you use \code{RRreg} in publications, please cite the package as follows:
+#' 
+#' Heck, D. W., & Moshagen, M. (in press). RRreg: An R package for correlation and regression analyses of randomized response data. \emph{Journal of Statistical Software.}
+#' 
 #' @references 
 #' Warner, S. L. (1965). Randomized response: A survey technique for eliminating 
 #' evasive answer bias. \emph{Journal of the American Statistical Association, 60}, 63–69.

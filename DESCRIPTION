@@ -33,6 +33,6 @@ Encoding: UTF-8
 LazyLoad: yes
 URL: http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg/
 VignetteBuilder: knitr
-Version: 0.6.5
-Date: 2018-02-11
+Version: 0.6.6
+Date: 2018-03-29
 RoxygenNote: 6.0.1

@@ -1,3 +1,9 @@
+RRreg 0.6.6 (March 2018)
+===========
+
+* Bugfixes in predict.RRlog()
+
+
 RRreg 0.6.5 (February 2018)
 ===========
 
