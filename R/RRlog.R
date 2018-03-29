@@ -298,15 +298,16 @@ RRlog.formula <- function(formula, data=list(), model, p, group, n.response=1,..
 
 #' Predict Individual Prevalences of the RR Attribute
 #' 
-#' Predictions of the loglinear RR model for the individual probabilities of having the sensitive RR attribute.
+#' Predictions of the loglinear RR model for the individual probabilities (or logits) of having the sensitive RR attribute.
 #' 
 #' @param object A fitted \code{\link{RRlog}} model
 #' @param newdata An optional vector, matrix, or data.frame with values on the predictor variables. Note that for matrices, the order of predictors should match the order of predictors in the formula. Uses the fitted values of the model if omitted.
+#' @param type "link" gives predicted values on the logit scale, "response" on the probability scale
 #' @param se.fit Get standard errors for the fitted/predicted values (using the error variance and df of the original RR model).
 #' @param ci Confidence level for confidence interval. If 0, no boundaries are returned.
 #' @param ... ignored
 #' @export
-predict.RRlog <- function(object, newdata=NULL, se.fit=FALSE, 
+predict.RRlog <- function(object, newdata=NULL, type = "response", se.fit=FALSE, 
                           ci= 0.95, ...)
 {
   if(is.null(newdata)){
@@ -323,7 +324,6 @@ predict.RRlog <- function(object, newdata=NULL, se.fit=FALSE,
       x <- newdata
     }
     y <- as.vector(x %*% coef(object))
-    y <- exp(y)/(1+exp(y))
   }
   if(!se.fit & ci == 0){
     return(y)
@@ -338,6 +338,12 @@ predict.RRlog <- function(object, newdata=NULL, se.fit=FALSE,
     zcrit <- qnorm((1-ci)/2, lower.tail=F)
     ci.lower <- y - predict.se*zcrit
     ci.upper <- y + predict.se*zcrit
+    if(type == "response"){
+      y <- plogis(y)
+      predict.se <- NA # computed SE refer to logits and are invalid for probability scale
+      ci.lower <- plogis(ci.lower)
+      ci.upper <- plogis(ci.upper)
+    } 
     if(se.fit & ci!=0)
       return(cbind(predict=y, se=predict.se, ci.lower=ci.lower, ci.upper=ci.upper))
     else if(se.fit)
