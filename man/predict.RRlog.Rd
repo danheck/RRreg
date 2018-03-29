@@ -16,7 +16,7 @@
 \code{"response"} on the probability scale 
 (note: predicted probablities refer to having the sensitive RR attribute, not to the probability of responding).}
 
-\item{se.fit}{Get standard errors for the fitted/predicted values (using the error variance and df of the original RR model).}
+\item{se.fit}{Get standard errors for the predicted values (using the observed Fisher information from the fitted model). Standard errors for the probability scale are computed using the delta method.}
 
 \item{ci}{Confidence level for confidence interval. If 0, no boundaries are returned.}
 

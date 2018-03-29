@@ -16,10 +16,8 @@
 # Vignette: \tab \url{http://www.dwheck.de/separate_content/RRregManual/index.html}\cr
 #' }
 #' 
-#' @aliases RRreg-package RRreg
 #' @name RRreg-package
 #' @docType package
-# @title The RRreg Package
 #' @author Daniel W. Heck \email{heck@@uni-mannheim.de} and Morten Moshagen \email{morten.moshagen@@uni-ulm.de}
 #' @keywords package
 #' 
@@ -34,6 +32,7 @@
 #' Warner, S. L. (1965). Randomized response: A survey technique for eliminating 
 #' evasive answer bias. \emph{Journal of the American Statistical Association, 60}, 63–69.
 "_PACKAGE"
+
 
 #' Minaret Data
 #' 

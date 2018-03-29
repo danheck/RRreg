@@ -32,14 +32,14 @@ RRlog.fit <- function(model, x, y, n.response, p, start, group, setPar2=-1, maxi
   if(is2group(model)){
     nams <- c(nams, ifelse(model=="SLD", "t", ifelse(model == "UQTunknown", "pi", "gamma")))
   }
-  #   print(grad)
-  #   print(grad(func=RRlog.SLD.ll,x=est$par,cov=x,y=y,prand=p,group=group,setT=setT))
-  res <- list(model=model,
-              pString=paste("p = ",paste0(round(p,3),collapse=",")),
-              coefficients=coef,
-              logLik=logLik,param=nams,
-              hessian=hessian,iter=iter, convergence=convergence)
-  return(res)
+  
+  list(model=model,
+       p=p,
+       pString=paste("p = ",paste0(round(p,3),collapse=",")),
+       group = group,
+       coefficients=coef,
+       logLik=logLik,param=nams,
+       hessian=hessian,iter=iter, convergence=convergence)
 }
 
 
