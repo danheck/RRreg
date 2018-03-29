@@ -302,19 +302,20 @@ RRlog.formula <- function(formula, data=list(), model, p, group, n.response=1,..
 #' 
 #' @param object A fitted \code{\link{RRlog}} model
 #' @param newdata An optional vector, matrix, or data.frame with values on the predictor variables. Note that for matrices, the order of predictors should match the order of predictors in the formula. Uses the fitted values of the model if omitted.
-#' @param type "link" gives predicted values on the logit scale, "response" on the probability scale
-#' @param se.fit Get standard errors for the fitted/predicted values (using the error variance and df of the original RR model).
+#' @param type \code{"link"} gives predicted values on the logit scale, 
+#'     \code{"response"} on the probability scale 
+#'     (note: predicted probablities refer to having the sensitive RR attribute, not to the probability of responding).
+#' @param se.fit Get standard errors for the predicted values (using the observed Fisher information from the fitted model). Standard errors for the probability scale are computed using the delta method.
 #' @param ci Confidence level for confidence interval. If 0, no boundaries are returned.
 #' @param ... ignored
 #' @export
 predict.RRlog <- function(object, newdata=NULL, type = "response", se.fit=FALSE, 
                           ci= 0.95, ...)
 {
-  if(is.null(newdata)){
-    y <- fitted(object)
+  if (is.null(newdata)){
     x <- model.matrix(object$formula, object$model.frame)
-  }else{
-    if(!is.null(object$formula)){
+  } else {
+    if (!is.null(object$formula)){
       newdata <- data.frame(newdata, predict=1)
       ## model has been fitted using formula interface
       pred.formula <- update(object$formula, predict~.)
@@ -323,8 +324,8 @@ predict.RRlog <- function(object, newdata=NULL, type = "response", se.fit=FALSE,
     else{
       x <- newdata
     }
-    y <- as.vector(x %*% coef(object))
   }
+  y <- as.vector(x %*% coef(object))
   if(!se.fit & ci == 0){
     return(y)
   }else{
@@ -340,7 +341,13 @@ predict.RRlog <- function(object, newdata=NULL, type = "response", se.fit=FALSE,
     ci.upper <- y + predict.se*zcrit
     if(type == "response"){
       y <- plogis(y)
-      predict.se <- NA # computed SE refer to logits and are invalid for probability scale
+      # standard errors for probability scale: delta method
+      # https://cran.r-project.org/web/packages/modmarg/vignettes/delta-method.html
+      deriv <- exp(-y)/(1+exp(-y))^2
+      j <- deriv * x                  # Jacobian for each prediction
+      vcov_prob <- j %*% vcov %*% t(j)
+      predict.se <- sqrt(diag(vcov_prob)) # computed SE refer to logits and are invalid for probability scale
+      
       ci.lower <- plogis(ci.lower)
       ci.upper <- plogis(ci.upper)
     } 
