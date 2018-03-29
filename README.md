@@ -16,9 +16,16 @@ The package can be downloaded from CRAN by typing `install.packages("RRreg")` in
 
 To get the most recent version, `RRreg` can also directly be installed from GitHub by:
 ```
-install.packages("devtools")
-library("devtools")
-install_github("danheck/RRreg")
+# install.packages("devtools")
+devtools::install_github("danheck/RRreg")
 ```
 
 The manual is available within R by typing `vignette('RRreg')`.
+
+### Citation
+
+If you use `RRreg` in publications, please cite the package as follows:
+
+Heck, D. W., & Moshagen, M. (in press). 
+RRreg: An R package for correlation and regression analyses of randomized response data. 
+*Journal of Statistical Software.*
