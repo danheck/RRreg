@@ -305,9 +305,17 @@ RRlog.formula <- function(formula, data=list(), model, p, group, n.response=1,..
 #' @param type \code{"link"} gives predicted values on the logit scale, 
 #'     \code{"response"} on the probability scale 
 #'     (note: predicted probablities refer to having the sensitive RR attribute, not to the probability of responding).
-#' @param se.fit Get standard errors for the predicted values (using the observed Fisher information from the fitted model). Standard errors for the probability scale are computed using the delta method.
-#' @param ci Confidence level for confidence interval. If 0, no boundaries are returned.
+#' @param se.fit Return standard errors for the predicted values in addition to confidence intervals.
+#'     SEs on the logit scale are computed using the observed Fisher information from the fitted model. 
+#'     Standard errors for the probability scale are computed using the delta method.
+#' @param ci Confidence level for confidence interval. Note that the confidence interval 
+#'     on the probability scale is computed as the logit-transformed CI on the logit-scale
+#'     (hence, the CI will in general not be symmetric). If 0, no boundaries are returned.
 #' @param ... ignored
+#' 
+#' @return a matrix with columns for the point estimates, confidence interval, 
+#'     and standard errors (if \code{se.fit=TRUE}).
+#' 
 #' @export
 predict.RRlog <- function(object, newdata=NULL, type = "response", se.fit=FALSE, 
                           ci= 0.95, ...)

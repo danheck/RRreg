@@ -16,11 +16,19 @@
 \code{"response"} on the probability scale 
 (note: predicted probablities refer to having the sensitive RR attribute, not to the probability of responding).}
 
-\item{se.fit}{Get standard errors for the predicted values (using the observed Fisher information from the fitted model). Standard errors for the probability scale are computed using the delta method.}
+\item{se.fit}{Return standard errors for the predicted values in addition to confidence intervals.
+SEs on the logit scale are computed using the observed Fisher information from the fitted model. 
+Standard errors for the probability scale are computed using the delta method.}
 
-\item{ci}{Confidence level for confidence interval. If 0, no boundaries are returned.}
+\item{ci}{Confidence level for confidence interval. Note that the confidence interval 
+on the probability scale is computed as the logit-transformed CI on the logit-scale
+(hence, the CI will in general not be symmetric). If 0, no boundaries are returned.}
 
 \item{...}{ignored}
+}
+\value{
+a matrix with columns for the point estimates, confidence interval, 
+    and standard errors (if \code{se.fit=TRUE}).
 }
 \description{
 Predictions of the loglinear RR model for the individual probabilities (or logits) of having the sensitive RR attribute.
