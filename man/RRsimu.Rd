@@ -38,7 +38,7 @@ RRsimu(numRep, n, pi, model, p, cor = 0, b.log = 0, complyRates = c(1, 1),
 
 \item{getPower}{whether to compute power for \code{method="RRcor"} (performs an additional bootstrap assuming independence)}
 
-\item{nCPU}{integer: how many processors to use? (use 'max' for automatic detection on Windows)}
+\item{nCPU}{integer: number of CPU cores used for parallel computation.}
 }
 \value{
 A list containing

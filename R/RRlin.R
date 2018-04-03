@@ -372,12 +372,7 @@ RRlin <- function(formula, data, models, p.list, group=NULL,
       bs.res <- npboot(R=bs.n)
       res$bs.beta <- bs.res$beta; res$bs.sigma <- bs.res$sigma; 
       res$bs.pi <- bs.res$pi; res$bs.logLik <- bs.res$logLik; 
-    }else{
-      #       require(doParallel, quietly=T)
-      if (nCPU=="max"){
-        try(nCPU <-  as.numeric(Sys.getenv('NUMBER_OF_PROCESSORS')))
-        if (nCPU=="max") nCPU <- 2
-      }
+    } else {
       cl.tmp =  makeCluster(nCPU) 
       registerDoParallel(cl.tmp, cores=nCPU)
       bs.res <- foreach(k=1:nCPU , .packages='RRreg') %dopar% { 

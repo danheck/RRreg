@@ -425,11 +425,6 @@ for (i in 1:m){
     if (nCPU == 1){
       bs.ests <- getBoot(rep=bs.n)   
     }else{
-      #       require(doParallel, quietly = TRUE)
-      if (nCPU=="max"){
-        try(nCPU <-  as.numeric(Sys.getenv('NUMBER_OF_PROCESSORS')))
-        if (nCPU=="max") nCPU <- 2
-      }
       cl.tmp =  makeCluster(nCPU) 
       registerDoParallel(cl.tmp, cores=nCPU)
       rep <- ceiling(bs.n/nCPU)

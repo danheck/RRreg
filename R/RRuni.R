@@ -205,14 +205,13 @@ summary.RRuni<-function(object,...){
   if (object$model %in% c("mix.unknown")){
     zval_g=object$piUQ/object$piUQSE
     TAB=rbind(TAB,
-              #               cbind(object$beta,object$betaSE,zval_b,pnorm(-abs(zval_b))),
               cbind(object$piUQ,object$piUQSE,zval_g,pnorm(zval_g,lower.tail=F)))
     rownames(TAB)=c("pi","piUQ")
   }
   res <- list(call=object$call,n=object$n,
               coefficients=TAB, model=object$model)
   class(res) <- "summary.RRuni"
-  return(res)
+  res
 }
 
 
@@ -226,7 +225,7 @@ print.summary.RRuni<-function(x,...){
   printCoefmat( round(x$coefficients,6))
   if (x$model=="SLD"){
     cat("\n(for the parameter t, i.e., the probability of true responding of carriers,
- the test is H0: t=1; H1: t<1 and the one-sided probability value is given)")
+ the test is H0: t=1; H1: t<1 and the one-sided probability value is given)\n")
   }
 }
 

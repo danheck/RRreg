@@ -17,7 +17,7 @@
 #' @param groupRatio proportion of participants in group 1. Only for two-group models (e.g., \code{"SLD"}) (for 2 RR variables: \code{vector})
 #' @param MLest concerns \code{\link{RRuni}}: whether to use \code{optim} to get ML instead of moment estimates (only relevant if pi is outside of [0,1])
 #' @param getPower whether to compute power for \code{method="RRcor"} (performs an additional bootstrap assuming independence)
-#' @param nCPU integer: how many processors to use? (use 'max' for automatic detection on Windows)
+#' @param nCPU integer: number of CPU cores used for parallel computation.
 #' @return A list containing
 #'  \item{parEsts}{matrix containing the estimated parameters}
 #'  \item{results}{matrix  with mean parameters, standard errors, and number of samples to which the respective method could not be fitted}
@@ -297,11 +297,6 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
   
   # multi core processing
   if (nCPU!=1){
-    #     require(doParallel, quietly=T)
-    if (nCPU=="max"){
-      try(nCPU <-  as.numeric(Sys.getenv('NUMBER_OF_PROCESSORS')))
-      if (nCPU=="max") nCPU <- 2    
-    }
     cl.tmp =  makeCluster(nCPU) 
     registerDoParallel(cl.tmp, cores=nCPU)
     #   try(rm(parEsts), silent=TRUE)
@@ -408,12 +403,12 @@ print.RRsimu <- function(x,...){
   cat(paste0("\nPower on alpha=",x$alpha," level:\n"))
   print( round(x$power,5))
   sel <- x$results[,3] > x$numRep* .05
-  if(any(sel)){
+  if (any(sel)){
     warning("Fitting routines did fail in \n  ",
             paste(x$results[,3]*100/x$numRep, collapse=","), 
                   "% of bootstrap samples for:\n      ", 
             paste(rownames(x$results)[sel], collapse="; "), ", respectively.", 
-            "\n  This might be due to extreme prevalence rates (e.g., pi=.01).")
+            "\n  This might be due to extreme prevalence rates (e.g., pi=.01).\n")
   }
   
   # if("RRlog" %in% x$method){

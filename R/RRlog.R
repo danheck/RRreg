@@ -447,10 +447,7 @@ print.summary.RRlog <- function(x, ...){
   cat("\n")
   if(x$model == "SLD") 
     cat("Note that the parameter t is tested against the null hypothesis 
-        that all participants answered truthfully (i.e., H0: t=1).")
-  #   cat("\nEstimate of pi:\n")
-  #   write(paste0("pi = ",round(x$pi,6))) #" (use RRuni to get standard errors"))
-  #                piSE = ",round(x$piSE,6),") 
+        that all participants answered truthfully (i.e., H0: t=1).\n")
 }
 
 #' @export
