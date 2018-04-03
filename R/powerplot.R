@@ -2,6 +2,7 @@
 #' 
 #' Uses the function \code{\link{RRsimu}} to estimate the power of the multivariate RR methods (correlation \code{\link{RRcor}}, logistic regression \code{\link{RRlog}}, and/or linear regression \code{\link{RRlin}}.
 #' 
+#' @inheritParams RRsimu
 #' @param numRep number of boostrap replications
 #' @param n vector of samples sizes
 #' @param pi true prevalence
@@ -14,7 +15,6 @@
 #' @param sysBias probability of responding 'yes' in case of noncompliance
 #' @param groupRatio ratio of subgroups in two-group RR designs
 #' @param alpha type-I error used to estimate power
-#' @param nCPU number of CPUs to be used
 #' @param show.messages toggle printing of progress messages
 #' 
 #' @return

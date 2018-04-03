@@ -11,7 +11,7 @@
 #' @param group vector or matrix specifying group membership by the indices 1 and 2. Only for multigroup RR models, e.g., \code{UQTunknown}, \code{CDM} or \code{SLD}
 #' @param Kukrep defines the number of repetitions in Kuk's card playing method
 #' @param bs.n Number of samples used for the non-parametric bootstrap
-#' @param nCPU Number of cores used for the bootstrap
+#' @param nCPU only relevant for the bootstrap: either the number of CPU cores or a cluster initialized via \code{\link[parallel]{makeCluster}}.
 #' @param maxit maximum number of iterations in optimization routine
 #' @param fit.n number of fitting runs with random starting values 
 #' @param pibeta approximate ratio of probabilities pi to regression weights beta (to adjust scaling). Can be used for speeding-up and fine-tuning ML estimation (i.e., choosing a smaller value for larger beta values).
@@ -368,24 +368,29 @@ RRlin <- function(formula, data, models, p.list, group=NULL,
       # return results as list
       bs.res <- list(beta=bs.beta, pi=bs.pi, sigma=bs.sigma, logLik=bs.logLik)
     }
-    if (nCPU==1){
-      bs.res <- npboot(R=bs.n)
+    if (is.numeric(nCPU) && nCPU == 1){
+      cl.tmp <- NULL
+      bs.res <- npboot(R = bs.n)
       res$bs.beta <- bs.res$beta; res$bs.sigma <- bs.res$sigma; 
       res$bs.pi <- bs.res$pi; res$bs.logLik <- bs.res$logLik; 
-    } else {
+    } else if (is.numeric(nCPU) && nCPU > 1){
       cl.tmp =  makeCluster(nCPU) 
-      registerDoParallel(cl.tmp, cores=nCPU)
-      bs.res <- foreach(k=1:nCPU , .packages='RRreg') %dopar% { 
-        npboot(R=ceiling(bs.n/nCPU)) }
-      
-      #       res$bs.beta <- bs.res$beta; res$bs.sigma <- bs.res$sigma; 
-      #       res$bs.pi <- bs.res$pi; res$bs.logLik <- bs.res$logLik; 
-      for (i in 1:nCPU){
+    } else if (any(class(nCPU) %in% c("SOCKcluster", "cluster"))){
+      cl.tmp <- nCPU
+    } else {
+      stop("'nCPU' must be integer or a cluster (see ?parallel::makeCluster)")
+    }
+    if (!is.null(cl.tmp)){
+      registerDoParallel(cl.tmp)
+      bs.res <- foreach(k=seq_along(cl.tmp) , .packages='RRreg') %dopar% { 
+        npboot(R=ceiling(bs.n/length(cl.tmp))) }
+      for (i in seq_along(cl.tmp)){
         res$bs.beta <- rbind(res$bs.beta, bs.res[[i]]$beta); 
         res$bs.sigma <- c(res$bs.sigma, bs.res[[i]]$sigma); 
         res$bs.pi <- rbind(res$bs.pi, bs.res[[i]]$pi); 
         res$bs.logLik <- c(res$bs.logLik, bs.res[[i]]$logLik);
       }
+      if (is.numeric(nCPU)) stopCluster(cl.tmp)
     }   
   }
   

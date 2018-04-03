@@ -34,7 +34,7 @@ powerplot(numRep, n = c(100, 500, 1000), pi, cor = c(0, 0.1, 0.3),
 
 \item{alpha}{type-I error used to estimate power}
 
-\item{nCPU}{number of CPUs to be used}
+\item{nCPU}{either the number of CPU cores or a cluster initialized via \code{\link[parallel]{makeCluster}}.}
 
 \item{show.messages}{toggle printing of progress messages}
 }

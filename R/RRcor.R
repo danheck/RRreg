@@ -9,7 +9,8 @@
 #' @param bs.n number of samples used to get bootstrapped standard errors
 #' @param bs.type to get boostrapped standard errors, use \code{"se.p"} for the parametric and/or \code{"se.n"} for the nonparametric bootstrap. Use \code{"pval"} to get p-values from the parametric bootstrap (assuming a true correlation of zero). Note that \code{bs.n} has to be larger than 0. The parametric bootstrap is based on the assumption, that the continuous variable is normally distributed within groups defined by the true state of the RR variable. For polytomous forced response (FR) designs, the RR variable is assumed to have equally spaced distances between categories (i.e., that it is interval scaled)
 #  @param pval if \code{TRUE}, p-values are obtained from a separate parametric bootstrap using the null hypothesis that the true correlation is zero (i.e., cor=0; note that \code{bs.n} must be larger than zero)
-#' @param nCPU number of CPUs used for the bootstrap
+#' @inheritParams RRlin
+#' 
 #' @return \code{RRcor} returns a list with the following components:: 
 #' 
 #' \code{r} estimated correlation matrix
@@ -342,7 +343,12 @@ for (i in 1:m){
   if(bs.n>0){ # && "se.p" %in% bs.type){
     if (any(models %in% c("mix.norm","mix.exp")))
       warning("Parametric boostrap not available for continuous mixture RR models. Use the nonparametric bootstrap instead: bs.type='se.n'")
-    samples.p <- array(NA, dim=c(m,m,nCPU*ceiling(bs.n/nCPU)))
+    if (is.numeric(nCPU)){
+      bs.n2 <- nCPU*ceiling(bs.n/nCPU)
+    } else {
+      bs.n2 <- length(nCPU)*ceiling(bs.n/length(nCPU))
+    }
+    samples.p <- array(NA, dim=c(m,m,bs.n2))
     for (i in 1:(m-1)){
       for(j in (i+1):m){
 #         samples.p[i,i,] <- 1
@@ -422,15 +428,22 @@ for (i in 1:m){
       }
       bs.ests
     }
-    if (nCPU == 1){
-      bs.ests <- getBoot(rep=bs.n)   
-    }else{
+    if (is.numeric(nCPU) && nCPU == 1){
+      cl.tmp <- NULL
+      bs.ests <- getBoot(rep = bs.n)   
+    } else if (is.numeric(nCPU)){
       cl.tmp =  makeCluster(nCPU) 
-      registerDoParallel(cl.tmp, cores=nCPU)
-      rep <- ceiling(bs.n/nCPU)
-      bs.ests <- foreach(k=1:nCPU , .packages='RRreg') %dopar% {getBoot(rep) }
-      bs.ests <- array(unlist(bs.ests), dim = c(m,m, rep*nCPU))
-      stopCluster(cl.tmp)
+    } else if (any(class(nCPU) %in% c("SOCKcluster", "cluster"))){
+      cl.tmp <- nCPU
+    } else {
+      stop("'nCPU' must be integer or a cluster (see ?parallel::makeCluster)")
+    }
+    if (!is.null(cl.tmp)){
+      registerDoParallel(cl.tmp)
+      rep <- ceiling(bs.n/length(cl.tmp))
+      bs.ests <- foreach(k= seq_along(cl.tmp), .packages='RRreg') %dopar% {getBoot(rep) }
+      bs.ests <- array(unlist(bs.ests), dim = c(m,m, rep*length(cl.tmp)))
+      if (is.numeric(nCPU)) stopCluster(cl.tmp)
     }
     #     print(apply(bs.ests,1:2,mean))
     bs.n.NA <- sum(is.na(bs.ests[2,1,]))

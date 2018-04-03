@@ -22,7 +22,7 @@ RRcor(x, y = NULL, models, p.list, group = NULL, bs.n = 0,
 
 \item{bs.type}{to get boostrapped standard errors, use \code{"se.p"} for the parametric and/or \code{"se.n"} for the nonparametric bootstrap. Use \code{"pval"} to get p-values from the parametric bootstrap (assuming a true correlation of zero). Note that \code{bs.n} has to be larger than 0. The parametric bootstrap is based on the assumption, that the continuous variable is normally distributed within groups defined by the true state of the RR variable. For polytomous forced response (FR) designs, the RR variable is assumed to have equally spaced distances between categories (i.e., that it is interval scaled)}
 
-\item{nCPU}{number of CPUs used for the bootstrap}
+\item{nCPU}{only relevant for the bootstrap: either the number of CPU cores or a cluster initialized via \code{\link[parallel]{makeCluster}}.}
 }
 \value{
 \code{RRcor} returns a list with the following components:: 

@@ -17,7 +17,7 @@
 #' @param groupRatio proportion of participants in group 1. Only for two-group models (e.g., \code{"SLD"}) (for 2 RR variables: \code{vector})
 #' @param MLest concerns \code{\link{RRuni}}: whether to use \code{optim} to get ML instead of moment estimates (only relevant if pi is outside of [0,1])
 #' @param getPower whether to compute power for \code{method="RRcor"} (performs an additional bootstrap assuming independence)
-#' @param nCPU integer: number of CPU cores used for parallel computation.
+#' @param nCPU either the number of CPU cores or a cluster initialized via \code{\link[parallel]{makeCluster}}.
 #' @return A list containing
 #'  \item{parEsts}{matrix containing the estimated parameters}
 #'  \item{results}{matrix  with mean parameters, standard errors, and number of samples to which the respective method could not be fitted}
@@ -43,8 +43,7 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
                    method=c("RRuni","RRcor","RRlog","RRlin"), 
                    alpha=0.05, groupRatio=0.5, MLest=FALSE, 
                    getPower=TRUE, nCPU=1){
-  try(stopCluster(cl.tmp), silent = T)
-  
+
   modelNames <- c("Warner","UQTknown","UQTunknown","Mangat","Kuk",
                   "FR","Crosswise","Triangular","direct","CDM","CDMsym","SLD","custom")
   model <- pmatch(model, modelNames, duplicates.ok=T )
@@ -296,23 +295,29 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
   ###############################################
   
   # multi core processing
-  if (nCPU!=1){
-    cl.tmp =  makeCluster(nCPU) 
-    registerDoParallel(cl.tmp, cores=nCPU)
-    #   try(rm(parEsts), silent=TRUE)
-    if (!twoRR){
-      parEsts <- foreach(k=1:nCPU , .combine= rbind,.packages='RRreg') %dopar% { 
-        getParEsts.oneRR(ceiling(numRep/nCPU)) }
-    }else{
-      parEsts <- foreach(k=1:nCPU , .combine= rbind,.packages='RRreg') %dopar% { 
-        getParEsts.twoRR(ceiling(numRep/nCPU)) }
-    }
-    stopCluster(cl.tmp)
-  }else{
+  if (is.numeric(nCPU) && nCPU == 1){
+    cl.tmp <- NULL
     if(!twoRR)
       parEsts <- getParEsts.oneRR(numRep)
     else
       parEsts <- getParEsts.twoRR(numRep)
+  } else if (is.numeric(nCPU) && nCPU > 1){
+    cl.tmp =  makeCluster(nCPU) 
+  } else if (any(class(nCPU) %in% c("SOCKcluster", "cluster"))){
+    cl.tmp <- nCPU
+  } else {
+    stop("'nCPU' must be integer or a cluster (see ?parallel::makeCluster)")
+  }
+  if (!is.null(cl.tmp)){
+    registerDoParallel(cl.tmp)
+    if (!twoRR){
+      parEsts <- foreach(k=seq_along(cl.tmp), .combine= rbind,.packages='RRreg') %dopar% { 
+        getParEsts.oneRR(ceiling(numRep/length(cl.tmp))) }
+    }else{
+      parEsts <- foreach(k=seq_along(cl.tmp), .combine= rbind,.packages='RRreg') %dopar% { 
+        getParEsts.twoRR(ceiling(numRep/length(cl.tmp))) }
+    }
+    if (is.numeric(nCPU)) stopCluster(cl.tmp)
   }
   
   # significance testing of beta coefficients

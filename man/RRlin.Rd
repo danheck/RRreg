@@ -22,7 +22,7 @@ RRlin(formula, data, models, p.list, group = NULL, Kukrep = 1, bs.n = 0,
 
 \item{bs.n}{Number of samples used for the non-parametric bootstrap}
 
-\item{nCPU}{Number of cores used for the bootstrap}
+\item{nCPU}{only relevant for the bootstrap: either the number of CPU cores or a cluster initialized via \code{\link[parallel]{makeCluster}}.}
 
 \item{maxit}{maximum number of iterations in optimization routine}
 
