@@ -49,6 +49,12 @@ powerplot <- function(numRep, n=c(100,500,1000), pi, cor=c(0,.1,.3), b.log=NULL,
   nmet <- length(method)
   res <- array(NA, dim=c(length(n), length(cor), nmet), dimnames=list(n,cor, method))
   
+  if (is.numeric(nCPU) && nCPU > 1){
+    nCPU <- makeCluster(nCPU)
+    stop_cluster <- TRUE
+  } else {
+    stop_cluster <- FALSE
+  }
   for (nn in 1:length(n)){
     for (c in 1:ncor){
       sim <- RRsimu(numRep=numRep, n=n[nn], pi=pi, model=model, p=p, method=method,
@@ -62,8 +68,8 @@ powerplot <- function(numRep, n=c(100,500,1000), pi, cor=c(0,.1,.3), b.log=NULL,
       if(! any(is.na(names(sim$power))))
         dimnames(res)[[3]] <- names(sim$power)
     }
-    
   }
+  if (stop_cluster) stopCluster(nCPU)
   
 
   
