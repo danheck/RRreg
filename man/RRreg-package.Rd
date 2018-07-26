@@ -23,7 +23,9 @@ URL: \tab \url{http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg}\cr
 
 If you use \code{RRreg} in publications, please cite the package as follows:
 
-Heck, D. W., & Moshagen, M. (in press). RRreg: An R package for correlation and regression analyses of randomized response data. \emph{Journal of Statistical Software.}
+Heck, D. W., & Moshagen, M. (2018). 
+RRreg: An R package for correlation and regression analyses of randomized response data. 
+\emph{Journal of Statistical Software. 85 (2)}, 1-29. doi: 10.18637/jss.v085.i02
 }
 
 \references{

@@ -1,15 +1,18 @@
-bibentry("Manual",
-		title="RRreg: An R package for correlation and regression analyses of randomized response data",
-		author="Daniel W. Heck and Morten Moshagen",
-		year="in press",
-		journal="Journal of Statistical Software",
-		url="https://CRAN.R-project.org/package=RRreg",
-		note="R package version 0.6.4)",
-		
-		textVersion = "Heck, D. W., & Moshagen, M. (in press). RRreg: An R package for correlation and regression analyses of randomized response data. Journal of Statistical Software. https://CRAN.R-project.org/package=RRreg",
-		
-		url="https://CRAN.R-project.org/package=RRreg",
-		mheader = "To cite RRreg in publications use:")
+bibentry(bibtype = "Article",
+  title        = "{RRreg}: An {R} Package for Correlation and Regression Analyses of Randomized Response Data",
+  author       = c(person(given = c("Daniel", "W."),
+                          family = "Heck",
+                          email = "heck@uni-mannheim.de"),
+                   person(given = "Morten",
+                          family = "Moshagen",
+                          email = "morten.moshagen@uni-ulm.de")),
+  journal      = "Journal of Statistical Software",
+  year         = "2018",
+  volume       = "85",
+  number       = "2",
+  pages        = "1--29",
+  doi          = "10.18637/jss.v085.i02",
 
-
+  header       = "To cite RRreg in publications use:"
+)
 
