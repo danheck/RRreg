@@ -5,10 +5,12 @@ Authors@R: c(person( given="Daniel
     W.",family="Heck",email="heck@uni-mannheim.de", role=c("aut","cre")),
     person(given="Morten",family="Moshagen",email="morten.moshagen@uni-ulm.de",
     rol=c("aut")))
-Author: Daniel W. Heck [aut, cre], Morten Moshagen [aut]
+Author: 
+    Daniel W. Heck [aut, cre], 
+    Morten Moshagen [aut]
 Maintainer: Daniel W. Heck <heck@uni-mannheim.de>
 Depends:
-    R (>= 3.0.0)
+    R (>= 3.5.0)
 Imports:
     parallel,
     doParallel,
@@ -18,21 +20,32 @@ Imports:
     graphics,
     lme4
 Suggests:
-    knitr
-Description: Univariate and multivariate methods to analyze randomized response 
+    knitr, 
+    R.rsp
+Description: 
+    Univariate and multivariate methods to analyze randomized response 
     (RR) survey designs (e.g., Warner, S. L. (1965). Randomized response: A 
     survey technique for eliminating evasive answer bias. Journal of the 
-    American Statistical Association, 60, 63–69). <doi:10.2307/2283137> 
+    American Statistical Association, 60, 63–69, <doi:10.2307/2283137>). 
     Besides univariate estimates of true proportions, RR variables can be used 
     for correlations, as dependent variable in a logistic regression (with or 
-    without random effects), as predictors in a linear regression, or as 
-    dependent variable in a beta-binomial ANOVA. For simulation and bootstrap 
-    purposes, RR data can be generated according to several models.
+    without random effects), or as predictors in a linear regression
+    (Heck, D. W., & Moshagen, M. (2018). RRreg: An R package for correlation and 
+    regression analyses of randomized response data. Journal of Statistical 
+    Software, 85(2), 1–29, <doi:10.18637/jss.v085.i02>). For simulations and 
+    the estimation of statistical power, RR data can be generated according to 
+    several models. The implemented methods also allow to test the link between 
+    continuous covariates and dishonesty in cheating paradigms such as the 
+    coin-toss or dice-roll task (Moshagen, M., & Hilbig, B. E. (2017). 
+    The statistical analysis of cheating paradigms. Behavior Research Methods, 
+    49, 724–732, <doi:10.3758/s13428-016-0729-x>).
 License: GPL-3
 Encoding: UTF-8
 LazyLoad: yes
 URL: http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg/
-VignetteBuilder: knitr
-Version: 0.6.7
-Date: 2018-04-03
+VignetteBuilder: 
+    knitr, 
+    R.rsp
+Version: 0.6.9
+Date: 2018-07-26
 RoxygenNote: 6.0.1

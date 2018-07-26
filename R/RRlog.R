@@ -298,27 +298,32 @@ RRlog.formula <- function(formula, data=list(), model, p, group, n.response=1,..
 
 #' Predict Individual Prevalences of the RR Attribute
 #' 
-#' Predictions of the loglinear RR model for the individual probabilities (or logits) of having the sensitive RR attribute.
+#' Predictions of the RR logistic regression model for the individual probabilities (or logits) 
+#' of having the sensitive RR attribute, or of the probability of the RR responses.
 #' 
 #' @param object A fitted \code{\link{RRlog}} model
-#' @param newdata An optional vector, matrix, or data.frame with values on the predictor variables. Note that for matrices, the order of predictors should match the order of predictors in the formula. Uses the fitted values of the model if omitted.
-#' @param type \code{"link"} gives predicted values on the logit scale, 
-#'     \code{"response"} on the probability scale 
-#'     (note: predicted probablities refer to having the sensitive RR attribute, not to the probability of responding).
+#' @param newdata An optional vector, matrix, or data.frame with values on the 
+#'     predictor variables. Note that for matrices, the order of predictors 
+#'     should match the order of predictors in the formula. Uses the fitted 
+#'     values of the model if omitted.
+#' @param type \code{"response"} returns predicted probabilities for the (observable) RR responses,
+#'     \code{"link"} returns predicted logit-values for the (latent) sensitive attribute, 
+#'     and \code{"attribute"} returns predicted probabilities of having the (latent) sensitive attribute.
 #' @param se.fit Return standard errors for the predicted values in addition to confidence intervals.
 #'     SEs on the logit scale are computed using the observed Fisher information from the fitted model. 
 #'     Standard errors for the probability scale are computed using the delta method.
-#' @param ci Confidence level for confidence interval. Note that the confidence interval 
-#'     on the probability scale is computed as the logit-transformed CI on the logit-scale
-#'     (hence, the CI will in general not be symmetric). If 0, no boundaries are returned.
+#' @param ci Confidence level for confidence interval. If \code{ci=FALSE}, no 
+#'     confidence interval is returned. Confidence intervals  on the probability 
+#'     scale (if \code{type="response"} or \code{type="attribute"}) are computed 
+#'     based on the CI on the logit-scale using the inverse link function
+#'     (hence, the CI will in general not be symmetric). 
 #' @param ... ignored
 #' 
-#' @return a matrix with columns for the point estimates, confidence interval, 
-#'     and standard errors (if \code{se.fit=TRUE}).
-#' 
+#' @return either a vector of predicted values or a matrix with columns for the 
+#'     point estimates, confidence interval, and standard errors (if \code{se.fit=TRUE} and \code{ci=.95}).
 #' @export
-predict.RRlog <- function(object, newdata=NULL, type = "response", se.fit=FALSE, 
-                          ci= 0.95, ...)
+predict.RRlog <- function (object, newdata = NULL, type = c("link", "response", "attribute"), 
+                           se.fit = FALSE, ci = 0.95, ...)
 {
   if (is.null(newdata)){
     x <- model.matrix(object$formula, object$model.frame)
@@ -333,39 +338,65 @@ predict.RRlog <- function(object, newdata=NULL, type = "response", se.fit=FALSE,
       x <- newdata
     }
   }
+  # logit values:
   y <- as.vector(x %*% coef(object))
-  if(!se.fit & ci == 0){
-    return(y)
-  }else{
-    vcov <- vcov(object)
-    if(is2group(object$model)){
-      k <- length(object$coef)
-      vcov <- vcov[1:k,1:k]
-    }
-    predict.vcov <- x %*% vcov %*% t(x)
-    predict.se <- sqrt(diag(predict.vcov))
-    zcrit <- qnorm((1-ci)/2, lower.tail=F)
-    ci.lower <- y - predict.se*zcrit
-    ci.upper <- y + predict.se*zcrit
-    if(type == "response"){
-      y <- plogis(y)
-      # standard errors for probability scale: delta method
-      # https://cran.r-project.org/web/packages/modmarg/vignettes/delta-method.html
-      deriv <- exp(-y)/(1+exp(-y))^2
-      j <- deriv * x                  # Jacobian for each prediction
-      vcov_prob <- j %*% vcov %*% t(j)
-      predict.se <- sqrt(diag(vcov_prob)) # computed SE refer to logits and are invalid for probability scale
-      
-      ci.lower <- plogis(ci.lower)
-      ci.upper <- plogis(ci.upper)
-    } 
-    if(se.fit & ci!=0)
-      return(cbind(predict=y, se=predict.se, ci.lower=ci.lower, ci.upper=ci.upper))
-    else if(se.fit)
-      return(cbind(predict=y, se=predict.se))
-    else
-      return(cbind(predict=y, ci.lower=ci.lower, ci.upper=ci.upper))
+  vcov <- vcov(object)
+  
+  if(is2group(object$model)){
+    k <- length(object$coef)
+    vcov <- vcov[1:k,1:k]
   }
+  
+  predict.vcov <- x %*% vcov %*% t(x)
+  predict.se <- sqrt(diag(predict.vcov))
+  zcrit <- qnorm((1-ci)/2, lower.tail=F)
+  ci.lower <- y - predict.se*zcrit
+  ci.upper <- y + predict.se*zcrit
+  
+  type  <- match.arg(type, c("link", "response", "attribute"))
+  
+  # predict probability for RR response ("yes" or "no" etc.)
+  if (type == "response"){
+    # get complete link function (logit + RR response)
+    p <- getPW(object$model, object$p)[2,]
+    linkfun <- RRloglink(p)
+    y <- linkfun$linkinv(y)
+    ci.lower <- linkfun$linkinv(ci.lower)
+    ci.upper <- linkfun$linkinv(ci.upper)  
+    
+    # standard errors for probability scale (RR responses): delta method
+    # https://cran.r-project.org/web/packages/modmarg/vignettes/delta-method.html
+    # c <- p[1]
+    d <- p[2] - p[1]
+    deriv <- d * exp(-y)/(1+exp(-y))^2   # derivation of:    g(y) = c + d/(1 + exp(-y))
+    j <- deriv * x                       # Jacobian for each prediction
+    vcov_prob <- j %*% vcov %*% t(j)
+    predict.se <- sqrt(diag(vcov_prob)) # computed SE refer to response probability scale
+  }
+  
+  # predict sensitive attribute  (one step between "link" / "response")
+  if (type == "attribute"){
+    y <- plogis(y)
+    ci.lower <- plogis(ci.lower)
+    ci.upper <- plogis(ci.upper)
+    
+    # standard errors for probability scale (latent attribute): delta method
+    # https://cran.r-project.org/web/packages/modmarg/vignettes/delta-method.html
+    deriv <- exp(-y)/(1+exp(-y))^2  # derivation of:    g(y) = 1/(1+exp(-y))
+    j <- deriv * x                  # Jacobian for each prediction
+    vcov_prob <- j %*% vcov %*% t(j)
+    predict.se <- sqrt(diag(vcov_prob)) # computed SE refer to latent-attribute probability scale
+  } 
+  
+  # output
+  if (!se.fit && ci == 0)
+    return(y)
+  else if (se.fit && ci != 0)
+    return (cbind(predict=y, se=predict.se, ci.lower=ci.lower, ci.upper=ci.upper))
+  else if (se.fit)
+    return (cbind(predict=y, se=predict.se))
+  else
+    return (cbind(predict=y, ci.lower=ci.lower, ci.upper=ci.upper))
 }
 
 #' @export
@@ -467,44 +498,53 @@ vcov.RRlog <- function(object, ...){
 
 #' Plot Logistic RR Regression
 #' 
-#' Plot the predictions of a fitted  logistic RR regression model. Data are not included directly, as these are not directly interpretable due to the RR design.
+#' Plot predicted logit values/probabilities of a randomized response logistic regression model.
 #' 
 #' @param x a fitted \link{RRlog} object
 #' @param predictor character name of a predictor of the model to be fitted
-#' @param center.preds whether to compute predictions by assuming that all other predictors are at their respective mean values (if FALSE: all other predictors set to zero)
-#' @param plot.mean whether to plot mean of predictor as vertical line
-#' @param ci level for confidence intervals. Set to 0 to omit.
+#' @param center.preds whether to compute predictions by assuming that all other 
+#'     predictors are at their respective mean values (if \code{FALSE}: all other 
+#'     predictors are set to zero)
+#' @param plot.mean whether to plot the mean of the predictor as a vertical line
+#' @param ci level for confidence intervals. Use \code{ci=0} to omit.
 #' @param xlim if provided, these boundaries are used for the predictor on the x-axis
 #' @param steps number of steps for plotting
-#' @param ... other arguments passed to the function \link{plot}
+#' @param ... other arguments passed to the function \link{plot} (e.g., \code{ylim=c(0,1)}).
+#' @inheritParams predict.RRlog
+#' 
+#' @seealso \code{\link{predict.RRlog}}
 #'  
 #' @examples
 #'  # generate data
 #'  n <- 500
 #'  x <- data.frame(x1=rnorm(n))
 #'  pi.true <- 1/(1+exp(.3+1.5*x$x1))
-#'  dat <- RRgen(n, pi.true=pi.true, model="Warner", p=.1)
+#'  true <- rbinom(n, 1, plogis(pi.true))
+#'  dat <- RRgen(n, trueState=true, model="Warner", p=.1)
 #'  x$response <- dat$response
-#'  # fit and plot model
+#'  
+#'  # fit and plot RR logistic regression
 #'  mod <- RRlog(response ~ x1, data=x, model="Warner", p=.1)
-#'  plot(mod, "x1" ,ci=.95)
+#'  plot(mod, "x1" ,ci=.95, type = "attribute", ylim = 0:1)
 #'  
 #' @export
-plot.RRlog <- function(x, predictor=NULL, center.preds=T, 
-                       plot.mean=T, ci=.95, xlim=NULL, steps=50, ...){
+plot.RRlog <- function(x, predictor = NULL, type = c("link", "response", "attribute"),
+                       center.preds = TRUE, plot.mean = TRUE, ci = .95, 
+                       xlim = NULL, steps = 50, ...){
+  type <- match.arg(type, c("link", "response", "attribute"))
   
   # single predictor: choose automatically
   beta <- x$coef
-  if(missing(predictor) | is.null(predictor)){
+  if (missing(predictor) | is.null(predictor)){
     if(length(beta) == 2 & names(beta)[1] == "(Intercept)"){
       predictor <- names(beta)[2]
     }else{
-      stop(" Please provide a predictor for the x-axis.")
+      stop("Please specify a predictor for the x-axis.")
     }
   }
   
   # predict values
-  if(missing(xlim) | is.null(xlim)){
+  if (missing(xlim) | is.null(xlim)){
     predvals <- x$model.frame[,predictor]
     xlim <- c(min(predvals), max(predvals))
   }
@@ -516,15 +556,15 @@ plot.RRlog <- function(x, predictor=NULL, center.preds=T,
   X <- cbind(matrix(X.new, length(xx),length(beta)-1,  byrow=T), predictor=xx)
   colnames(X) <- c(names(X.new), predictor)
   
-  pred <- predict(x, newdata=X, ci=ci) 
+  pred <- predict(x, newdata = X, ci = ci, type = type) 
   if(is.null(dim(pred))){
     yy <- pred
-  }else{
+  } else {
     yy <- pred[,"predict"]
   }
   
-  plot(xx, yy, main=paste("RRlog model:",substitute(x)), type="l", 
-       xlab=substitute(predictor), ylab=colnames(x$model.frame)[1], ylim=0:1)
+  plot(xx, yy, main=paste0("Predictions for RRlog: ",substitute(x), " (type=", type[1], ")"), type="l", 
+       xlab=substitute(predictor), ylab=colnames(x$model.frame)[1], ...)
   if(!is.null(dim(pred))){
     polygon(c(xx, rev(xx)), c(pred[,2], rev(pred[,3])),border=NA,
             col=adjustcolor("gray", alpha.f=.5))
