@@ -4,8 +4,8 @@
 \alias{predict.RRlog}
 \title{Predict Individual Prevalences of the RR Attribute}
 \usage{
-\method{predict}{RRlog}(object, newdata = NULL, type = c("link", "response",
-  "attribute"), se.fit = FALSE, ci = 0.95, ...)
+\method{predict}{RRlog}(object, newdata = NULL, type = c("link",
+  "response", "attribute"), se.fit = FALSE, ci = 0.95, ...)
 }
 \arguments{
 \item{object}{A fitted \code{\link{RRlog}} model}

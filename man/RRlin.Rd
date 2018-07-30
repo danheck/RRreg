@@ -4,8 +4,8 @@
 \alias{RRlin}
 \title{Linear randomized response regression}
 \usage{
-RRlin(formula, data, models, p.list, group = NULL, Kukrep = 1, bs.n = 0,
-  nCPU = 1, maxit = 1000, fit.n = 3, pibeta = 0.05)
+RRlin(formula, data, models, p.list, group = NULL, Kukrep = 1,
+  bs.n = 0, nCPU = 1, maxit = 1000, fit.n = 3, pibeta = 0.05)
 }
 \arguments{
 \item{formula}{a continuous criterion is predicted by one or more categorical RR variables defined by \code{models}. If the number of predictors exceeds the number defined by the vector \code{models}, the remaining predictors are treated as non-randomized variables (e.g., direct questions). Interactions including any of the RR variables cannot be included.}

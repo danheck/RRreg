@@ -18,15 +18,15 @@ RRlog.fit <- function(model, x, y, n.response, p, start, group, setPar2=-1, maxi
   try({est <- optim(par=start,fn=RRlog.loglik,
                     method="L-BFGS-B",
                     lower = low, upper = up,
-                    control=list(fnscale=-1, maxit=maxit),hessian=T,  
+                    control=list(fnscale = -1, maxit = maxit),hessian = TRUE,  
                     X=x, y=y, prand=p, group=group, 
                     model=model, n.response=n.response, setPar2=setPar2)
-  logLik=est$value;
-  coef=est$par;
-  iter=est$counts;
-  hessian=est$hessian
+  logLik <- est$value
+  coef <- est$par
+  iter <- est$counts
+  hessian <- est$hessian
   convergence <- est$convergence
-  },silent=T)
+  },silent = TRUE)
   
   nams <- colnames(x)
   if(is2group(model)){

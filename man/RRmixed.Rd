@@ -4,7 +4,8 @@
 \alias{RRmixed}
 \title{Mixed Effects Logistic Regression for RR Data}
 \usage{
-RRmixed(formula, data, model, p, const = 1e-04, adjust_control = FALSE, ...)
+RRmixed(formula, data, model, p, const = 1e-04, adjust_control = FALSE,
+  ...)
 }
 \arguments{
 \item{formula}{two-sided formula including random and fixed effects (see below or \code{\link{glmer}} for details)}

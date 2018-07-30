@@ -339,7 +339,7 @@ predict.RRlog <- function (object, newdata = NULL, type = c("link", "response", 
     }
   }
   # logit values:
-  y <- as.vector(x %*% coef(object))
+  ypred <- predict <- as.vector(x %*% coef(object))
   vcov <- vcov(object)
   
   if(is2group(object$model)){
@@ -350,8 +350,8 @@ predict.RRlog <- function (object, newdata = NULL, type = c("link", "response", 
   predict.vcov <- x %*% vcov %*% t(x)
   predict.se <- sqrt(diag(predict.vcov))
   zcrit <- qnorm((1-ci)/2, lower.tail=F)
-  ci.lower <- y - predict.se*zcrit
-  ci.upper <- y + predict.se*zcrit
+  ci.lower <- predict - predict.se*zcrit
+  ci.upper <- predict + predict.se*zcrit
   
   type  <- match.arg(type, c("link", "response", "attribute"))
   
@@ -360,7 +360,7 @@ predict.RRlog <- function (object, newdata = NULL, type = c("link", "response", 
     # get complete link function (logit + RR response)
     p <- getPW(object$model, object$p)[2,]
     linkfun <- RRloglink(p)
-    y <- linkfun$linkinv(y)
+    predict <- linkfun$linkinv(ypred)
     ci.lower <- linkfun$linkinv(ci.lower)
     ci.upper <- linkfun$linkinv(ci.upper)  
     
@@ -368,7 +368,7 @@ predict.RRlog <- function (object, newdata = NULL, type = c("link", "response", 
     # https://cran.r-project.org/web/packages/modmarg/vignettes/delta-method.html
     # c <- p[1]
     d <- p[2] - p[1]
-    deriv <- d * exp(-y)/(1+exp(-y))^2   # derivation of:    g(y) = c + d/(1 + exp(-y))
+    deriv <- d * exp(-ypred)/(1+exp(-ypred))^2   # derivation of:    g(y) = c + d/(1 + exp(-y))
     j <- deriv * x                       # Jacobian for each prediction
     vcov_prob <- j %*% vcov %*% t(j)
     predict.se <- sqrt(diag(vcov_prob)) # computed SE refer to response probability scale
@@ -376,27 +376,27 @@ predict.RRlog <- function (object, newdata = NULL, type = c("link", "response", 
   
   # predict sensitive attribute  (one step between "link" / "response")
   if (type == "attribute"){
-    y <- plogis(y)
+    predict <- plogis(ypred)
     ci.lower <- plogis(ci.lower)
     ci.upper <- plogis(ci.upper)
     
     # standard errors for probability scale (latent attribute): delta method
     # https://cran.r-project.org/web/packages/modmarg/vignettes/delta-method.html
-    deriv <- exp(-y)/(1+exp(-y))^2  # derivation of:    g(y) = 1/(1+exp(-y))
-    j <- deriv * x                  # Jacobian for each prediction
+    deriv <- exp(-ypred)/(1+exp(-ypred))^2  # derivation of:    g(y) = 1/(1+exp(-y))
+    j <- deriv * x                # Jacobian for each prediction
     vcov_prob <- j %*% vcov %*% t(j)
     predict.se <- sqrt(diag(vcov_prob)) # computed SE refer to latent-attribute probability scale
   } 
   
   # output
   if (!se.fit && ci == 0)
-    return(y)
+    return(predict)
   else if (se.fit && ci != 0)
-    return (cbind(predict=y, se=predict.se, ci.lower=ci.lower, ci.upper=ci.upper))
+    return (cbind(predict=predict, se=predict.se, ci.lower=ci.lower, ci.upper=ci.upper))
   else if (se.fit)
-    return (cbind(predict=y, se=predict.se))
+    return (cbind(predict=predict, se=predict.se))
   else
-    return (cbind(predict=y, ci.lower=ci.lower, ci.upper=ci.upper))
+    return (cbind(predict=predict, ci.lower=ci.lower, ci.upper=ci.upper))
 }
 
 #' @export
