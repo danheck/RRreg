@@ -12,33 +12,53 @@ RRlog(formula, data, model, p, group, n.response = 1, LR.test = TRUE,
 
 \item{data}{\code{data.frame}, in which variables can be found (optional)}
 
-\item{model}{Available RR models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"custom"}. See \code{vignette("RRreg")} for details.}
+\item{model}{Available RR models: \code{"Warner"}, \code{"UQTknown"}, 
+\code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, 
+\code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, 
+\code{"SLD"}, \code{"custom"}. See \code{vignette("RRreg")} for details.}
 
-\item{p}{randomization probability/probabilities (depending on model, see \code{\link{RRuni}} for details)}
+\item{p}{randomization probability/probabilities (depending on model, see 
+\code{\link{RRuni}} for details)}
 
 \item{group}{vector specifying group membership. Can be omitted for single-group RR designs (e.g., Warner). For two-group RR designs (e.g., \code{CDM} or \code{SLD}), use 1 and 2 to indicate the group membership, matching the respective randomization probabilities \code{p[1], p[2]}. If an RR design and a direct question (DQ) were both used in the study, the group indices are set to 0 (DQ) and 1 (RR; 1 or 2 for two-group RR designs). This can be used to test, whether the RR design leads to a different prevalence estimate by including a dummy variable for the question format (RR vs. DQ) as predictor. If the corresponding regression coefficient is significant, the prevalence estimates differ between RR and DQ. Similarly, interaction hypotheses can be tested (e.g., the correlation between a sensitive attribute and a predictor is only found using the RR but not the DQ design). Hypotheses like this can be tested by including the interaction of the DQ-RR-dummy variable and the predictor in \code{formula} (e.g., \code{RR ~ dummy*predictor}).}
 
-\item{n.response}{number of responses per participant, e.g., if a participant responds to 5 RR questions with the same randomization probability \code{p} (either a single number if all participants give the same number of responses or a vector)}
+\item{n.response}{number of responses per participant, e.g., if a participant 
+responds to 5 RR questions with the same randomization probability \code{p} 
+(either a single number if all participants give the same number of responses or a vector)}
 
-\item{LR.test}{test regression coefficients by a likelihood ratio test, i.e., fitting the model repeatedly while excluding one parameter at a time}
+\item{LR.test}{test regression coefficients by a likelihood ratio test, i.e., 
+fitting the model repeatedly while excluding one parameter at a time (each 
+nested model is fitted only once, which can result in local maxima).
+The likelihood-ratio test statistic \eqn{G^2(df=1)} is reported in the table 
+of coefficiencts as \code{deltaG2}.}
 
-\item{fit.n}{Number of fitting replications using random starting values to avoid local maxima
-param fit.bound The model is fitted repeatedly either until the absolute parameter estimates are below \code{fit.bound} or the maximum number of fitting replication is reached. Thereby, stability of the estimates is increased. \code{fit.bound} should be increased if extreme parameter estimates are to be expected.}
+\item{fit.n}{Number of fitting replications using random starting values to avoid local maxima}
 
-\item{EM.max}{maximum number of iterations of the EM algorithm. If \code{EM.max=0}, the EM algorithm is skipped.}
+\item{EM.max}{maximum number of iterations of the EM algorithm. 
+If \code{EM.max=0}, the EM algorithm is skipped.}
 
 \item{optim.max}{Maximum number of iterations within each run of \code{optim}}
 
 \item{...}{ignored}
 }
 \value{
-Returns an object \code{RRlog} which can be analysed by the generic method \code{\link{summary}}
+Returns an object \code{RRlog} which can be analysed by the generic 
+  method \code{\link{summary}}. In the table of coefficients, the column \code{Wald} 
+  refers to the Chi^2 test statistic which is computed as Chi^2 = z^2 = Estimate^2/StdErr^2.
+  If \code{LR.test = TRUE}, the test statistic \code{deltaG2} is
+  the likelihood-ratio-test statistic, which is computed by fitting a nested logistic
+  model without the corresponding predictor.
 }
 \description{
-A dichotomous variable, measured once or more per person by a randomized response method, serves as dependent variable using one or more continuous and/or categorical predictors.
+A dichotomous variable, measured once or more per person by a randomized 
+response method, serves as dependent variable using one or more continuous 
+and/or categorical predictors.
 }
 \details{
-The logistic regression model is fitted first by an EM algorithm, in which the dependend RR variable is treated as a misclassified binary variable (Magder & Hughes, 1997). The results are used as starting values for a Newton-Raphson based optimization by \code{\link{optim}}.
+The logistic regression model is fitted first by an EM algorithm, 
+  in which the dependend RR variable is treated as a misclassified binary variable 
+  (Magder & Hughes, 1997). The results are used as starting values for a 
+  Newton-Raphson based optimization by \code{\link{optim}}.
 }
 \examples{
 # generate data set without biases
@@ -52,10 +72,14 @@ summary(ana)
 glm(true~covariate, dat, family=binomial(link="logit"))
 }
 \references{
-van den Hout, A., van der Heijden, P. G., & Gilchrist, R. (2007). The logistic regression model with response variables subject to randomized response. \emph{Computational Statistics & Data Analysis, 51}, 6060-6069.
+van den Hout, A., van der Heijden, P. G., & Gilchrist, R. (2007). 
+  The logistic regression model with response variables subject to randomized response. 
+  \emph{Computational Statistics & Data Analysis, 51}, 6060-6069.
 }
 \seealso{
-\code{vignette('RRreg')} or \url{http://www.dwheck.de/separate_content/RRregManual/index.html} for a detailed description of the RR models and the appropriate definition of \code{p}
+\code{vignette('RRreg')} or 
+  \url{http://www.dwheck.de/separate_content/RRregManual/index.html} for a 
+  detailed description of the RR models and the appropriate definition of \code{p}
 }
 \author{
 Daniel W. Heck

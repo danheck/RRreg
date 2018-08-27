@@ -46,6 +46,6 @@ URL: http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg/
 VignetteBuilder: 
     knitr, 
     R.rsp
-Version: 0.6.9
-Date: 2018-07-26
+Version: 0.7.0
+Date: 2018-08-27
 RoxygenNote: 6.1.0

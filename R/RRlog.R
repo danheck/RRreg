@@ -1,30 +1,55 @@
-# Randomized response as dependent variable in logistic regression
-
-# generic function to allow for a formula interface:
 #' Logistic randomized response regression
 #' 
-#' A dichotomous variable, measured once or more per person by a randomized response method, serves as dependent variable using one or more continuous and/or categorical predictors.
+#' A dichotomous variable, measured once or more per person by a randomized 
+#' response method, serves as dependent variable using one or more continuous 
+#' and/or categorical predictors.
+#' 
 #' @param formula specifying the regression model, see \code{\link{formula}}
 #' @param data \code{data.frame}, in which variables can be found (optional)
-#' @param model Available RR models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"custom"}. See \code{vignette("RRreg")} for details.
+#' @param model Available RR models: \code{"Warner"}, \code{"UQTknown"}, 
+#'   \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, 
+#'   \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, 
+#'   \code{"SLD"}, \code{"custom"}. See \code{vignette("RRreg")} for details.
 #\code{"custom"} (custom: the argument \code{p} defines the sensitivity and specificity of the binary RR response, i.e., the probabilities P(1 | 1) and P(0 | 0))
 #'
-#' @param p randomization probability/probabilities (depending on model, see \code{\link{RRuni}} for details)
+#' @param p randomization probability/probabilities (depending on model, see 
+#'   \code{\link{RRuni}} for details)
 #' @param group vector specifying group membership. Can be omitted for single-group RR designs (e.g., Warner). For two-group RR designs (e.g., \code{CDM} or \code{SLD}), use 1 and 2 to indicate the group membership, matching the respective randomization probabilities \code{p[1], p[2]}. If an RR design and a direct question (DQ) were both used in the study, the group indices are set to 0 (DQ) and 1 (RR; 1 or 2 for two-group RR designs). This can be used to test, whether the RR design leads to a different prevalence estimate by including a dummy variable for the question format (RR vs. DQ) as predictor. If the corresponding regression coefficient is significant, the prevalence estimates differ between RR and DQ. Similarly, interaction hypotheses can be tested (e.g., the correlation between a sensitive attribute and a predictor is only found using the RR but not the DQ design). Hypotheses like this can be tested by including the interaction of the DQ-RR-dummy variable and the predictor in \code{formula} (e.g., \code{RR ~ dummy*predictor}).
-#' @param n.response number of responses per participant, e.g., if a participant responds to 5 RR questions with the same randomization probability \code{p} (either a single number if all participants give the same number of responses or a vector)
-#' @param LR.test test regression coefficients by a likelihood ratio test, i.e., fitting the model repeatedly while excluding one parameter at a time
-# @param intercept should  the model contain an intercept?
+#' @param n.response number of responses per participant, e.g., if a participant 
+#'   responds to 5 RR questions with the same randomization probability \code{p} 
+#'   (either a single number if all participants give the same number of responses or a vector)
+#' @param LR.test test regression coefficients by a likelihood ratio test, i.e., 
+#'   fitting the model repeatedly while excluding one parameter at a time (each 
+#'   nested model is fitted only once, which can result in local maxima).
+#'   The likelihood-ratio test statistic \eqn{G^2(df=1)} is reported in the table 
+#'   of coefficiencts as \code{deltaG2}.
 #' @param fit.n Number of fitting replications using random starting values to avoid local maxima
-#' param fit.bound The model is fitted repeatedly either until the absolute parameter estimates are below \code{fit.bound} or the maximum number of fitting replication is reached. Thereby, stability of the estimates is increased. \code{fit.bound} should be increased if extreme parameter estimates are to be expected.
-#' @param EM.max maximum number of iterations of the EM algorithm. If \code{EM.max=0}, the EM algorithm is skipped.
+#' @param EM.max maximum number of iterations of the EM algorithm. 
+#'   If \code{EM.max=0}, the EM algorithm is skipped.
 #' @param optim.max Maximum number of iterations within each run of \code{optim}
 # @param start starting values for optimization. Might be useful if model does not converge with default starting values.
 #' @param ... ignored
-#' @details The logistic regression model is fitted first by an EM algorithm, in which the dependend RR variable is treated as a misclassified binary variable (Magder & Hughes, 1997). The results are used as starting values for a Newton-Raphson based optimization by \code{\link{optim}}.
+#' 
+#' @details The logistic regression model is fitted first by an EM algorithm, 
+#'   in which the dependend RR variable is treated as a misclassified binary variable 
+#'   (Magder & Hughes, 1997). The results are used as starting values for a 
+#'   Newton-Raphson based optimization by \code{\link{optim}}.
 #' @author Daniel W. Heck
-#' @seealso \code{vignette('RRreg')} or \url{http://www.dwheck.de/separate_content/RRregManual/index.html} for a detailed description of the RR models and the appropriate definition of \code{p} 
-#' @return Returns an object \code{RRlog} which can be analysed by the generic method \code{\link{summary}}
-#' @references van den Hout, A., van der Heijden, P. G., & Gilchrist, R. (2007). The logistic regression model with response variables subject to randomized response. \emph{Computational Statistics & Data Analysis, 51}, 6060-6069. 
+#' @seealso \code{vignette('RRreg')} or 
+#'   \url{http://www.dwheck.de/separate_content/RRregManual/index.html} for a 
+#'   detailed description of the RR models and the appropriate definition of \code{p} 
+#' @return Returns an object \code{RRlog} which can be analysed by the generic 
+#'   method \code{\link{summary}}. In the table of coefficients, the column \code{Wald} 
+#'   refers to the Chi^2 test statistic which is computed as Chi^2 = z^2 = Estimate^2/StdErr^2.
+#'   If \code{LR.test = TRUE}, the test statistic \code{deltaG2} is
+#'   the likelihood-ratio-test statistic, which is computed by fitting a nested logistic
+#'   model without the corresponding predictor.
+#'   
+#' 
+#' @references van den Hout, A., van der Heijden, P. G., & Gilchrist, R. (2007). 
+#'   The logistic regression model with response variables subject to randomized response. 
+#'   \emph{Computational Statistics & Data Analysis, 51}, 6060-6069. 
+#' 
 #' @examples
 #' # generate data set without biases
 #' dat <- RRgen(1000,pi=.3,"Warner",p=.9)
@@ -111,11 +136,7 @@ RRlog.default <-function(formula, data, model, p, group, n.response=1, LR.test=T
       yy <- ifelse(rbinom(n, 1, max(.5,cnt/fit.n)) == 1, 
                    rbinom(n, 1, .5), y)
       #     print(sum(yy == y) /n)   # proporiton of identical RR outcomes for starting values
-      # glm.mod <- glm.fit(x, yy, family=binomial(link = "logit"))
-      glm.mod <- glm(cbind(yy, n.response-yy)~x+0, family = binomial(link = "logit"))
-      
-      #     print(paste(Sys.time(), "Start EM"))
-      
+      glm.mod <- glm(cbind(yy, n.response-yy) ~ x+0, family = binomial(link = "logit"))
       
       EM.cnt <- 0
       repeat{
@@ -148,8 +169,6 @@ RRlog.default <-function(formula, data, model, p, group, n.response=1, LR.test=T
         start <- c(start, runif(1, .4,.8))
     }
     
-    #     print(paste(Sys.time(), " - Start optim"))
-    
     ####################### optim estimation of full likelihood
     try(est2 <- RRlog.fit(model, x, y, n.response, p, start, group, maxit=optim.max))
     
@@ -160,8 +179,6 @@ RRlog.default <-function(formula, data, model, p, group, n.response=1, LR.test=T
   if(is.null(est$convergence) || est$convergence != 0)
     warning("Model did not convergence in ML estimation using optim.")
   
-  #   print(Sys.time())
-  #   if (cnt == fit.n[2]) warning(paste0("Maximum number of fitting replications reached (fit.n=",fit.n[2],"). This could indicate extreme and/or unstable parameter estimates. Consider re-fitting the model (e.g., using fit.n=c(5,1000) and/or fit.bound=25)"))
   try(if(est$convergence != 0)
     warning(paste0("optim$convergence=",est$convergence,
                    ". Check convergence of model (e.g. by refitting using fit.n=c(20,20).")), silent=T)
@@ -185,26 +202,40 @@ RRlog.default <-function(formula, data, model, p, group, n.response=1, LR.test=T
   if (LR.test){
     ncoef <- ncol(x)
     deltaLogLik <- rep(NA,est$npar)
-    start <- est$coefficients
-    for (i in 1:ncoef){
-      xx <- x
-      xx[,i] <- rep(0,length(y))
-      try(est.res <- RRlog.fit(model, xx, y, n.response, p, start, group, setPar2=-1, maxit=optim.max))
-      deltaLogLik[i] <- est.res$logLik - est$logLik
-    }
-    # multi group models: additional parameter
-    if (is2group(model)){
-      par2fix <- fix.par2(model)
-      try(est.res <- RRlog.fit(model, x, y, n.response, p, start[1:ncol(x)], 
-                               group, setPar2=par2fix, maxit=optim.max))
-      cnt <- 0
-      while(is.na(est.res$logLik) && cnt<5){
-        cnt <- cnt + 1
-        try(est.res <- RRlog.fit(model, x, y, n.response, p, rnorm(ncol(x),0,.2), 
-                                 group, setPar2=par2fix, maxit=optim.max))}
-      deltaLogLik[est$npar] <- est.res$logLik - est$logLik
-    }
     
+    if(ncoef > 1){
+      start <- est$coefficients
+      for (i in 1:ncoef){
+        xx <- x[,-i,drop=FALSE]
+        # xx[,i] <- rep(0,length(y))
+        try({
+          est.res <- RRlog.fit(model, xx, y, n.response, p, start[-i], 
+                               group, setPar2=-1, maxit=optim.max)
+         
+          # [bugfix]: sanity check for local maxima -> crosscheck LR test with Wald test
+          deltaLogLik[i] <- est.res$logLik - est$logLik
+          chi2_wald <- est$coef[i]^2 / est$vcov[i,i]
+          if(abs(deltaLogLik[i] - chi2_wald) >  1) {
+            est.res2 <- RRlog.fit(model, xx, y, n.response, p, start[-i]*.2, 
+                                  group, setPar2=-1, maxit=optim.max)
+            if(est.res2$logLik > est.res$logLik)
+              deltaLogLik[i] <- est.res2$logLik - est$logLik
+          }
+        })
+      }
+      # multi group models: additional parameter
+      if (is2group(model)){
+        par2fix <- fix.par2(model)
+        try(est.res <- RRlog.fit(model, x, y, n.response, p, start[1:ncol(x)], 
+                                 group, setPar2=par2fix, maxit=optim.max))
+        cnt <- 0
+        while(is.na(est.res$logLik) && cnt<5){
+          cnt <- cnt + 1
+          try(est.res <- RRlog.fit(model, x, y, n.response, p, rnorm(ncol(x),0,.2), 
+                                   group, setPar2=par2fix, maxit=optim.max))}
+        deltaLogLik[est$npar] <- est.res$logLik - est$logLik
+      }
+    }
     prob <- pchisq( -2*deltaLogLik,1,lower.tail =FALSE)
     est$prob <- prob
     est$deltaLogLik <- deltaLogLik

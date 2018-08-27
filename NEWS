@@ -1,3 +1,11 @@
+RRreg 0.7.0 (August 2018)
+===========
+
+* Bugfix for likelihood ratio test (LRT) in RRlog: refitting nested model if 
+  difference between Wald's-Chi^2 and LRT-Chi^2 is larger than one.
+* Improved documentation of summary output for RRlog
+
+
 RRreg 0.6.9 (July 2018)
 ===========
 

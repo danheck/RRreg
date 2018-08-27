@@ -38,7 +38,7 @@
 #' 
 #' @examples 
 #' # generate data with a level-1 predictor 
-#' set.seed(123)
+#' set.seed(1234)
 #' d <- data.frame(group=factor(rep(LETTERS[1:20],each=50)), 
 #'                 cov=rnorm(20*50))
 #' # generate dependent data based on logistic model (random intercept):
