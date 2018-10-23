@@ -2,11 +2,12 @@ Package: RRreg
 Type: Package
 Title: Correlation and Regression Analyses for Randomized Response Data
 Authors@R: c(person( given="Daniel
-    W.",family="Heck",email="heck@uni-mannheim.de", role=c("aut","cre")),
+    W.",family="Heck",email="heck@uni-mannheim.de", role=c("aut","cre"),
+    comment = c(ORCID = "0000-0002-6302-9252")),
     person(given="Morten",family="Moshagen",email="morten.moshagen@uni-ulm.de",
     rol=c("aut")))
 Author: 
-    Daniel W. Heck [aut, cre], 
+    Daniel W. Heck [aut, cre] (<https://orcid.org/0000-0002-6302-9252>), 
     Morten Moshagen [aut]
 Maintainer: Daniel W. Heck <heck@uni-mannheim.de>
 Depends:
