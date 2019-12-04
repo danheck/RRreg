@@ -4,8 +4,7 @@
 \alias{RRuni}
 \title{Univariate analysis of randomized response data}
 \usage{
-RRuni(response, data, model, p, group = NULL, MLest = TRUE,
-  Kukrep = 1)
+RRuni(response, data, model, p, group = NULL, MLest = TRUE, Kukrep = 1)
 }
 \arguments{
 \item{response}{either vector of responses containing 0='no' and 1='yes' or name of response variable in \code{data}.For the Forced Response (\code{FR}) model, response values are integers from 0 to (m-1), where 'm' is the number of response categories.  In Kuk's card playing method (\code{Kuk}), the observed response variable gives the number of red cards.}

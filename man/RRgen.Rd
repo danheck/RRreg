@@ -4,8 +4,17 @@
 \alias{RRgen}
 \title{Generate randomized response data}
 \usage{
-RRgen(n, pi.true, model, p, complyRates = c(1, 1), sysBias = c(0, 0),
-  groupRatio = 0.5, Kukrep = 1, trueState = NULL)
+RRgen(
+  n,
+  pi.true,
+  model,
+  p,
+  complyRates = c(1, 1),
+  sysBias = c(0, 0),
+  groupRatio = 0.5,
+  Kukrep = 1,
+  trueState = NULL
+)
 }
 \arguments{
 \item{n}{sample size of generated data}

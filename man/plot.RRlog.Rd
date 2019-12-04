@@ -4,9 +4,17 @@
 \alias{plot.RRlog}
 \title{Plot Logistic RR Regression}
 \usage{
-\method{plot}{RRlog}(x, predictor = NULL, type = c("link", "response",
-  "attribute"), center.preds = TRUE, plot.mean = TRUE, ci = 0.95,
-  xlim = NULL, steps = 50, ...)
+\method{plot}{RRlog}(
+  x,
+  predictor = NULL,
+  type = c("link", "response", "attribute"),
+  center.preds = TRUE,
+  plot.mean = TRUE,
+  ci = 0.95,
+  xlim = NULL,
+  steps = 50,
+  ...
+)
 }
 \arguments{
 \item{x}{a fitted \link{RRlog} object}

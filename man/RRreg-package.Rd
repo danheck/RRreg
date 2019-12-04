@@ -16,7 +16,7 @@ Depends: \tab R (>= 3.0.0)\cr
 Imports: \tab parallel, doParallel, foreach, stats, grDevices, graphics, lme4\cr
 Suggests: \tab knitr\cr
 License: \tab GPL-2\cr
-URL: \tab \url{http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg}\cr
+URL: \tab \url{https://www.sowi.uni-mannheim.de/en/erdfelder/research/software/rrreg/}\cr
 }
 }
 \section{Citation}{
@@ -35,11 +35,11 @@ evasive answer bias. \emph{Journal of the American Statistical Association, 60},
 \seealso{
 Useful links:
 \itemize{
-  \item \url{http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg/}
+  \item \url{https://www.sowi.uni-mannheim.de/en/erdfelder/research/software/rrreg/}
 }
 
 }
 \author{
-Daniel W. Heck \email{heck@uni-mannheim.de} and Morten Moshagen \email{morten.moshagen@uni-ulm.de}
+Daniel W. Heck \email{dheck@uni-marburg.de} and Morten Moshagen \email{morten.moshagen@uni-ulm.de}
 }
 \keyword{package}

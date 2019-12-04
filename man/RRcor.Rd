@@ -4,8 +4,16 @@
 \alias{RRcor}
 \title{Bivariate correlations including randomized response variables}
 \usage{
-RRcor(x, y = NULL, models, p.list, group = NULL, bs.n = 0,
-  bs.type = c("se.n", "se.p", "pval"), nCPU = 1)
+RRcor(
+  x,
+  y = NULL,
+  models,
+  p.list,
+  group = NULL,
+  bs.n = 0,
+  bs.type = c("se.n", "se.p", "pval"),
+  nCPU = 1
+)
 }
 \arguments{
 \item{x}{a numeric vector, matrix or data frame.}

@@ -4,8 +4,19 @@
 \alias{RRlog}
 \title{Logistic randomized response regression}
 \usage{
-RRlog(formula, data, model, p, group, n.response = 1, LR.test = TRUE,
-  fit.n = 3, EM.max = 1000, optim.max = 500, ...)
+RRlog(
+  formula,
+  data,
+  model,
+  p,
+  group,
+  n.response = 1,
+  LR.test = TRUE,
+  fit.n = 3,
+  EM.max = 1000,
+  optim.max = 500,
+  ...
+)
 }
 \arguments{
 \item{formula}{specifying the regression model, see \code{\link{formula}}}

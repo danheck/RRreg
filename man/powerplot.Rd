@@ -4,10 +4,22 @@
 \alias{powerplot}
 \title{Power plots for multivariate RR methods}
 \usage{
-powerplot(numRep, n = c(100, 500, 1000), pi, cor = c(0, 0.1, 0.3),
-  b.log = NULL, model, p, method = c("RRcor", "RRlog", "RRlin"),
-  complyRates = c(1, 1), sysBias = c(0, 0), groupRatio = 0.5,
-  alpha = 0.05, nCPU = 1, show.messages = TRUE)
+powerplot(
+  numRep,
+  n = c(100, 500, 1000),
+  pi,
+  cor = c(0, 0.1, 0.3),
+  b.log = NULL,
+  model,
+  p,
+  method = c("RRcor", "RRlog", "RRlin"),
+  complyRates = c(1, 1),
+  sysBias = c(0, 0),
+  groupRatio = 0.5,
+  alpha = 0.05,
+  nCPU = 1,
+  show.messages = TRUE
+)
 }
 \arguments{
 \item{numRep}{number of boostrap replications}

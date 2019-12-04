@@ -4,10 +4,23 @@
 \alias{RRsimu}
 \title{Monte Carlo simulation for one or two RR variables}
 \usage{
-RRsimu(numRep, n, pi, model, p, cor = 0, b.log = 0,
-  complyRates = c(1, 1), sysBias = c(0, 0), method = c("RRuni",
-  "RRcor", "RRlog", "RRlin"), alpha = 0.05, groupRatio = 0.5,
-  MLest = FALSE, getPower = TRUE, nCPU = 1)
+RRsimu(
+  numRep,
+  n,
+  pi,
+  model,
+  p,
+  cor = 0,
+  b.log = 0,
+  complyRates = c(1, 1),
+  sysBias = c(0, 0),
+  method = c("RRuni", "RRcor", "RRlog", "RRlin"),
+  alpha = 0.05,
+  groupRatio = 0.5,
+  MLest = FALSE,
+  getPower = TRUE,
+  nCPU = 1
+)
 }
 \arguments{
 \item{numRep}{number of replications}
