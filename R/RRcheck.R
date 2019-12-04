@@ -92,28 +92,48 @@ RRcheck.log <- function(model, y, p, group, n.response, vectorName){
 #   if (! model  %in% c("FR", "custom")){
 #     RRcheck.xp (model,y,p,vectorName)
 #   } else 
-    if ( any(y!=floor(y)) || length(table(y))>(n.response+1) ||  
-                                  min(y)<0 || any(y>n.response)){
-    warning(paste0("For a logistic regression with the model 'FR'/'custom', 
-                   responses  must be between 0,...,n.response (default: n.response=1)."))        
+    if ( any(y != floor(y)) || 
+         min(y)<0 || 
+         any(y>n.response) || 
+         any(length(unique(y)) > n.response+1)){
+    warning(paste0("For a logistic regression with the model 'FR'/'custom',
+                   responses  must be between 0,...,n.response (default: n.response=1)."))
   }
   RRcheck.p(model,p)
   if ( is2group(model)) {
+    
     group <- as.numeric(group)
-    if ( missing(group) || is.null(group) || 
-           length(group) != length(y) || !(length(table(group)) %in% 2:3 ) || !(min(group) %in% 0:1) || max(group) != 2){
-      warning(paste0("The model '",model,"' requires a vector 'group' specifying the group membership of each participant by 1 and 2 (numeric or factor). Additionally, the vector 'group' may contain the number 0 for participants who were given a direct question."))
-    }else if (length(table(group)) == 3 )
-      warning("The group vector contains 3 categories, which are interpreted as follows: 0=direct answer ; 1=group 1 with randomization probability p[1] ; 2=group 2 with randomization probability p[2]",call. = F)
-  }else if (!missing(group) || !is.null(group)){
-    if (length(group) != length(y) || !(length(table(group)) %in% 1:2 ) || !(min(group) %in% 0:1) || max(group) != 1)
-      warning("The 'group' vector may contain 1 or 2 categories, which are interpreted as follows: 0=direct question format ; 1=randomized response format")
+    if ( missing(group) || 
+         is.null(group) || 
+         length(group) != length(y) || 
+         !(length(table(group)) %in% 2:3 ) || 
+         !(min(group) %in% 0:1) || 
+         max(group) != 2){
+      warning(paste0("The model '",model,"' requires a vector 'group' specifying", 
+                     "the group membership of each participant by 1 and 2",
+                     "(numeric or factor). Additionally, the vector 'group' may", 
+                     "contain the number 0 for participants who were given a direct question."))
+      
+    } else if (length(table(group)) == 3 )
+      warning("The group vector contains 3 categories, which are interpreted as", 
+              "follows: 0=direct answer ; 1=group 1 with randomization probability", 
+              "p[1] ; 2=group 2 with randomization probability p[2]",
+              call. = FALSE)
+    
+  } else if (!missing(group) || !is.null(group)){
+    
+    if (length(group) != length(y) ||
+        !(length(table(group)) %in% 1:2 ) ||
+        !(min(group) %in% 0:1) ||
+        max(group) != 1)
+      warning("The 'group' vector may contain 1 or 2 categories, which are", 
+              "interpreted as follows: 0=direct question format ; 1=randomized response format")
+    
     if (length(table(group)) == 2 )
-      warning("The group vector contains 2 categories, which are interpreted as follows: 0=direct question format ; 1=randomized response format",call. = F)
+      warning("The group vector contains 2 categories, which are interpreted as", 
+              "follows: 0=direct question format ; 1=randomized response format",
+              call. = FALSE)
   }
-#   if (length(table(y))!=2){
-#     warning("For logistic regression, only dichotomous responses are allowed")
-#   }
 }
 
 RRcheck.param<- function(pi){

@@ -12,13 +12,13 @@
 # Encoding: \tab UTF-8\cr
 #' License: \tab GPL-2\cr
 # LazyLoad: \tab yes\cr
-#' URL: \tab \url{http://psycho3.uni-mannheim.de/Home/Research/Software/RRreg}\cr
-# Vignette: \tab \url{http://www.dwheck.de/separate_content/RRregManual/index.html}\cr
+#' URL: \tab \url{https://www.sowi.uni-mannheim.de/en/erdfelder/research/software/rrreg/}\cr
+# Vignette: \tab \url{https://www.dwheck.de/separate_content/RRregManual/index.html}\cr
 #' }
 #' 
 #' @name RRreg-package
 #' @docType package
-#' @author Daniel W. Heck \email{heck@@uni-mannheim.de} and Morten Moshagen \email{morten.moshagen@@uni-ulm.de}
+#' @author Daniel W. Heck \email{dheck@@uni-marburg.de} and Morten Moshagen \email{morten.moshagen@@uni-ulm.de}
 #' @keywords package
 #' 
 #' @import stats

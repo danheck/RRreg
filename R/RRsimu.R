@@ -77,7 +77,7 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
     warning("For two RR variables, only the argument cor is used to simulate data.")
   if (cor != 0){
     if (!twoRR){
-      # if (class(complyRates)!= "list") complyRates <- list(complyRates)
+      # if (!inherits(complyRates, "list")) complyRates <- list(complyRates)
       # if only one RR variable included: transform correlation to mean difference
       diffMean <- sqrt(cor^2/(pi[1]*(1-pi[1])*(1-cor^2))) * sign(cor)
       if (model %in% c("custom", "FR") & length(pi)>2){
@@ -303,7 +303,8 @@ RRsimu <- function(numRep, n, pi, model, p, cor=0, b.log=0,
       parEsts <- getParEsts.twoRR(numRep)
   } else if (is.numeric(nCPU) && nCPU > 1){
     cl.tmp =  makeCluster(nCPU) 
-  } else if (any(class(nCPU) %in% c("SOCKcluster", "cluster"))){
+  } else if (any(inherits(nCPU, "SOCKcluster"), 
+                 inherits(nCPU, "cluster"))){
     cl.tmp <- nCPU
   } else {
     stop("'nCPU' must be integer or a cluster (see ?parallel::makeCluster)")

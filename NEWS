@@ -1,3 +1,9 @@
+RRreg 0.7.1 (December 2019)
+===========
+
+* Bug fixes for issues concerning class(matrix(...)) in R 4.0.0
+
+
 RRreg 0.7.0 (August 2018)
 ===========
 

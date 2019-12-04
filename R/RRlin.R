@@ -77,16 +77,16 @@ RRlin <- function(formula, data, models, p.list, group=NULL,
   if (missing(group)){
     group <- matrix(1, length(y), M, dimnames = list(NULL,paste0("g",1:M)))
   }
-  if (!missing(data) && class(substitute(group)) == "name") {
+  if (!missing(data) && inherits(substitute(group), "name")) {
     try({data1 <- as.data.frame(data)
          gg <-  as.matrix(eval(substitute(group),data1, parent.frame()),dimnames=list(NULL,group))
          group <- gg
     },silent=T)
-    if (class(substitute(group)) == "name"){
+    if (inherits(substitute(group), "name")){
       stop(paste0("'group' (",substitute(group),") could not be found in 'data' (",substitute(data),")."))
     }
   }
-  if(class(group) != "matrix"){
+  if(!inherits(group, "matrix")){
     group <- matrix(group,ncol=1)
   }
   
@@ -375,7 +375,8 @@ RRlin <- function(formula, data, models, p.list, group=NULL,
       res$bs.pi <- bs.res$pi; res$bs.logLik <- bs.res$logLik; 
     } else if (is.numeric(nCPU) && nCPU > 1){
       cl.tmp =  makeCluster(nCPU) 
-    } else if (any(class(nCPU) %in% c("SOCKcluster", "cluster"))){
+    } else if (any(inherits(nCPU, "SOCKcluster"), 
+                   inherits(nCPU, "cluster"))){
       cl.tmp <- nCPU
     } else {
       stop("'nCPU' must be integer or a cluster (see ?parallel::makeCluster)")
@@ -498,7 +499,7 @@ vcov.RRlin <- function(object, ...){
 
 ### bootstrap methods
 # bs.se <- function(ests,true){
-#   if (class(ests) == 'matrix'){
+#   if (inherits(ests, 'matrix')){
 #     sqrt(apply((t(ests)-true)^2,1,sum,na.rm=TRUE) /nrow(ests))
 #   }else{
 #     sqrt(sum((ests-true)^2,na.rm=TRUE)/(length(ests)))

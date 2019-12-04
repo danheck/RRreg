@@ -124,7 +124,7 @@ getPW <- function (model, p, group = 1, par2=NULL, Kukrep=1){
                                 par2),           # 1 -> 1
                               nrow=2,dimnames= list(0:1,0:1)),
          "custom" = {
-              if (class(p) != "matrix" || nrow(p) != ncol(p) || any(colSums(p)!=1))
+              if (!inherits(p, "matrix") || nrow(p) != ncol(p) || any(colSums(p)!=1))
                 stop("If the RR method 'custom' is used, a missclassification matrix 'p' 
                      must be provided, where p[i,j] gives the probability of responding
                      'i' (i-th row), while being in the true state 'j' (j-th column). 
