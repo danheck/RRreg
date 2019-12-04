@@ -15,7 +15,7 @@ vignette: >
 
 Correlation and regression analysis for randomized response designs
 
-Contact: <heck@uni-mannheim.de>
+Contact: <dheck@uni-marburg.de>
 
 
 # Introduction
