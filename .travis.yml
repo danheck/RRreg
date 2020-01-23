@@ -1,7 +1,17 @@
 language: r
+latex: true
 sudo: false
-cache: packages
+warnings_are_errors: TRUE
 r:
   - devel
+  - release
+
+env:
+  - _R_CHECK_FORCE_SUGGESTS_=true
+    _R_CHECK_CRAN_INCOMING_=true
+
 r_binary_packages:
- - lme4
+  - lme4
+
+cache: 
+  - packages
