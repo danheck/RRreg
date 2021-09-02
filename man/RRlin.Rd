@@ -70,7 +70,7 @@ summary(lm(depvar~true +trueFR+nonRR, data=dat))
 van den Hout, A., & Kooiman, P. (2006). Estimating the linear regression model with categorical covariates subject to randomized response. \emph{Computational Statistics & Data Analysis, 50}, 3311-3323.
 }
 \seealso{
-\code{vignette('RRreg')} or \url{http://www.dwheck.de/separate_content/RRregManual/index.html} for a detailed description of the RR models and the appropriate definition of \code{p}
+\code{vignette('RRreg')} or \url{https://www.dwheck.de/separate_content/RRregManual/index.html} for a detailed description of the RR models and the appropriate definition of \code{p}
 }
 \author{
 Daniel W. Heck

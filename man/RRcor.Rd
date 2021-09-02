@@ -76,5 +76,5 @@ RRcor(x=gData[,c("response","cov","UQTresp")],
 Fox, J. A., & Tracy, P. E. (1984). Measuring associations with randomized response. \emph{Social Science Research, 13}, 188-197.
 }
 \seealso{
-\code{vignette('RRreg')} or \url{http://www.dwheck.de/separate_content/RRregManual/index.html} for a detailed description of the RR models and the appropriate definition of \code{p}
+\code{vignette('RRreg')} or \url{https://www.dwheck.de/separate_content/RRregManual/index.html} for a detailed description of the RR models and the appropriate definition of \code{p}
 }

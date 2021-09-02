@@ -89,7 +89,7 @@ van den Hout, A., van der Heijden, P. G., & Gilchrist, R. (2007).
 }
 \seealso{
 \code{vignette('RRreg')} or 
-  \url{http://www.dwheck.de/separate_content/RRregManual/index.html} for a 
+  \url{https://www.dwheck.de/separate_content/RRregManual/index.html} for a 
   detailed description of the RR models and the appropriate definition of \code{p}
 }
 \author{

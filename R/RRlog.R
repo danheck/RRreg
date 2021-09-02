@@ -36,7 +36,7 @@
 #'   Newton-Raphson based optimization by \code{\link{optim}}.
 #' @author Daniel W. Heck
 #' @seealso \code{vignette('RRreg')} or 
-#'   \url{http://www.dwheck.de/separate_content/RRregManual/index.html} for a 
+#'   \url{https://www.dwheck.de/separate_content/RRregManual/index.html} for a 
 #'   detailed description of the RR models and the appropriate definition of \code{p} 
 #' @return Returns an object \code{RRlog} which can be analysed by the generic 
 #'   method \code{\link{summary}}. In the table of coefficients, the column \code{Wald} 

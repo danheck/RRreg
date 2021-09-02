@@ -1,3 +1,15 @@
+RRreg 0.7.3 (September 2021)
+===========
+
+* bugfix: use "role" instead of "rol" in description
+
+
+RRreg 0.7.2 (August 2021)
+===========
+
+* bugfix: add rmarkdown to dependencies
+
+
 RRreg 0.7.1 (December 2019)
 ===========
 
