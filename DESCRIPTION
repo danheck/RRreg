@@ -1,10 +1,10 @@
 Package: RRreg
 Type: Package
 Title: Correlation and Regression Analyses for Randomized Response Data
-Version: 0.7.3
-Date: 2021-09-02
+Version: 0.7.4
+Date: 2022-11-09
 Authors@R: c(person("Daniel W.", "Heck", 
-                    email = "dheck@uni-marburg.de", 
+                    email = "daniel.heck@uni-marburg.de", 
                     role = c("aut","cre"), 
                     comment = c(ORCID = "0000-0002-6302-9252")),
              person("Morten", "Moshagen",
@@ -13,7 +13,7 @@ Authors@R: c(person("Daniel W.", "Heck",
 Author: 
     Daniel W. Heck [aut, cre] (<https://orcid.org/0000-0002-6302-9252>), 
     Morten Moshagen [aut]
-Maintainer: Daniel W. Heck <dheck@uni-marburg.de>
+Maintainer: Daniel W. Heck <daniel.heck@uni-marburg.de>
 Depends:
     R (>= 3.5.0)
 Imports:
@@ -48,8 +48,8 @@ Description:
 License: GPL-3
 Encoding: UTF-8
 LazyLoad: yes
-URL: https://www.sowi.uni-mannheim.de/en/erdfelder/research/software/rrreg/
+URL: https://github.com/danheck/RRreg
 VignetteBuilder: 
     knitr, 
     R.rsp
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.1

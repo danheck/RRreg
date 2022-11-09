@@ -40,6 +40,6 @@ Useful links:
 
 }
 \author{
-Daniel W. Heck \email{dheck@uni-marburg.de} and Morten Moshagen \email{morten.moshagen@uni-ulm.de}
+Daniel W. Heck \email{daniel.heck@uni-marburg.de} and Morten Moshagen \email{morten.moshagen@uni-ulm.de}
 }
 \keyword{package}

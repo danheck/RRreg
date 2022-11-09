@@ -3,3 +3,6 @@
 rkward*
 README.md
 .travis.yml
+vignettes\RRreg.R
+vignettes\RRreg.html
+

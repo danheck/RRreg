@@ -18,7 +18,7 @@
 #' 
 #' @name RRreg-package
 #' @docType package
-#' @author Daniel W. Heck \email{dheck@@uni-marburg.de} and Morten Moshagen \email{morten.moshagen@@uni-ulm.de}
+#' @author Daniel W. Heck \email{daniel.heck@@uni-marburg.de} and Morten Moshagen \email{morten.moshagen@@uni-ulm.de}
 #' @keywords package
 #' 
 #' @import stats
