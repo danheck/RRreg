@@ -1,19 +1,17 @@
 ---
-title: "RRreg manual"
+title: "RRreg: Correlation and regression analysis for randomized response designs"
 author: "Daniel W. Heck"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
     fig_caption: no
 vignette: >
-  %\VignetteIndexEntry{An Introduction to the RRreg package}
+  %\VignetteIndexEntry{RRreg: Correlation and regression analysis for randomized response designs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 
-
-Correlation and regression analysis for randomized response designs
 
 Contact: <daniel.heck@uni-marburg.de>
 
@@ -170,7 +168,9 @@ The function `RRmixed` is used as follows:
 # make random cluster:
 data.W$cluster <- c("a", "b")
 mixmod <- RRmixed(response ~ cov + (1 | cluster), 
-                  data=data.W, model = "Warner", p = .2)
+                  data=data.W, 
+                  model = "Warner", 
+                  p = .2)
 mixmod
 ```
 
@@ -224,6 +224,7 @@ data.W$cov <-
   3 * as.numeric(data.W2$true) + 
   rnorm(1000, mean = 1, sd = 5)
 data.W$response2 <- data.W2$response
+
 lin3 <- RRlin(cov ~ response + response2,
               data = data.W, 
               models = c("Warner", "Warner"), 

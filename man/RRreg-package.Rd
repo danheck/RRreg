@@ -35,7 +35,7 @@ evasive answer bias. \emph{Journal of the American Statistical Association, 60},
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://www.sowi.uni-mannheim.de/en/erdfelder/research/software/rrreg/}
+  \item \url{https://github.com/danheck/RRreg}
 }
 
 }

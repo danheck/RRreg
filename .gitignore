@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 RRreg.Rproj
+vignettes/RRreg.R
+vignettes/RRreg.html
