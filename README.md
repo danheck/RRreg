@@ -26,4 +26,4 @@ The manual is available within R by typing `vignette('RRreg')`.
 
 If you use `RRreg` in publications, please cite the package as follows:
 
-Heck, D. W., & Moshagen, M. (2018). RRreg: An R package for correlation and regression analyses of randomized response data. *Journal of Statistical Software, 85* (2), 1–29. doi: 10.18637/jss.v085.i02
+- Heck, D. W., & Moshagen, M. (2018). RRreg: An R package for correlation and regression analyses of randomized response data. *Journal of Statistical Software, 85* (2), 1–29. https://doi.org/10.18637/jss.v085.i02
