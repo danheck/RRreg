@@ -37,7 +37,7 @@ Additionally, three functions can be used to generate data for robustness studie
 
 In the following, cocaine abuse is used as a running example to demonstrate the RR analysis with `RRreg`. The following RR designs are included in the package: [UQTknown](#UQTknown), [Mangat](#Mangat), [Kuk](#Kuk), [FR](#FR), [Crosswise](#Crosswise), [Triangular](#Triangular), [UQTunknown](#UQTunknown), [CDM](#CDM), [CDMsym](#CDMsym), [SLD](#SLD)
 
-
+&nbsp; 
 
 # Statistical Methods
 
@@ -51,33 +51,39 @@ The original RR design proposed by Warner in 1965 works as follows: With randomi
 ![title](figures/Warner.jpg)
 
 <a id="RRgen"></a>
-First, let's load the package and generate a single data frame using the function `RRgen`. We simulate data for 1000 participants, a proportion of 30% cocaine users (`pi.true=.3`; obviously, this rate is unrealistic, but it should suffice for the sake of example), and a randomization probability of `p=.2`:
+First, let's load the package and generate a single data frame using the function `RRgen`. We simulate data for 1000 participants, a true prevalence of 30% cocaine users (`pi.true = .30`; obviously, this rate is unrealistic, but it should suffice for the sake of example), and a randomization probability of `p=1/6` (e.g., resulting from a dice roll):
 
 ```{r}
 library(RRreg)
-data.W <- RRgen(n = 1000, 
-                pi.true = .3, 
-                model = "Warner", 
-                p = .2, 
-                complyRates = c(1, 1),
-                sysBias = c(0, 0))
+set.seed(123)
+
+data.W <- RRgen(
+  n = 1000,
+  pi.true = .30,
+  model = "Warner",
+  p = 1 / 6,
+  complyRates = c(1, 1),
+  sysBias = c(0, 0)
+)
 head(data.W)
 ```
 
-In the function `RRgen`, the argument `complyRates` gives the proportions of participants who do adhere to the RR instructions for carriers and non-carriers of the sensitive attribute, respectively. The argument `sysBias` gives the probability of *yes* responses in case of non-compliance for carriers and non-carriers, respectively. If `sysBias = c(0,0)`, noncomplying individuals always respond with self-protective *no* responses (also known as SP-'no' responses). In comparison, `sysBias = c(0,0.5)` indicates that noncomplying non-carriers answer *yes* or *no* by chance. However, since we generated data assuming perfect compliance, this argument can be neglected. These options can be used to test how robust the results are against non-adherence.
+In the function `RRgen`, the argument `complyRates` gives the proportions of participants who do adhere to the RR instructions for carriers and non-carriers of the sensitive attribute, respectively. The argument `sysBias` gives the probability of *yes* responses in case of non-compliance for carriers and non-carriers, respectively. If `sysBias = c(0, 0)`, noncomplying individuals always respond with self-protective *no* responses (also known as SP-'no' responses). In comparison, `sysBias = c(0, 0.5)` indicates that noncomplying non-carriers answer *yes* or *no* by chance. However, since we generated data assuming perfect compliance, this argument can be neglected. These options can be used to test how robust the results are against non-adherence.
 
 Now that we have a data set, we can estimate the prevalence of cocaine users by means of `RRuni`:
 
 ```{r}
-warner <- RRuni(response = response, 
-                data = data.W, 
-                model = "Warner", 
-                p = .2, 
-                MLest = T)
+warner <- RRuni(
+  response = response,
+  data = data.W,
+  model = "Warner",
+  p = 1 / 6,
+  MLest = TRUE
+)
 summary(warner)
 ```
 
-The `response` variable containing 1 for *yes* and 0 for *no* responses can either be given as a vector or as a column name in the data set `data`. Moreover, the argument `model` specifies the RR design with its randomization probability given by `p` (see Sections 4 and 5 for details about other RR models) . If `MLest = FALSE` is used, the prevalence estimate is derived as an analytical least-squares estimator, which can assume values outside of the interval [0,1]. However, using `MLest = TRUE` (default), estimates of `pi` are restricted to the interval [0,1].
+The `response` variable containing 1 for *yes* and 0 for *no* responses can either be given as a vector or as a column name in the data set `data`. Moreover, the argument `model` specifies the RR design with its randomization probability given by `p` (see Sections 4 and 5 for details about other RR models) . If `MLest = FALSE` is used, the prevalence estimate is derived as a closed-form least-squares estimator, which can assume values outside of the interval [0,1]. However, using `MLest = TRUE` (default), estimates of `pi` are restricted to the interval [0,1].
 
 * Warner, S. L. (1965). Randomized response: A survey technique for eliminating evasive answer bias. *Journal of the American Statistical Association, 60*, 63-69. 
 
@@ -102,13 +108,15 @@ data.W$cov[data.W$true == 0] <- rnorm(sum(data.W$true == 0))
 Now, we can estimate the bivariate (point-biserial) correlation between the dichotomous Warner RR variable and the continuous covariate:
 
 ```{r}
-RRcor(x = data.W$response, 
-      y = data.W$cov, 
-      models = c("Warner", "direct"), 
-      p.list = list(.2), 
-      bs.n = 0, 
-      bs.type = c("se.n", "se.p", "pval"), 
-      nCPU = 1)
+RRcor(
+  x = data.W$response,
+  y = data.W$cov,
+  models = c("Warner", "direct"),
+  p.list = list(1 / 6),
+  bs.n = 0,
+  bs.type = c("se.n", "se.p", "pval"),
+  nCPU = 1
+)
 ```
 
 The argument `models` defines which variables given by `x` and `y` are treated as RR variables. `x` and `y` can be vectors and/or data frames/matrices having one variable in each column (the order is then given as following: First, columns of `x` from left to right, and second, columns of `y` from left to right). The randomization probabilities `p.list` have to be in the same order as `models`. No values have to be specified for direct (nonRR) variables. To obtain bootstrapped standard errors, `bs.n` has to be set to a number of bootstrap replications larger than 0. Additionally, `bs.type` defines which kind of bootstrap should be performed (`"se.n"`, `"se.p"`: nonparametric/parametric for standard errors; `"pval"` parametric bootstrap assuming independence for p-values). For faster processing, `nCPU`can be increased to use parallel computation. In our example, we also know the true states of the participants in the data set and can check the results by:
@@ -128,20 +136,24 @@ cor(x = data.W$true, y = data.W$cov)
 Alternatively, we can run a logistic regression to predict the probability of cocaine use. In the `formula` below, the Warner RR variable is defined as criterion on the left side, whereas the continuous covariate is used as predictor on the right. The interface is similar to that of the standard linear regression in R (i.e., `lm()`).
 
 ```{r}
-log1 <- RRlog(response ~ cov, 
-              data = data.W, 
-              model = "Warner", 
-              p = .2,  
-              fit.n = 1)
+log1 <- RRlog(
+  formula = response ~ cov,
+  data = data.W,
+  model = "Warner",
+  p = 1 / 6,
+  fit.n = 1
+)
 summary(log1)
 ```
 
 To remove the intercept from the model, use `formula=response~cov - 1`. The argument `LR.test` determines whether the coefficients should be tested by means of a likelihood ratio test, that is, by removing one predictor at a time. Again, we can check the results by:
 
 ```{r}
-glm(true ~ cov, 
-    data = data.W,
-    family = binomial(link = "logit"))
+glm(
+  formula = true ~ cov,
+  data = data.W,
+  family = binomial(link = "logit")
+)
 ```
 
 * van den Hout, A., van der Heijden, P. G., & Gilchrist, R. (2007). The logistic regression model with response variables subject to randomized response. *Computational Statistics & Data Analysis, 51*, 6060-6069.
@@ -167,10 +179,12 @@ The function `RRmixed` is used as follows:
 ```{r}
 # make random cluster:
 data.W$cluster <- c("a", "b")
-mixmod <- RRmixed(response ~ cov + (1 | cluster), 
-                  data=data.W, 
-                  model = "Warner", 
-                  p = .2)
+mixmod <- RRmixed(
+  formula = response ~ cov + (1 | cluster),
+  data = data.W,
+  model = "Warner",
+  p = 1 / 6
+)
 mixmod
 ```
 
@@ -185,12 +199,14 @@ mixmod
 Third, we can use the Warner RR variable as predictor in a linear regression:
 
 ```{r}
-lin1 <- RRlin(cov ~ response, 
-              data = data.W, 
-              models = "Warner", 
-              p.list = .2, 
-              bs.n = 0, 
-              fit.n = 1)
+lin1 <- RRlin(
+  formula = cov ~ response,
+  data = data.W,
+  models = "Warner",
+  p.list = 1 / 6,
+  bs.n = 0,
+  fit.n = 1
+)
 summary(lin1)
 ```
 
@@ -200,12 +216,14 @@ As a special case, if the number of predictors used in the formula interface is 
 
 ```{r}
 data.W$pred <- rnorm(1000)
-lin2 <- RRlin(formula = cov ~ response + pred, 
-              data = data.W, 
-              models = "Warner", 
-              p.list = list(.2), 
-              bs.n = 0, 
-              fit.n = 1)
+lin2 <- RRlin(
+  formula = cov ~ response + pred,
+  data = data.W,
+  models = "Warner",
+  p.list = list(1 / 6),
+  bs.n = 0,
+  fit.n = 1
+)
 summary(lin2)
 ```
 
@@ -217,19 +235,21 @@ lm(cov ~ true + pred, data = data.W)
 
 It is also possible to include several RR variables as predictors if the randomization devices used are stochastically independent: 
 
-```{r}
+```{r, echo = TRUE}
 data.W2 <- RRgen(n = 1000, pi.true = .45, model = "Warner", p = .35)
-data.W$cov <- 
-  2 * as.numeric(data.W$true) - 
-  3 * as.numeric(data.W2$true) + 
+data.W$cov <-
+  2 * as.numeric(data.W$true) -
+  3 * as.numeric(data.W2$true) +
   rnorm(1000, mean = 1, sd = 5)
 data.W$response2 <- data.W2$response
 
-lin3 <- RRlin(cov ~ response + response2,
-              data = data.W, 
-              models = c("Warner", "Warner"), 
-              p.list = list(.2, .35), 
-              fit.n = 1)
+lin3 <- RRlin(
+  formula = cov ~ response + response2,
+  data = data.W,
+  models = c("Warner", "Warner"),
+  p.list = list(1 / 6, .35),
+  fit.n = 1
+)
 summary(lin3)
 ```
 
@@ -256,32 +276,47 @@ An example is:
 
 ```{r}
 # generate data with different prevalence rates for RR and DQ
-RR <- RRgen(n = 500, pi = .5, model = "Warner", p = 2/12)
+RR <- RRgen(n = 500, pi = .5, model = "Warner", p = 2 / 12)
 DQ <- rbinom(500, size = 1, prob = .35)
 response <- c(RR$response, DQ)
 # dummy variable for RR vs. DQ
 group <- rep(1:0, each = 500)
 # predictor variable (effect-coded)
 RR.design <- rep(c(1, -1), each = 500)
-# simulate interaction of question format and age 
+# simulate interaction of question format and age
 # (DQ: no correlation; RR: positive correlation)
-z.age <- scale(c(rnorm(500, mean = RR$true, sd = 3), 
-                 rnorm(500, mean = .5, sd = 3)))         
-# fit full model 
+z.age <- scale(c(
+  rnorm(500, mean = RR$true, sd = 3),
+  rnorm(500, mean = .5, sd = 3)
+))
+# fit full model
 # (testing difference in prevalence estimates and interaction)
-fit <- RRlog(response ~ RR.design * z.age, 
-             model = "Warner", 
-             p = 2/12, 
-             group = group, 
-             LR.test = TRUE, 
-             fit.n = 1) 
+fit <- RRlog(
+  formula = response ~ RR.design * z.age,
+  model = "Warner",
+  p = 2 / 12,
+  group = group,
+  LR.test = TRUE,
+  fit.n = 1
+)
 summary(fit)
-# get prevalence estimate for RR and DQ 
+# get prevalence estimate for RR and DQ
 # (for z.age = 0 = mean(z.age))
-logit1 <- coef(fit) %*% c(1, 1, 0, 1*0)
-cat(exp(logit1) / (1+ exp(logit1)))
-logit2 <- coef(fit) %*% c(1, -1, 0, -1*0)
-cat(exp(logit2) / (1+ exp(logit2)))
+logit1 <- coef(fit) %*% c(1, 1, 0, 1 * 0)
+cat(exp(logit1) / (1 + exp(logit1)))
+logit2 <- coef(fit) %*% c(1, -1, 0, -1 * 0)
+cat(exp(logit2) / (1 + exp(logit2)))
+
+# Likelihood ratio test again model with main effect only
+fit2 <- RRlog(
+  formula = response ~ RR.design,
+  model = "Warner",
+  p = 2 / 12,
+  group = group,
+  LR.test = TRUE,
+  fit.n = 1
+)
+anova(fit, fit2)
 ```
 
 &nbsp; 
@@ -352,15 +387,32 @@ The FR model can easily be extended to account for more than two response catego
 
 The following code snippets illustrate, how the FR method is used with multiple response categories:
 
-* `RRgen(n = 1000, pi.true = c(.3,.1,.4,.2), model = "FR", p = c(.1,.1,.2,.05))`
-* `RRlin(criterion~response, data = dat, models = "FR", p.list = list(c(.1,.1,.2,.05)), fit.n = 1)`
+```{r}
+RR <- RRgen(
+  n = 1000,
+  pi.true = c(.1, .2, .1, .4, .2),
+  model = "FR", p = c(.1, .1, .05, .05, .05)
+)
+dat <- data.frame(
+  response = RR$response,
+  dv = RR$true + rnorm(1000)
+)
+
+fit <- RRlin(dv ~ response,
+  data = dat,
+  models = "FR",
+  p.list = list(c(.1, .1, .05, .05, .05)),
+  fit.n = 1
+)
+summary(fit)
+```
 
 For data generation of a polytomous FR model using `RRgen`, the arguments `complyRates` and `sysBias` have the following definition:
 
 * `complyRates=c(c0, c1, ...)` gives the probability of complying to the RR instructions separately for all possible true states
 * `sysBias = c(s1, s2, ...)` defines the multinomial probability distribution which is used in case of noncompliance (the values have to sum up to 1). 
 
-For instance, having the categories `0,1,2,3,4` and `complyRates=c(1,1,1,.8,.5), sysBias=c(.5,.3,.2,0,0)` would simulate the scenario that participants with true states 3 and 4 would comply less and instead prefer responses 0, 1, or 2.
+For instance, having the categories `0, 1, 2, 3, 4` and `complyRates=c(1, 1, 1, .8, .5), sysBias=c(.5, .3, .2, 0, 0)` would simulate the scenario that participants with true states 3 and 4 would comply less and instead prefer responses 0, 1, or 2.
 
 * Greenberg, B. G., Abul-Ela, A.-L. A., Simmons, W. R., & Horvitz, D. G. (1969). The Unrelated Question Randomized Response Model: Theoretical Framework. *Journal of the American Statistical Association, 64*, 520-539.
 
@@ -410,7 +462,7 @@ For the irrelevant question, the prevalence of *yes* responses  has to be known 
 
 RR designs can be understood as a misclassification mechanisms: The true latent states/responses are perturbed randomly according to a known randomization scheme. This randomization scheme can be described in form of a matrix $PW$, where each entry $PW_{ji}$ gives the probability to give a response $j$ if the true state is $i$.
 
-The package `RRreg` contains the function `getPW` to obtain this misclassification matrix for the implemented designs. The forced response design with proabilities `P=c(.1,.2)`, for instance, can be described by:
+The package `RRreg` contains the function `getPW` to obtain this misclassification matrix for the implemented designs. The forced response design with probabilities `P = c(.1, .2)`, for instance, can be described by:
 
 ```{r}
 getPW(model = "FR", p = c(.1, .1))
@@ -538,16 +590,22 @@ The randomization probabilities must differ across groups to render the model id
 
 ```{r}
 ### generate 2 two-group RR variables and a continuous covariate
-RR1 <- RRgen(1000, pi = .4, model = "SLD", p = c(.2,.8), complyRates = c(.8,1))
-RR2 <- RRgen(1000, pi = .6, model = "SLD", p = c(.3,.7), complyRates = c(.9,1))
-cov <- RR1$true + RR2$true + rnorm(1000, 0, 3)
+RR1 <- RRgen(n = 1000, pi = .4, model = "SLD", p = c(.2, .8), complyRates = c(.8, 1))
+RR2 <- RRgen(n = 1000, pi = .6, model = "SLD", p = c(.3, .7), complyRates = c(.9, 1))
+df <- data.frame(
+  rr1 = RR1$response,
+  rr2 = RR2$response,
+  cov = RR1$true + RR2$true + rnorm(1000, 0, 3)
+)
 
 ### logistic regression (dependent RR variable)
-logmod <- RRlog(RR1$response ~ cov, 
-                model = "SLD", 
-                p = c(.2, .8), 
-                group = RR1$group,
-                fit.n = 1)
+logmod <- RRlog(rr1 ~ cov,
+  data = df,
+  model = "SLD",
+  p = c(.2, .8),
+  group = RR1$group,
+  fit.n = 1
+)
 summary(logmod)
 
 ### group matrix for RRlin and RRcor: use multiple group vectors in one matrix
@@ -555,18 +613,20 @@ group <- cbind(RR1$group, RR2$group)
 
 # bivariate correlation between 2 two-group variables and a continuous covariate
 # note that only the most informative subsets of the data are used (see ?RRcor)
-responses <- cbind(RR1$response, RR2$response, cov)
-colnames(responses) <- c("RR1", "RR2", "cov")
-RRcor(responses, 
-      models = c("SLD", "SLD", "direct"), 
-      p.list = list(c(.2, .8), c(.3, .7)), 
-      group = group)
+RRcor(
+  x = df,
+  models = c("SLD", "SLD", "direct"),
+  p.list = list(c(.2, .8), c(.3, .7)),
+  group = group
+)
 
 # linear model with 2 RR predictors
-linmod <- RRlin(cov ~ RR1$response + RR2$response, 
-                models = c("SLD","SLD"), 
-                p.list = list(c(.2, .8), c(.3, .7)), 
-                group = group, 
-                fit.n = 1)
+linmod <- RRlin(cov ~ rr1 + rr2,
+  data = df,
+  models = c("SLD", "SLD"),
+  p.list = list(c(.2, .8), c(.3, .7)),
+  group = group,
+  fit.n = 1
+)
 summary(linmod)
 ```

@@ -1,3 +1,12 @@
+RRreg 0.7.5 (November 2022)
+===========
+
+* new function anova.RRlog() for likelihood ratio tests (LRT) of RRlog models
+* added logLik to RRuni() models
+* improved vignettes
+* clean styling of R code
+
+
 RRreg 0.7.3 (September 2021)
 ===========
 

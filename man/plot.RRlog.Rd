@@ -22,11 +22,11 @@
 \item{predictor}{character name of a predictor of the model to be fitted}
 
 \item{type}{\code{"response"} returns predicted probabilities for the (observable) RR responses,
-\code{"link"} returns predicted logit-values for the (latent) sensitive attribute, 
+\code{"link"} returns predicted logit-values for the (latent) sensitive attribute,
 and \code{"attribute"} returns predicted probabilities of having the (latent) sensitive attribute.}
 
-\item{center.preds}{whether to compute predictions by assuming that all other 
-predictors are at their respective mean values (if \code{FALSE}: all other 
+\item{center.preds}{whether to compute predictions by assuming that all other
+predictors are at their respective mean values (if \code{FALSE}: all other
 predictors are set to zero)}
 
 \item{plot.mean}{whether to plot the mean of the predictor as a vertical line}
@@ -43,18 +43,18 @@ predictors are set to zero)}
 Plot predicted logit values/probabilities of a randomized response logistic regression model.
 }
 \examples{
- # generate data
- n <- 500
- x <- data.frame(x1=rnorm(n))
- pi.true <- 1/(1+exp(.3+1.5*x$x1))
- true <- rbinom(n, 1, plogis(pi.true))
- dat <- RRgen(n, trueState=true, model="Warner", p=.1)
- x$response <- dat$response
- 
- # fit and plot RR logistic regression
- mod <- RRlog(response ~ x1, data=x, model="Warner", p=.1)
- plot(mod, "x1" ,ci=.95, type = "attribute", ylim = 0:1)
- 
+# generate data
+n <- 500
+x <- data.frame(x1 = rnorm(n))
+pi.true <- 1 / (1 + exp(.3 + 1.5 * x$x1))
+true <- rbinom(n, 1, plogis(pi.true))
+dat <- RRgen(n, trueState = true, model = "Warner", p = .1)
+x$response <- dat$response
+
+# fit and plot RR logistic regression
+mod <- RRlog(response ~ x1, data = x, model = "Warner", p = .1)
+plot(mod, "x1", ci = .95, type = "attribute", ylim = 0:1)
+
 }
 \seealso{
 \code{\link{predict.RRlog}}

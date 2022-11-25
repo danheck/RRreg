@@ -27,57 +27,95 @@ RRsimu(
 
 \item{n}{sample size}
 
-\item{pi}{true proportion of carriers of sensitive attribute (for 2 RR variables: \code{vector})}
+\item{pi}{true proportion of carriers of sensitive attribute (for 2 RR
+variables: \code{vector})}
 
-\item{model}{either one or two RR model (as \code{vector}), see \code{\link{RRuni}}}
+\item{model}{either one or two RR model (as \code{vector}), see
+\code{\link{RRuni}}}
 
-\item{p}{randomization probability (for 2 RR variables: a \code{list}). See \code{\link{RRuni}}  for details.}
+\item{p}{randomization probability (for 2 RR variables: a \code{list}). See
+\code{\link{RRuni}}  for details.}
 
-\item{cor}{true Pearson-correlation used for data generation (for \code{\link{RRcor}}). Can also be used to generate data with two dichotomous RR variables.}
+\item{cor}{true Pearson-correlation used for data generation (for
+\code{\link{RRcor}}). Can also be used to generate data with two
+dichotomous RR variables.}
 
-\item{b.log}{true regression coefficient in logistic regression (for \code{\link{RRlog}})}
+\item{b.log}{true regression coefficient in logistic regression (for
+\code{\link{RRlog}})}
 
-\item{complyRates}{vector with two values giving the proportions of participants who adhere to the instructions in the subset with or without the sensitive attribute, respectively (for 2 RR variables: a \code{list})}
+\item{complyRates}{vector with two values giving the proportions of
+participants who adhere to the instructions in the subset with or without
+the sensitive attribute, respectively (for 2 RR variables: a \code{list})}
 
-\item{sysBias}{probability of responding 'yes' (coded as 1 in the RR variable) in case of non-compliance for carriers and non-carriers, respectively. See \code{\link{RRgen}}}
+\item{sysBias}{probability of responding 'yes' (coded as 1 in the RR
+variable) in case of non-compliance for carriers and non-carriers,
+respectively. See \code{\link{RRgen}}}
 
-\item{method}{vector specifying which RR methods to be used in each replication. For a single RR variable, the methods \code{\link{RRuni}}, \code{\link{RRcor}},\code{\link{RRlog}}, and \code{\link{RRlin}} are available. For 2 RR variables, only \code{\link{RRcor}} is available.}
+\item{method}{vector specifying which RR methods to be used in each
+replication. For a single RR variable, the methods \code{\link{RRuni}},
+\code{\link{RRcor}},\code{\link{RRlog}}, and \code{\link{RRlin}} are
+available. For 2 RR variables, only \code{\link{RRcor}} is available.}
 
-\item{alpha}{significance threshold for testing the logistic regression parameter \code{beta}}
+\item{alpha}{significance threshold for testing the logistic regression
+parameter \code{beta}}
 
-\item{groupRatio}{proportion of participants in group 1. Only for two-group models (e.g., \code{"SLD"}) (for 2 RR variables: \code{vector})}
+\item{groupRatio}{proportion of participants in group 1. Only for two-group
+models (e.g., \code{"SLD"}) (for 2 RR variables: \code{vector})}
 
-\item{MLest}{concerns \code{\link{RRuni}}: whether to use \code{optim} to get ML instead of moment estimates (only relevant if pi is outside of [0,1])}
+\item{MLest}{concerns \code{\link{RRuni}}: whether to use \code{optim} to get
+ML instead of moment estimates (only relevant if pi is outside of [0,1])}
 
-\item{getPower}{whether to compute power for \code{method="RRcor"} (performs an additional bootstrap assuming independence)}
+\item{getPower}{whether to compute power for \code{method="RRcor"} (performs
+an additional bootstrap assuming independence)}
 
-\item{nCPU}{either the number of CPU cores or a cluster initialized via \code{\link[parallel]{makeCluster}}.}
+\item{nCPU}{either the number of CPU cores or a cluster initialized via
+\code{\link[parallel]{makeCluster}}.}
 }
 \value{
-A list containing
- \item{parEsts}{matrix containing the estimated parameters}
- \item{results}{matrix  with mean parameters, standard errors, and number of samples to which the respective method could not be fitted}
- \item{power}{vector with the estimated power of the selected randomized response procedures}
+A list containing \item{parEsts}{matrix containing the estimated
+  parameters} \item{results}{matrix  with mean parameters, standard errors,
+  and number of samples to which the respective method could not be fitted}
+  \item{power}{vector with the estimated power of the selected randomized
+  response procedures}
 }
 \description{
-Simulate and analyse bivariate data including either one RR variable (either correlation, logistic, or linear regression model) or two RR variables (only correlations). Useful for power analysis, parametric bootstraps or for testing the effects of noncompliance on the stability of estimates.
+Simulate and analyse bivariate data including either one RR
+  variable (either correlation, logistic, or linear regression model) or two
+  RR variables (only correlations). Useful for power analysis, parametric
+  bootstraps or for testing the effects of noncompliance on the stability of
+  estimates.
 }
 \details{
 For a single RR variable:
 
-The parameter \code{b.log} is the slope-coefficient for the true, latent values in a logistic regression model that is used for data generation. 
+  The parameter \code{b.log} is the slope-coefficient for the true, latent
+  values in a logistic regression model that is used for data generation.
 
-The argument \code{cor} is used for data generation for linear models. The directly measured covariate is sampled from a normal distribution with shifted means, depending on the true state on the sensitive attribute (i.e., the true, underlying values on the RR variable). For dichotomous RR variables, this corresponds to the assumption of an ordinary t-test, where the dependent variable is normally distributed within groups with equal variance. The difference in means is chosen in a way, to obtain the point-biserial correlation defined by \code{cor}.
+  The argument \code{cor} is used for data generation for linear models. The
+  directly measured covariate is sampled from a normal distribution with
+  shifted means, depending on the true state on the sensitive attribute
+  (i.e., the true, underlying values on the RR variable). For dichotomous RR
+  variables, this corresponds to the assumption of an ordinary t-test, where
+  the dependent variable is normally distributed within groups with equal
+  variance. The difference in means is chosen in a way, to obtain the
+  point-biserial correlation defined by \code{cor}.
 
-For two RR variables:
+  For two RR variables:
 
-\code{cor} has to be used. In case of two dichotomous RR variables, the true group membership of individuals is sampled from a 2x2 cross table. Within this table, probabilities are chosen in a way, to obtain the point-tetrachoric correlation defined by \code{cor}
+  \code{cor} has to be used. In case of two dichotomous RR variables, the
+  true group membership of individuals is sampled from a 2x2 cross table.
+  Within this table, probabilities are chosen in a way, to obtain the
+  point-tetrachoric correlation defined by \code{cor}
 
-Note, that for the FR model with multiple response categories (e.g., from 0 to 4), the specified \code{cor} is not the exact target of the sampling procedure. It assumes a normal distribution for each true state, with constant differences between the groups (i.e., it assumes an interval scaled variable).
+  Note, that for the FR model with multiple response categories (e.g., from 0
+  to 4), the specified \code{cor} is not the exact target of the sampling
+  procedure. It assumes a normal distribution for each true state, with
+  constant differences between the groups (i.e., it assumes an interval
+  scaled variable).
 }
 \examples{
 # Not run: Simulate data according to the Warner model
-# mcsim <-  RRsimu(numRep=100, n=300, pi=.4, 
+# mcsim <-  RRsimu(numRep=100, n=300, pi=.4,
 #                  model="Warner", p=.2, cor=.3)
 # print(mcsim)
 }

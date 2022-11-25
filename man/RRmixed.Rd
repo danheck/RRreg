@@ -7,22 +7,29 @@
 RRmixed(formula, data, model, p, const = 1e-04, adjust_control = FALSE, ...)
 }
 \arguments{
-\item{formula}{two-sided formula including random and fixed effects (see below or \code{\link{glmer}} for details)}
+\item{formula}{two-sided formula including random and fixed effects (see
+below or \code{\link{glmer}} for details)}
 
 \item{data}{an optional data frame with variables named in formula}
 
-\item{model}{type of RR design. Only 1-group RR designs are supported at the moment (i.e., \code{"Warner"}, \code{"FR"}, \code{"UQTknown"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"Kuk"}, \code{"Mangat"}, \code{"custom"}). See \code{\link{RRuni}} or \code{vignette(RRreg)} for details.}
+\item{model}{type of RR design. Only 1-group RR designs are supported at the
+moment (i.e., \code{"Warner"}, \code{"FR"}, \code{"UQTknown"},
+\code{"Crosswise"}, \code{"Triangular"}, \code{"Kuk"}, \code{"Mangat"},
+\code{"custom"}). See \code{\link{RRuni}} or \code{vignette(RRreg)} for
+details.}
 
 \item{p}{randomization probability}
 
-\item{const}{the RR link function is not defined for small and/or large probabilities 
-(the boundaries depend on \code{model} and \code{p}). To increase robustness of the estimation, 
-these probabilities smaller and larger than the respective boundaries 
-(plus/minus a constant defined via \code{const}) are smoothed by separate logit-link functions.}
+\item{const}{the RR link function is not defined for small and/or large
+probabilities (the boundaries depend on \code{model} and \code{p}). To
+increase robustness of the estimation, these probabilities smaller and
+larger than the respective boundaries (plus/minus a constant defined via
+\code{const}) are smoothed by separate logit-link functions.}
 
-\item{adjust_control}{whether to adjust the control arguments for \code{glmer}, 
-which might help in case of convergence issues for some models. \code{\link[lme4]{lmerControl}} settings
-are changed to \code{nAGQ0initStep = FALSE} and \code{optimizer = "bobyqa"}.}
+\item{adjust_control}{whether to adjust the control arguments for
+\code{glmer}, which might help in case of convergence issues for some
+models. \code{\link[lme4]{lmerControl}} settings are changed to
+\code{nAGQ0initStep = FALSE} and \code{optimizer = "bobyqa"}.}
 
 \item{...}{further arguments passed to \code{\link{glmer}}}
 }
@@ -30,44 +37,58 @@ are changed to \code{nAGQ0initStep = FALSE} and \code{optimizer = "bobyqa"}.}
 an object of class \code{glmerMod}
 }
 \description{
-Uses the package \code{\link{lme4}} to fit a generalized linear mixed model (GLMM) with an adjusted link funciton.
+Uses the package \code{\link{lme4}} to fit a generalized linear mixed model
+(GLMM) with an adjusted link funciton.
 }
 \details{
-Some examples for formula:
-\itemize{
- \item{random intercept:   }{ \code{response ~ covariate + (1 | group)}}
- \item{random slope:   }{ \code{response ~ covariate + (0 + covariate | group)}}
- \item{both random slope and intercept:   }{ \code{response ~ covariate +(covariate | group)}}
- \item{level-2 predictor (must have constant values within groups!):   }{ \code{response ~ lev2 + (1|group)}}
+Some examples for formula: 
+\itemize{ 
+  \item{random intercept: }
+       {\code{response ~ covariate + (1 | group)}} 
+  \item{random slope: }
+       {\code{response ~ covariate + (0 + covariate | group)}} 
+  \item{both random slope and intercept: }
+       {\code{response ~ covariate +(covariate | group)}}
+  \item{level-2 predictor (must have constant values within groups!):}
+       {\code{response ~ lev2 + (1|group)}} 
 }
 
-Note that parameter estimation will be unstable and might fail if the observed
-responses are not in line with the model. For instance, a Forced-Response
-model (\code{model="FR"}) with \code{p=c(0,1/4)} requires that expected
-probabilities for responses are in the interval [.25,1.00]. If the observed 
-proportion of responses is very low (<<.25), intercepts will be estimated to 
-be very small (<<0) and/or parameter estimation might fail. See 
-\code{\link[lme4]{glmer}} for setting better starting values and \code{\link[lme4]{lmerControl}}
-for further options to increase stability.
+Note that parameter estimation will be unstable and might fail if the
+observed responses are not in line with the model. For instance, a
+Forced-Response model (\code{model="FR"}) with \code{p=c(0,1/4)} requires
+that expected probabilities for responses are in the interval [.25,1.00]. If
+the observed proportion of responses is very low (<<.25), intercepts will be
+estimated to be very small (<<0) and/or parameter estimation might fail. See
+\code{\link[lme4]{glmer}} for setting better starting values and
+\code{\link[lme4]{lmerControl}} for further options to increase stability.
 }
 \examples{
-# generate data with a level-1 predictor 
+# generate data with a level-1 predictor
 set.seed(1234)
-d <- data.frame(group=factor(rep(LETTERS[1:20],each=50)), 
-                cov=rnorm(20*50))
+d <- data.frame(
+  group = factor(rep(LETTERS[1:20], each = 50)),
+  cov = rnorm(20 * 50)
+)
 # generate dependent data based on logistic model (random intercept):
-d$true <- simulate(~  cov + (1|group), newdata=d,
-                     family=binomial(link="logit"),
-                     newparams=list(beta=c("(Intercept)"=-.5, cov=1),
-                                    theta=c("group.(Intercept)"=.8)))[[1]]
+d$true <- simulate(~ cov + (1 | group),
+  newdata = d,
+  family = binomial(link = "logit"),
+  newparams = list(
+    beta = c("(Intercept)" = -.5, cov = 1),
+    theta = c("group.(Intercept)" = .8)
+  )
+)[[1]]
 # scramble responses using RR:
 model <- "FR"
-p <- c(true0=.1, true1=.2)
-d$resp <- RRgen(model="FR", p=p, trueState=d$true)$response
+p <- c(true0 = .1, true1 = .2)
+d$resp <- RRgen(model = "FR", p = p, trueState = d$true)$response
 # fit model:
-mod <- RRmixed(resp ~  cov +(1|group), data=d, model="FR", p=p)
+mod <- RRmixed(resp ~ cov + (1 | group), data = d, model = "FR", p = p)
 summary(mod)
 }
 \references{
-van den Hout, A., van der Heijden, P. G., & Gilchrist, R. (2007). The Logistic Regression Model with Response Variables Subject to Randomized Response. Computational Statistics & Data Analysis, 51, 6060–6069.
+van den Hout, A., van der Heijden, P. G., & Gilchrist, R.
+  (2007). The Logistic Regression Model with Response Variables Subject to
+  Randomized Response. Computational Statistics & Data Analysis, 51,
+  6060–6069.
 }

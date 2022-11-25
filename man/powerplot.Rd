@@ -38,7 +38,8 @@ powerplot(
 
 \item{method}{multivariate RR method}
 
-\item{complyRates}{probability of compliance within carriers/noncarriers of sensitive attribute}
+\item{complyRates}{probability of compliance within carriers/noncarriers of
+sensitive attribute}
 
 \item{sysBias}{probability of responding 'yes' in case of noncompliance}
 
@@ -46,21 +47,27 @@ powerplot(
 
 \item{alpha}{type-I error used to estimate power}
 
-\item{nCPU}{either the number of CPU cores or a cluster initialized via \code{\link[parallel]{makeCluster}}.}
+\item{nCPU}{either the number of CPU cores or a cluster initialized via
+\code{\link[parallel]{makeCluster}}.}
 
 \item{show.messages}{toggle printing of progress messages}
 }
 \value{
-a list of the class \code{powerplot} containing an array \code{res} with the power estimates and details of the simulation (e.g., model, p, pi, etc.)
+a list of the class \code{powerplot} containing an array \code{res}
+with the power estimates and details of the simulation (e.g., model, p, pi,
+etc.)
 }
 \description{
-Uses the function \code{\link{RRsimu}} to estimate the power of the multivariate RR methods (correlation \code{\link{RRcor}}, logistic regression \code{\link{RRlog}}, and/or linear regression \code{\link{RRlin}}.
+Uses the function \code{\link{RRsimu}} to estimate the power of the
+multivariate RR methods (correlation \code{\link{RRcor}}, logistic regression
+\code{\link{RRlog}}, and/or linear regression \code{\link{RRlin}}.
 }
 \examples{
 # Not run
 # pplot <- powerplot(100, n=c(150,250), cor=c(0,.3,.5),
 #                   method="RRlog", pi=.6, model="Warner", p=.3)
 # plot(pplot)
+
 }
 \seealso{
 \code{\link{RRsimu}} for Monte-Carlo simulation / parametric bootstrap

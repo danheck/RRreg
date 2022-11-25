@@ -19,58 +19,88 @@ RRlin(
 )
 }
 \arguments{
-\item{formula}{a continuous criterion is predicted by one or more categorical RR variables defined by \code{models}. If the number of predictors exceeds the number defined by the vector \code{models}, the remaining predictors are treated as non-randomized variables (e.g., direct questions). Interactions including any of the RR variables cannot be included.}
+\item{formula}{a continuous criterion is predicted by one or more categorical
+RR variables defined by \code{models}. If the number of predictors exceeds
+the number defined by the vector \code{models}, the remaining predictors
+are treated as non-randomized variables (e.g., direct questions).
+Interactions including any of the RR variables cannot be included.}
 
-\item{data}{an optional data frame, list or environment, containing the variables in the model.}
+\item{data}{an optional data frame, list or environment, containing the
+variables in the model.}
 
-\item{models}{character vector specifying RR model(s) in order of appearance in formula. Available models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"custom"} (custom: a randomization matrix must be specified in the corresponding element of \code{p.list}, where the entry \code{p[i,j]} defines the probability of responding i (i-th row) given a true state of j (j-th column)).}
+\item{models}{character vector specifying RR model(s) in order of appearance
+in formula. Available models: \code{"Warner"}, \code{"UQTknown"},
+\code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"},
+\code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"},
+\code{"SLD"}, \code{"custom"} (custom: a randomization matrix must be
+specified in the corresponding element of \code{p.list}, where the entry
+\code{p[i,j]} defines the probability of responding i (i-th row) given a
+true state of j (j-th column)).}
 
-\item{p.list}{list of randomization probabilities for RR models in the same order as specified in \code{models}. Note, that the randomization probabilities p must be provided in a \code{\link{list}}, e.g., \code{list(p=c(.2, .3))}. See \code{\link{RRuni}} for details.}
+\item{p.list}{list of randomization probabilities for RR models in the same
+order as specified in \code{models}. Note, that the randomization
+probabilities p must be provided in a \code{\link{list}}, e.g.,
+\code{list(p=c(.2, .3))}. See \code{\link{RRuni}} for details.}
 
-\item{group}{vector or matrix specifying group membership by the indices 1 and 2. Only for multigroup RR models, e.g., \code{UQTunknown}, \code{CDM} or \code{SLD}}
+\item{group}{vector or matrix specifying group membership by the indices 1
+and 2. Only for multigroup RR models, e.g., \code{UQTunknown}, \code{CDM}
+or \code{SLD}}
 
 \item{Kukrep}{defines the number of repetitions in Kuk's card playing method}
 
 \item{bs.n}{Number of samples used for the non-parametric bootstrap}
 
-\item{nCPU}{only relevant for the bootstrap: either the number of CPU cores or a cluster initialized via \code{\link[parallel]{makeCluster}}.}
+\item{nCPU}{only relevant for the bootstrap: either the number of CPU cores
+or a cluster initialized via \code{\link[parallel]{makeCluster}}.}
 
 \item{maxit}{maximum number of iterations in optimization routine}
 
 \item{fit.n}{number of fitting runs with random starting values}
 
-\item{pibeta}{approximate ratio of probabilities pi to regression weights beta (to adjust scaling). Can be used for speeding-up and fine-tuning ML estimation (i.e., choosing a smaller value for larger beta values).}
+\item{pibeta}{approximate ratio of probabilities pi to regression weights
+beta (to adjust scaling). Can be used for speeding-up and fine-tuning ML
+estimation (i.e., choosing a smaller value for larger beta values).}
 }
 \value{
-Returns an object \code{RRlin} which can be analysed by the generic method \code{\link{summary}}
+Returns an object \code{RRlin} which can be analysed by the generic
+  method \code{\link{summary}}
 }
 \description{
-Linear regression for a continuous criterion, using randomized-response (RR) variables as predictors.
+Linear regression for a continuous criterion, using randomized-response (RR)
+variables as predictors.
 }
 \examples{
 # generate two RR predictors
-dat <- RRgen(n=500, pi=.4, model="Warner", p=.3)
-dat2 <- RRgen(n=500, pi=c(.4,.6), model="FR", p=c(.1,.15))
+dat <- RRgen(n = 500, pi = .4, model = "Warner", p = .3)
+dat2 <- RRgen(n = 500, pi = c(.4, .6), model = "FR", p = c(.1, .15))
 dat$FR <- dat2$response
 dat$trueFR <- dat2$true
 
 # generate a third predictor and continuous dependent variables
 dat$nonRR <- rnorm(500, 5, 1)
-dat$depvar <- 2*dat$true - 3*dat2$true + 
-                       .5*dat$nonRR +rnorm(500, 1, 7) 
+dat$depvar <- 2 * dat$true - 3 * dat2$true +
+  .5 * dat$nonRR + rnorm(500, 1, 7)
 
 # use RRlin and compare to regression on non-RR variables
-linreg <- RRlin(depvar~response+FR+nonRR, data=dat,
-                models=c("Warner","FR"),
-                p.list=list(.3, c(.1,.15)), fit.n=1)
+linreg <- RRlin(depvar ~ response + FR + nonRR,
+  data = dat,
+  models = c("Warner", "FR"),
+  p.list = list(.3, c(.1, .15)), fit.n = 1
+)
 summary(linreg)
-summary(lm(depvar~true +trueFR+nonRR, data=dat))
+summary(lm(depvar ~ true + trueFR + nonRR, data = dat))
+
 }
 \references{
-van den Hout, A., & Kooiman, P. (2006). Estimating the linear regression model with categorical covariates subject to randomized response. \emph{Computational Statistics & Data Analysis, 50}, 3311-3323.
+van den Hout, A., & Kooiman, P. (2006). Estimating the linear
+  regression model with categorical covariates subject to randomized
+  response. \emph{Computational Statistics & Data Analysis, 50}, 3311-3323.
 }
 \seealso{
-\code{vignette('RRreg')} or \url{https://www.dwheck.de/separate_content/RRregManual/index.html} for a detailed description of the RR models and the appropriate definition of \code{p}
+\code{vignette('RRreg')} or
+  \url{https://www.dwheck.de/separate_content/RRregManual/index.html} for a
+  detailed description of the RR models and the appropriate definition of
+  \code{p}
 }
 \author{
 Daniel W. Heck

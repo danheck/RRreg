@@ -16,32 +16,32 @@
 \arguments{
 \item{object}{A fitted \code{\link{RRlog}} model}
 
-\item{newdata}{An optional vector, matrix, or data.frame with values on the 
-predictor variables. Note that for matrices, the order of predictors 
-should match the order of predictors in the formula. Uses the fitted 
+\item{newdata}{An optional vector, matrix, or data.frame with values on the
+predictor variables. Note that for matrices, the order of predictors
+should match the order of predictors in the formula. Uses the fitted
 values of the model if omitted.}
 
 \item{type}{\code{"response"} returns predicted probabilities for the (observable) RR responses,
-\code{"link"} returns predicted logit-values for the (latent) sensitive attribute, 
+\code{"link"} returns predicted logit-values for the (latent) sensitive attribute,
 and \code{"attribute"} returns predicted probabilities of having the (latent) sensitive attribute.}
 
 \item{se.fit}{Return standard errors for the predicted values in addition to confidence intervals.
-SEs on the logit scale are computed using the observed Fisher information from the fitted model. 
+SEs on the logit scale are computed using the observed Fisher information from the fitted model.
 Standard errors for the probability scale are computed using the delta method.}
 
-\item{ci}{Confidence level for confidence interval. If \code{ci=FALSE}, no 
-confidence interval is returned. Confidence intervals  on the probability 
-scale (if \code{type="response"} or \code{type="attribute"}) are computed 
+\item{ci}{Confidence level for confidence interval. If \code{ci=FALSE}, no
+confidence interval is returned. Confidence intervals  on the probability
+scale (if \code{type="response"} or \code{type="attribute"}) are computed
 based on the CI on the logit-scale using the inverse link function
 (hence, the CI will in general not be symmetric).}
 
 \item{...}{ignored}
 }
 \value{
-either a vector of predicted values or a matrix with columns for the 
+either a vector of predicted values or a matrix with columns for the
     point estimates, confidence interval, and standard errors (if \code{se.fit=TRUE} and \code{ci=.95}).
 }
 \description{
-Predictions of the RR logistic regression model for the individual probabilities (or logits) 
+Predictions of the RR logistic regression model for the individual probabilities (or logits)
 of having the sensitive RR attribute, or of the probability of the RR responses.
 }

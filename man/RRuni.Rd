@@ -7,17 +7,31 @@
 RRuni(response, data, model, p, group = NULL, MLest = TRUE, Kukrep = 1)
 }
 \arguments{
-\item{response}{either vector of responses containing 0='no' and 1='yes' or name of response variable in \code{data}.For the Forced Response (\code{FR}) model, response values are integers from 0 to (m-1), where 'm' is the number of response categories.  In Kuk's card playing method (\code{Kuk}), the observed response variable gives the number of red cards.}
+\item{response}{either vector of responses containing 0='no' and 1='yes' or
+name of response variable in \code{data}. For the Forced Response
+(\code{FR}) model, response values are integers from 0 to (m-1), where 'm'
+is the number of response categories. In Kuk's card playing method
+(\code{Kuk}), the observed response variable gives the number of red cards.}
 
 \item{data}{optional \code{data.frame} containing the response variable}
 
-\item{model}{defines RR model. Available models: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"FR"}, \code{"Kuk"},\code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"}, \code{"mix.norm"}, \code{"mix.exp"},\code{"mix.unknown"}, or \code{"custom"}. See argument \code{p} or type \code{vignette('RRreg')} for detailed specifications.}
+\item{model}{defines RR model. Available models: \code{"Warner"},
+\code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"FR"},
+\code{"Kuk"},\code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"},
+\code{"CDMsym"}, \code{"SLD"}, \code{"mix.norm"},
+\code{"mix.exp"},\code{"mix.unknown"}, or \code{"custom"}. See argument
+\code{p} or type \code{vignette('RRreg')} for detailed specifications.}
 
 \item{p}{randomization probability (see details or \code{vignette("RRreg")})}
 
-\item{group}{a group vector of the same length as \code{response} containing values 1 or 2, only required for two-group models, which specify different randomization probabilities for two groups, e.g., \code{CDM} or \code{SLD}. If a data.frame \code{data} is provided, the variable \code{group} is searched within it.}
+\item{group}{a group vector of the same length as \code{response} containing
+values 1 or 2, only required for two-group models, which specify different
+randomization probabilities for two groups, e.g., \code{CDM} or \code{SLD}.
+If a data.frame \code{data} is provided, the variable \code{group} is
+searched within it.}
 
-\item{MLest}{whether to use \code{optim} to get ML instead of moment estimates (only relevant if pi is outside of [0,1])}
+\item{MLest}{whether to use \code{optim} to get ML instead of moment
+estimates (only relevant if pi is outside of [0,1])}
 
 \item{Kukrep}{number of repetitions of Kuk's card-drawing method}
 }
@@ -25,50 +39,81 @@ RRuni(response, data, model, p, group = NULL, MLest = TRUE, Kukrep = 1)
 an \code{RRuni} object, can by analyzed by using \code{\link{summary}}
 }
 \description{
-Analyse a data vector \code{response} with a specified RR model (e.g., \code{Warner}) with known randomization probability \code{p}
+Analyse a data vector \code{response} with a specified RR model (e.g.,
+\code{Warner}) with known randomization probability \code{p}
 }
 \details{
-Each RR design \code{model} differs in the definition of the randomization probability \code{p}, which is defined as a single probability for
- \itemize{
- \item \code{"Warner"}: Probabiltiy to get sensitive Question 
- \item \code{"Mangat"}: Prob. for noncarriers to respond truthfully (i.e., with No=0)
- \item \code{"Crosswise"}: Probability to respond 'yes' to irrelevant second question (coding of responses: 1=['no-no' or 'yes-yes']; 0=['yes-no' or 'no-yes'])
- \item \code{"Triangular"}: Probability to respond 'yes' to irrelevant second question (coding of responses: 0='no' to both questions (='circle'); 1='yes' to at least one question ('triangle'))
- } 
- and as a two-valued vector of probabilities for 
- \itemize{
- \item \code{"Kuk"}: Probability of red cards in first and second set, respectively (red=1, black=0); 
- \item Unrelated Question (\code{"UQTknown"}): Prob. to respond to sensitive question and known prevalence of 'yes' responses to unrelated question 
- \item Unrelated Question (\code{"UQTunknown"}): Prob. to respond to sensitive question in group 1 and 2, respectively
- \item Cheating Detection (\code{"CDM"}): Prob. to be prompted to say yes in group 1 and 2, respectively
- \item Symmetric CDM (\code{"CDMsym"}): 4-valued vector: Prob. to be prompted to say 'yes'/'no' in group 1 and 'yes'/'no' in group 2
- \item Stochastic Lie Detector (\code{"SLD"}): Prob. for noncarriers to reply with 0='no' in group 1 and 2, respectively
- \item Forced Response model (\code{"FR"}): m-valued vector (m=number of response categories) with the probabilities of being prompted to select response categories 0,1,..,m-1, respectively (requires \code{sum(p)<1})
-\item RR as misclassification (\code{"custom"}): a quadratic misclassification matrix is specified, where the entry \code{p[i,j]} defines the probability of responding i (i-th row) given a true state of j (j-th column)) (see \code{\link{getPW}})
- }
- For the continuous RR models:
- \itemize{
- \item \code{"mix.norm"}: 3-valued vector - Prob. to respond to sensitive question and mean and SD of the masking normal distribution of the unrelated question
- \item \code{"mix.exp"}: 2-valued vector - Prob. to respond to sensitive question and mean of the masking exponential distribution of the unrelated question
- \item \code{"mix.unknown"}: 2-valued vector - Prob. of responding to sensitive question in group 1 and 2, respectively
- }
+Each RR design \code{model} differs in the definition of the
+randomization probability \code{p}, which is defined as a single probability
+for
+\itemize{
+  \item \code{"Warner"}: Probability to get sensitive Question
+  \item \code{"Mangat"}: Prob. for non-carriers to respond truthfully (i.e., with No=0)
+  \item \code{"Crosswise"}: Probability to respond 'yes' to irrelevant second 
+    question (coding of responses: 1=['no-no' or 'yes-yes']; 0=['yes-no' or 'no-yes'])
+  \item \code{"Triangular"}: Probability to respond 'yes' to irrelevant second 
+      question (coding of responses: 0='no' to both questions (='circle'); 1='yes' 
+      to at least one question ('triangle'))
+}
+and as a two-valued vector of probabilities for
+\itemize{
+  \item \code{"Kuk"}: Probability of red cards in first and second set, 
+        respectively (red=1, black=0);
+  \item Unrelated Question (\code{"UQTknown"}): Prob. to respond to sensitive 
+        question and known prevalence of 'yes' responses to unrelated question
+  \item Unrelated Question (\code{"UQTunknown"}): Prob. to respond to
+        sensitive question in group 1 and 2, respectively
+  \item Cheating Detection (\code{"CDM"}): Prob. to be prompted to say yes 
+        in group 1 and 2, respectively
+  \item Symmetric CDM (\code{"CDMsym"}): 4-valued vector: Prob. to be 
+        prompted to say 'yes'/'no' in group 1 and 'yes'/'no' in group 2
+  \item Stochastic Lie Detector (\code{"SLD"}): Prob. for noncarriers to 
+        reply with 0='no' in group 1 and 2, respectively
+  \item Forced Response model (\code{"FR"}): m-valued vector (m=number of 
+        response categories) with the probabilities of being prompted to select 
+        response categories 0,1,..,m-1, respectively (requires \code{sum(p)<1})
+  \item RR as misclassification (\code{"custom"}): a quadratic misclassification 
+        matrix is specified, where the entry \code{p[i,j]} defines the 
+        probability of responding i (i-th row) given a true state of j 
+        (j-th column)) (see \code{\link{getPW}})
+}
+For the continuous RR models:
+\itemize{
+  \item \code{"mix.norm"}: 3-valued vector - Prob. to respond to sensitive 
+        question and mean and SD of the masking normal distribution of the 
+        unrelated question
+  \item \code{"mix.exp"}: 2-valued vector - Prob. to respond to sensitive 
+        question and mean of the masking exponential distribution of the 
+        unrelated question
+  \item \code{"mix.unknown"}: 2-valued vector - Prob. of responding to 
+        sensitive question in group 1 and 2, respectively
+}
 }
 \examples{
 # Generate responses of 1000 people according to Warner's model
 # with an underlying true proportion of .3
-genData <- RRgen(n=1000, pi=.3, model="Warner", p=.7)
-# Analyse univariate data to estimate 'pi'
-analyse <- RRuni(response=genData$response, model="Warner", p=.7)
-summary(analyse)
+df <- RRgen(n = 1000, pi = .3, model = "Warner", p = .7)
+head(df)
 
-# Generate data in line with the Stochastic Lie Detector 
+# Analyse univariate data to estimate prevalence 'pi'
+estimate <- RRuni(response = df$response, model = "Warner", p = .7)
+summary(estimate)
+
+# Generate data in line with the Stochastic Lie Detector
 # assuming that 90\% of the respondents answer truthfully
-genData2 <- RRgen(n=1000, pi=.3, model="SLD", p=c(.2,.8), 
-                  complyRates=c(.8,1),groupRatio=0.4)
-analyse2 <- RRuni(response=genData2$response, model="SLD", 
-                  p=c(.2,.8), group=genData2$group)
-summary(analyse2)
+df2 <- RRgen(
+  n = 1000, pi = .3, model = "SLD", p = c(.2, .8),
+  complyRates = c(.8, 1), groupRatio = 0.4
+)
+estimate2 <- RRuni(
+  response = df2$response, model = "SLD",
+  p = c(.2, .8), group = df2$group
+)
+summary(estimate2)
+
 }
 \seealso{
-\code{vignette('RRreg')} or \url{https://www.dwheck.de/separate_content/RRregManual/index.html} for a detailed description of the RR models and the appropriate definition of \code{p}
+\code{vignette('RRreg')} or 
+\url{https://www.dwheck.de/separate_content/RRregManual/index.html} for a 
+detailed description of the RR models and the appropriate definition of \code{p}
 }

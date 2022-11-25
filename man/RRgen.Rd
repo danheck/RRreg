@@ -19,53 +19,95 @@ RRgen(
 \arguments{
 \item{n}{sample size of generated data}
 
-\item{pi.true}{true proportion in population (a vector for m-categorical \code{"FR"} or \code{"custom"} model)}
+\item{pi.true}{true proportion in population (a vector for m-categorical
+\code{"FR"} or \code{"custom"} model)}
 
-\item{model}{specifes the RR model, one of: \code{"Warner"}, \code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"}, \code{"FR"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"}, \code{"CDMsym"}, \code{"SLD"},  \code{"mix.norm"},  \code{"mix.exp"}, \code{"custom"}. See \code{vignette("RRreg")} for details.}
+\item{model}{specifes the RR model, one of: \code{"Warner"},
+\code{"UQTknown"}, \code{"UQTunknown"}, \code{"Mangat"}, \code{"Kuk"},
+\code{"FR"}, \code{"Crosswise"}, \code{"Triangular"}, \code{"CDM"},
+\code{"CDMsym"}, \code{"SLD"},  \code{"mix.norm"},  \code{"mix.exp"},
+\code{"custom"}. See \code{vignette("RRreg")} for details.}
 
-\item{p}{randomization probability (depending on model, see \code{\link{RRuni}} for details)}
+\item{p}{randomization probability (depending on model, see
+\code{\link{RRuni}} for details)}
 
-\item{complyRates}{vector with two values giving the proportions of carriers and non-carriers who adhere to the instructions, respectively}
+\item{complyRates}{vector with two values giving the proportions of carriers
+and non-carriers who adhere to the instructions, respectively}
 
-\item{sysBias}{probability of responding 'yes' (coded as 1) in case of non-compliance for carriers and non-carriers of the sensitive attribute, respectively. If \code{sysBias=c(0,0)}, carriers and non-carriers systematically give the nonsensitive response 'no' (also known as self-protective(SP)-'no' responses). If \code{sysBias=c(0,0.5)}, carriers always respond 'no' whereas non-carriers randomly select a response category. Note that \code{sysBias = c(0.5,0.5)} might be the best choice for \code{Kuk} and \code{Crosswise}. For the m-categorical \code{"FR"} or \code{"custom"} model, \code{sysBias} can be given as a probability vector for categories 0 to (m-1).}
+\item{sysBias}{probability of responding 'yes' (coded as 1) in case of
+non-compliance for carriers and non-carriers of the sensitive attribute,
+respectively. If \code{sysBias=c(0,0)}, carriers and non-carriers
+systematically give the nonsensitive response 'no' (also known as
+self-protective(SP)-'no' responses). If \code{sysBias=c(0,0.5)}, carriers
+always respond 'no' whereas non-carriers randomly select a response
+category. Note that \code{sysBias = c(0.5,0.5)} might be the best choice
+for \code{Kuk} and \code{Crosswise}. For the m-categorical \code{"FR"} or
+\code{"custom"} model, \code{sysBias} can be given as a probability vector
+for categories 0 to (m-1).}
 
-\item{groupRatio}{proportion of participants in group 1. Only required for two-group models, e.g., \code{SLD} and \code{CDM}}
+\item{groupRatio}{proportion of participants in group 1. Only required for
+two-group models, e.g., \code{SLD} and \code{CDM}}
 
-\item{Kukrep}{Number of repetitions of Kuk's procedure (how often red and black cards are drawn)}
+\item{Kukrep}{Number of repetitions of Kuk's procedure (how often red and
+black cards are drawn)}
 
-\item{trueState}{optional vector containing true states of participants (i.e., 1 for carriers and 0 for noncarriers of sensitive attribute; for \code{FR}: values from 0,1,...,M-1 (M = number of response categories) which will be randomized according to the defined procedure (if specified, \code{n} and \code{pi.true} are ignored)}
+\item{trueState}{optional vector containing true states of participants
+(i.e., 1 for carriers and 0 for noncarriers of sensitive attribute; for
+\code{FR}: values from 0,1,...,M-1 (M = number of response categories)
+which will be randomized according to the defined procedure (if specified,
+\code{n} and \code{pi.true} are ignored)}
 }
 \value{
-\code{data.frame} including the variables \code{true} and \code{response} (and for \code{SLD} and \code{CDM} a third variable \code{group})
+\code{data.frame} including the variables \code{true} and
+\code{response} (and for \code{SLD} and \code{CDM} a third variable
+\code{group})
 }
 \description{
-The method \code{RRgen} generates data according to a specified RR model, 
-e.g., \code{"Warner"}. True states are either provided by a vector \code{trueState} or drawn randomly from a Bernoulli distribution. Useful for simulation and testing purposes, e.g., power analysis.
+The method \code{RRgen} generates data according to a specified
+  RR model, e.g., \code{"Warner"}. True states are either provided by a
+  vector \code{trueState} or drawn randomly from a Bernoulli distribution.
+  Useful for simulation and testing purposes, e.g., power analysis.
 }
 \details{
-If \code{trueState} is specified, the randomized response procedure will be simulated for this vector, otherwise a random vector of length \code{n} with true proportion \code{pi.true} is drawn. Respondents answer biases can be simulated by adjusting the compliance rates: if \code{complyRates} is set to \code{c(1,1)}, all respondents adhere to the randomization procedure. If one or both rates are smaller than 1, \code{sysBias} determines whether noncompliant respondents systematically choose the nonsensitive category or whether they answer randomly. 
+If \code{trueState} is specified, the randomized response procedure
+will be simulated for this vector, otherwise a random vector of length
+\code{n} with true proportion \code{pi.true} is drawn. Respondents answer
+biases can be simulated by adjusting the compliance rates: if
+\code{complyRates} is set to \code{c(1,1)}, all respondents adhere to the
+randomization procedure. If one or both rates are smaller than 1,
+\code{sysBias} determines whether noncompliant respondents systematically
+choose the nonsensitive category or whether they answer randomly.
 
-\code{SLD} - to generate data according to the stochastic lie detector with the proportion \code{t} of honest carriers, parameters are set to \code{complyRates=c(t,1)} and \code{sysBias=c(0,0)}
+\code{SLD} - to generate data according to the stochastic lie detector with
+the proportion \code{t} of honest carriers, parameters are set to
+\code{complyRates=c(t,1)} and \code{sysBias=c(0,0)}
 
-\code{CDM} - to generate data according to the cheating detection model with the proportion \code{gamma} of cheaters, parameters are set to \code{complyRates=c(1-gamma,1-gamma)} and \code{sysBias=c(0,0)}
+\code{CDM} - to generate data according to the cheating detection model with
+the proportion \code{gamma} of cheaters, parameters are set to
+\code{complyRates=c(1-gamma,1-gamma)} and \code{sysBias=c(0,0)}
 }
 \examples{
 # Generate responses of 1000 people according to Warner's model,
 # every participant complies to the RR procedure
-genData <- RRgen(n=1000, pi.true=.3, model="Warner", p=.7)
+genData <- RRgen(n = 1000, pi.true = .3, model = "Warner", p = .7)
 colMeans(genData)
 
-# use Kuk's model with two decks of cards, 
+# use Kuk's model with two decks of cards,
 # p gives the proportions of red cards for carriers/noncarriers
-genData <- RRgen(n=1000, pi.true=.4, model="Kuk", p=c(.4,.7))
+genData <- RRgen(n = 1000, pi.true = .4, model = "Kuk", p = c(.4, .7))
 colMeans(genData)
 
 # Stochastic Lie Detector (SLD):
 # Only 80\% of carriers answer according to the RR procedure
-genData <- RRgen(n=1000, pi.true=.2, model="SLD", p=c(.2,.8),
-                 complyRates=c(.8,1),sysBias=c(0,0))
+genData <- RRgen(
+  n = 1000, pi.true = .2, model = "SLD", p = c(.2, .8),
+  complyRates = c(.8, 1), sysBias = c(0, 0)
+)
 colMeans(genData)
+
 }
 \seealso{
-see \code{vignette('RRreg')} for a detailed description of the models and \code{\link{RRlog}}, \code{\link{RRlin}} and \code{\link{RRcor}} for the multivariate analysis of RR data
+see \code{vignette('RRreg')} for a detailed description of the
+  models and \code{\link{RRlog}}, \code{\link{RRlin}} and \code{\link{RRcor}}
+  for the multivariate analysis of RR data
 }

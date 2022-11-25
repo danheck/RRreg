@@ -2,6 +2,7 @@
 
 S3method(RRlog,default)
 S3method(RRlog,formula)
+S3method(anova,RRlog)
 S3method(fitted,RRlog)
 S3method(logLik,RRlin)
 S3method(logLik,RRlog)
