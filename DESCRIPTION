@@ -5,12 +5,11 @@ Version: 0.7.5
 Date: 2022-11-25
 Authors@R: c(person("Daniel W.", "Heck", 
                     email = "daniel.heck@uni-marburg.de", 
-                    role = c("aut","cre"), 
+                    role = c("cre", "aut"), 
                     comment = c(ORCID = "0000-0002-6302-9252")),
              person("Morten", "Moshagen",
                     email = "morten.moshagen@uni-ulm.de", 
                     role = "ctb"))
-Maintainer: Daniel W. Heck <daniel.heck@uni-marburg.de>
 Depends:
     R (>= 3.5.0)
 Imports:

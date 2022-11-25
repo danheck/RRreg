@@ -254,9 +254,16 @@ summary(lin3)
 ```
 
 
-Besides the regression output, the function `summary` also provides 'Prevalence estimates for combinations of RR responses'. In our example using two Warner variables, the combination 0:0 indicates the sub-group having neither of both sensitive attributes and shows the corresponding prevalence estimate. Similarly, the combination 0:1 indicates the sub-group having only the second sensitive attribute and so on. Note that the last combination 1:1 is not provided and can be calculated by summing up all other prevalence estimates and substracting this sum from 1.
+Besides the regression coefficients, `RRlin()` also estimates the prevalences for 
+all combinations of RR responses:
 
-To include many RR variables as predictors, very large sample sizes are required for reliable estimation. In such a case, it might be necessary to adjust the optimization parameters `maxit` (maximum number of iterations) and `pibeta` (relative ratio of proability scale for `pi` to regression coefficients `beta`; e.g., choose a smaller value for larger absolute beta values).
+```{r}
+lin3$pi
+```
+
+In our example using two Warner variables, the combination 0:0 indicates the (latent) sub-group having neither of both sensitive attributes and shows the corresponding prevalence estimate. Similarly, the combination 0:1 indicates the sub-group having only the second sensitive attribute and so on. Note that the last combination 1:1 is not provided and can be calculated by summing up all other prevalence estimates and subtracting this sum from 1.
+
+To include many RR variables as predictors, very large sample sizes are required for reliable estimation. In such a case, it might be necessary to adjust the optimization parameters `maxit` (maximum number of iterations) and `pibeta` (relative ratio of probability scale for `pi` to regression coefficients `beta`; e.g., choose a smaller value for larger absolute beta values).
 
 * van den Hout, A., & Kooiman, P. (2006). Estimating the linear regression model with categorical covariates subject to randomized response. *Computational Statistics & Data Analysis, 50*, 3311-3323. 
 
