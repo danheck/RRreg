@@ -117,7 +117,7 @@ Fox, J. A., & Tracy, P. E. (1984). Measuring associations with
 }
 \seealso{
 \code{vignette('RRreg')} or
-  \url{https://www.dwheck.de/separate_content/RRregManual/index.html} for a
+  \url{https://www.dwheck.de/vignettes/RRreg.html} for a
   detailed description of the RR models and the appropriate definition of
   \code{p}
 }

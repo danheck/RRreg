@@ -6,18 +6,23 @@
 \alias{RRreg-package}
 \title{Correlation and Regression Analyses for Randomized Response Designs}
 \description{
-Univariate and multivariate methods for randomized response (RR) survey designs (e.g., Warner, 1965). Univariate estimates of true proportions can be obtained using \code{\link{RRuni}}. RR variables can be used in multivariate analyses for correlations (\code{\link{RRcor}}), as dependent variable in a logistic regression (\code{\link{RRlog}}), or as predictors in a linear regression (\code{\link{RRlin}}). The function \code{\link{RRgen}} generates single RR data sets, whereas \code{\link{RRsimu}} generates and analyzes RR data repeatedly for simulation and bootstrap purposes. An overview of the available RR designs and examples can be found in the package vignette by \code{vignette('RRreg')}.
+Univariate and multivariate methods for randomized response (RR) survey
+designs (e.g., Warner, 1965). Univariate estimates of true proportions can be
+obtained using \code{\link{RRuni}}. RR variables can be used in multivariate
+analyses for correlations (\code{\link{RRcor}}), as dependent variable in a
+logistic regression (\code{\link{RRlog}}), or as predictors in a linear
+regression (\code{\link{RRlin}}). The function \code{\link{RRgen}} generates
+single RR data sets, whereas \code{\link{RRsimu}} generates and analyzes RR
+data repeatedly for simulation and bootstrap purposes. An overview of the
+available RR designs and examples can be found in the package vignette by
+\code{vignette('RRreg')}.
 }
 \details{
-\tabular{ll}{
-Package: \tab RRreg\cr
-Type: \tab Package\cr
-Depends: \tab R (>= 3.0.0)\cr
-Imports: \tab parallel, doParallel, foreach, stats, grDevices, graphics, lme4\cr
-Suggests: \tab knitr\cr
-License: \tab GPL-2\cr
-URL: \tab \url{https://www.sowi.uni-mannheim.de/en/erdfelder/research/software/rrreg/}\cr
-}
+In case of issues or questions, please refer to the GitHub repository: 
+\url{https://github.com/danheck/RRreg}
+
+An introduction with examples is available via \code{vignette("RRreg")} or 
+at the website: \url{https://www.dwheck.de/vignettes/RRreg.html}
 }
 \section{Citation}{
 
@@ -25,7 +30,7 @@ If you use \code{RRreg} in publications, please cite the package as follows:
 
 Heck, D. W., & Moshagen, M. (2018).
 RRreg: An R package for correlation and regression analyses of randomized response data.
-\emph{Journal of Statistical Software. 85 (2)}, 1-29. doi: 10.18637/jss.v085.i02
+\emph{Journal of Statistical Software. 85 (2)}, 1-29. \doi{10.18637/jss.v085.i02}
 }
 
 \references{
@@ -40,6 +45,6 @@ Useful links:
 
 }
 \author{
-Daniel W. Heck \email{daniel.heck@uni-marburg.de} and Morten Moshagen \email{morten.moshagen@uni-ulm.de}
+Daniel W. Heck \email{daniel.heck@uni-marburg.de}
 }
 \keyword{package}

@@ -18,9 +18,12 @@ The following variables are included:
 \itemize{
   \item \code{age} in years
   \item \code{leftRight} political left-right orientation on a scale from -5 to 5
-  \item \code{rrt} response to RR question (SLD with randomization probabilities \code{p=c(2/12,10/12)})
-  \item \code{condition} group membership in SLD (either randomization probability \code{p[1]} or \code{p[2]})
-  \item \code{RRdesign} whether the respondent answered to the RR question (RRdesign=1) or to the direct question (RRdesign=-1)
+  \item \code{rrt} response to RR question (SLD with randomization probabilities 
+     \code{p=c(2/12,10/12)})
+  \item \code{condition} group membership in SLD (either randomization probability 
+     \code{p[1]} or \code{p[2]})
+  \item \code{RRdesign} whether the respondent answered to the RR question 
+     (RRdesign=1) or to the direct question (RRdesign=-1)
   \item \code{leftRight.c} zero-centered political left-right orientation
   \item \code{age.c} zero-centered age
 }

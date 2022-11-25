@@ -74,7 +74,7 @@
 #' @return an \code{RRuni} object, can by analyzed by using \code{\link{summary}}
 #' 
 #' @seealso \code{vignette('RRreg')} or 
-#' \url{https://www.dwheck.de/separate_content/RRregManual/index.html} for a 
+#' \url{https://www.dwheck.de/vignettes/RRreg.html} for a 
 #' detailed description of the RR models and the appropriate definition of \code{p}
 #' 
 #' @examples
