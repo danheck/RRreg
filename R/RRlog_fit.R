@@ -1,6 +1,6 @@
 
 # estimation function for RRlog
-RRlog.fit <- function(
+RRlog_fit <- function(
     model,
     x,
     y,
@@ -29,7 +29,7 @@ RRlog.fit <- function(
   try(
     {
       est <- optim(
-        par = start, fn = RRlog.loglik,
+        par = start, fn = RRlog_loglik,
         method = "L-BFGS-B",
         lower = low, upper = up,
         control = list(fnscale = -1, maxit = maxit), hessian = TRUE,
@@ -63,7 +63,7 @@ RRlog.fit <- function(
 
 
 # general loglik for RRlog
-RRlog.loglik <- function(param,
+RRlog_loglik <- function(param,
                          X,
                          y,
                          model,

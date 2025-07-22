@@ -224,7 +224,7 @@ RRlog.default <- function(
     }
     
     ####################### optim estimation of full likelihood
-    try(est2 <- RRlog.fit(model, x, y, n.response, p, start, group, maxit = optim.max))
+    try(est2 <- RRlog_fit(model, x, y, n.response, p, start, group, maxit = optim.max))
     
     if (!is.na(est2$logLik) && est2$logLik > est$logLik) {
       est <- est2
@@ -270,7 +270,7 @@ RRlog.default <- function(
         xx <- x[, -i, drop = FALSE]
         # xx[,i] <- rep(0,length(y))
         try({
-          est.res <- RRlog.fit(model, xx, y, n.response, p, start[-i],
+          est.res <- RRlog_fit(model, xx, y, n.response, p, start[-i],
                                group,
                                setPar2 = -1, maxit = optim.max
           )
@@ -279,7 +279,7 @@ RRlog.default <- function(
           deltaLogLik[i] <- est.res$logLik - est$logLik
           chi2_wald <- est$coef[i]^2 / est$vcov[i, i]
           if (abs(deltaLogLik[i] - chi2_wald) > 1) {
-            est.res2 <- RRlog.fit(model, xx, y, n.response, p, start[-i] * .2,
+            est.res2 <- RRlog_fit(model, xx, y, n.response, p, start[-i] * .2,
                                   group,
                                   setPar2 = -1, maxit = optim.max
             )
@@ -292,14 +292,14 @@ RRlog.default <- function(
       # multi group models: additional parameter
       if (is2group(model)) {
         par2fix <- fix.par2(model)
-        try(est.res <- RRlog.fit(model, x, y, n.response, p, start[1:ncol(x)],
+        try(est.res <- RRlog_fit(model, x, y, n.response, p, start[1:ncol(x)],
                                  group,
                                  setPar2 = par2fix, maxit = optim.max
         ))
         cnt <- 0
         while (is.na(est.res$logLik) && cnt < 5) {
           cnt <- cnt + 1
-          try(est.res <- RRlog.fit(model, x, y, n.response, p, rnorm(ncol(x), 0, .2),
+          try(est.res <- RRlog_fit(model, x, y, n.response, p, rnorm(ncol(x), 0, .2),
                                    group,
                                    setPar2 = par2fix, maxit = optim.max
           ))

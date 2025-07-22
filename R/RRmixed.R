@@ -1,10 +1,10 @@
 #' Mixed Effects Logistic Regression for RR Data
 #'
-#' Uses the package \code{\link{lme4}} to fit a generalized linear mixed model
+#' Uses the package \code{\link[lme4]{lme4}} to fit a generalized linear mixed model
 #' (GLMM) with an adjusted link funciton.
 #'
 #' @param formula two-sided formula including random and fixed effects (see
-#'   below or \code{\link{glmer}} for details)
+#'   below or \code{\link[lme4]{glmer}} for details)
 #' @param data an optional data frame with variables named in formula
 #' @param model type of RR design. Only 1-group RR designs are supported at the
 #'   moment (i.e., \code{"Warner"}, \code{"FR"}, \code{"UQTknown"},
@@ -21,7 +21,7 @@
 #'   \code{glmer}, which might help in case of convergence issues for some
 #'   models. \code{\link[lme4]{lmerControl}} settings are changed to
 #'   \code{nAGQ0initStep = FALSE} and \code{optimizer = "bobyqa"}.
-#' @param ... further arguments passed to \code{\link{glmer}}
+#' @param ... further arguments passed to \code{\link[lme4]{glmer}}
 #'
 #' @details Some examples for formula: 
 #' \itemize{ 

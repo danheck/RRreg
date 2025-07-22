@@ -1,8 +1,8 @@
 Package: RRreg
 Type: Package
 Title: Correlation and Regression Analyses for Randomized Response Data
-Version: 0.7.5
-Date: 2022-11-25
+Version: 0.7.6
+Date: 2025-07-22
 Authors@R: c(person("Daniel W.", "Heck", 
                     email = "daniel.heck@uni-marburg.de", 
                     role = c("cre", "aut"), 
@@ -11,7 +11,7 @@ Authors@R: c(person("Daniel W.", "Heck",
                     email = "morten.moshagen@uni-ulm.de", 
                     role = "ctb"))
 Depends:
-    R (>= 3.5.0)
+    R (>= 4.0.0)
 Imports:
     parallel,
     doParallel,
@@ -48,4 +48,4 @@ URL: https://github.com/danheck/RRreg
 VignetteBuilder: 
     knitr, 
     R.rsp
-RoxygenNote: 7.2.2
+RoxygenNote: 7.3.2

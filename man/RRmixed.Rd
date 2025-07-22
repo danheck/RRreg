@@ -8,7 +8,7 @@ RRmixed(formula, data, model, p, const = 1e-04, adjust_control = FALSE, ...)
 }
 \arguments{
 \item{formula}{two-sided formula including random and fixed effects (see
-below or \code{\link{glmer}} for details)}
+below or \code{\link[lme4]{glmer}} for details)}
 
 \item{data}{an optional data frame with variables named in formula}
 
@@ -31,13 +31,13 @@ larger than the respective boundaries (plus/minus a constant defined via
 models. \code{\link[lme4]{lmerControl}} settings are changed to
 \code{nAGQ0initStep = FALSE} and \code{optimizer = "bobyqa"}.}
 
-\item{...}{further arguments passed to \code{\link{glmer}}}
+\item{...}{further arguments passed to \code{\link[lme4]{glmer}}}
 }
 \value{
 an object of class \code{glmerMod}
 }
 \description{
-Uses the package \code{\link{lme4}} to fit a generalized linear mixed model
+Uses the package \code{\link[lme4]{lme4}} to fit a generalized linear mixed model
 (GLMM) with an adjusted link funciton.
 }
 \details{
