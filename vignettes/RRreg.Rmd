@@ -18,6 +18,8 @@ Contact: <daniel.heck@uni-marburg.de>
 
 # Introduction
 
+<img src="../man/figures/RRreg.png" width="200" style="float: right;  border: 0px">
+
 The randomized response (RR) design was developed by Warner (1965) to allow for complete anonymity of the respondents in surveys and thus to reduce effects of social desirability. In general, some kind of random noise (e.g., throwing a pair of dices) is added to the true response. Whereas the prevalence of a sensitive attribute (by convention termed $\pi$) can still be estimated at the group level, an individual response does not disclose the true state of the respondent. Accordingly, RR data require adapted models and formulas for multivariate analysis, implemented in the package `RRreg`.
 
 The main functions provide the following functionality and are explained in more detail in Section 2:

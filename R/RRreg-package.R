@@ -1,5 +1,8 @@
 #' Correlation and Regression Analyses for Randomized Response Designs
-#'
+
+#' @description{
+#' \if{html}{\figure{RRreg.png}{options: width=150 alt ="RRreg logo" style='float: right'}}
+#' \if{latex}{\figure{RRreg.png}{options: width=0.5in}}
 #' Univariate and multivariate methods for randomized response (RR) survey
 #' designs (e.g., Warner, 1965). Univariate estimates of true proportions can be
 #' obtained using \code{\link{RRuni}}. RR variables can be used in multivariate
@@ -10,6 +13,7 @@
 #' data repeatedly for simulation and bootstrap purposes. An overview of the
 #' available RR designs and examples can be found in the package vignette by
 #' \code{vignette('RRreg')}.
+#' }
 #' 
 #' @details
 #' In case of issues or questions, please refer to the GitHub repository: 

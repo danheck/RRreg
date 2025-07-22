@@ -22,7 +22,7 @@ To get the most recent version, `RRreg` can also directly be installed from GitH
 devtools::install_github("danheck/RRreg")
 ```
 
-The manual is available within R by typing `vignette('RRreg')`.
+The vignette is available within R by typing `vignette('RRreg')` or at https://dwheck.de/vignettes/RRreg.html.
 
 ### Citation
 
